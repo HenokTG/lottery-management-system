@@ -1,4 +1,4 @@
-const axios = require('axios').default;
+import axios from 'axios';
 
 const baseURL = 'https://hslms-dev-api-dot-duruj-351315.uc.r.appspot.com/api/v1/';
 
