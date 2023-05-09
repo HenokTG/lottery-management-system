@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 import PerfectScrollbar from 'react-perfect-scrollbar';
+import { format } from 'date-fns';
 // @mui
 import {
   Box,
@@ -24,7 +25,7 @@ import {
 import { styled } from '@mui/material/styles';
 // context and modules
 import { useGlobalContext } from '../../context';
-import { paymentDistributionsFetch } from '../../_apiAxios/payment-report';
+import { onlineBettingsFetch } from '../../_apiAxios/report';
 // icons
 import { Search as SearchIcon } from '../../icons/search';
 import { Download as DownloadIcon } from '../../icons/download';
@@ -40,7 +41,6 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
     fontSize: 14,
   },
 }));
-
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   '&:nth-of-type(odd)': {
     backgroundColor: theme.palette.action.hover,
@@ -50,8 +50,9 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
     border: 0,
   },
 }));
-// ---------------------------------------------------------------------------------
-export const PaymentDistributionResults = () => {
+// ---------------------------------------------------------------------
+
+export const OnlineBettingResults = () => {
   const { loggedIn } = useGlobalContext();
 
   const prevLocation = useLocation();
@@ -61,7 +62,7 @@ export const PaymentDistributionResults = () => {
 
   const [limit, setLimit] = useState(25);
   const [page, setPage] = useState(0);
-  const [paymentDistributionsList, setPaymentDistributionsList] = useState([]);
+  const [bettingTransactionsList, setBettingTransactionsList] = useState([]);
   const [paginationProps, setPaginationProps] = useState(null);
 
   const countAll = paginationProps !== null ? paginationProps.per_page * paginationProps.total_pages : -1;
@@ -74,9 +75,9 @@ export const PaymentDistributionResults = () => {
         navigate(`/login?redirectTo=${prevLocation.pathname}`);
       }
 
-      const fetchAPI = `transaction/bonus?page=${page + 1}&per_page=${limit}`; // this needs to be changed
+      const fetchAPI = `ticket/online-ticket?page=${page + 1}&per_page=${limit}`;
 
-      paymentDistributionsFetch(fetchAPI, setLoading, setPaymentDistributionsList, setPaginationProps);
+      onlineBettingsFetch(fetchAPI, setLoading, setBettingTransactionsList, setPaginationProps);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [limit, page]
@@ -92,16 +93,16 @@ export const PaymentDistributionResults = () => {
 
   const searchAction = (e) => {
     setSearchQuery(e.target.value);
-    const searchKey = 'description';
+    const searchKey = 'operator';
     const searchValue = e.target.value;
-    const fetchAPI = `transaction/bonus?page=${
+    const fetchAPI = `ticket/online-ticket?page=${
       page + 1
     }&per_page=${limit}&search_by=${searchKey}&search_term=${searchValue}`;
 
-    paymentDistributionsFetch(fetchAPI, setLoading, setPaymentDistributionsList, setPaginationProps);
+    onlineBettingsFetch(fetchAPI, setLoading, setBettingTransactionsList, setPaginationProps);
   };
 
-  const isDataNotFound = paymentDistributionsList.length === 0;
+  const isDataNotFound = bettingTransactionsList.length === 0;
 
   return (
     <Card>
@@ -126,7 +127,7 @@ export const PaymentDistributionResults = () => {
                         </InputAdornment>
                       ),
                     }}
-                    placeholder="Search payment distribution"
+                    placeholder="Search betting transaction"
                     variant="outlined"
                     color="success"
                     onChange={searchAction}
@@ -147,27 +148,42 @@ export const PaymentDistributionResults = () => {
               <Table size="small">
                 <TableHead sx={{ py: 2 }}>
                   <TableRow>
+                    <StyledTableCell align="center">Player Id</StyledTableCell>
+                    <StyledTableCell align="center">Game Name</StyledTableCell>
+                    <StyledTableCell align="center">Licence Catagory</StyledTableCell>
                     <StyledTableCell align="center">Operator Name</StyledTableCell>
-                    <StyledTableCell align="center">Company Name</StyledTableCell>
-                    <StyledTableCell align="center">Cash</StyledTableCell>
-                    <StyledTableCell align="center">Babk</StyledTableCell>
-                    <StyledTableCell align="center">Wallet</StyledTableCell>
+                    <StyledTableCell align="center">Transaction ID</StyledTableCell>
+                    <StyledTableCell align="center">Payment Method</StyledTableCell>
+                    <StyledTableCell align="center">Currency Code</StyledTableCell>
+                    <StyledTableCell align="center">Transaction Amount</StyledTableCell>
+                    <StyledTableCell align="center">Transaction Type</StyledTableCell>
+                    <StyledTableCell align="center">Winning Amount</StyledTableCell>
+                    <StyledTableCell align="center">Refund Amount</StyledTableCell>
+                    <StyledTableCell align="center">Date & Time</StyledTableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {paymentDistributionsList.map((paymentDistribution) => (
-                    <StyledTableRow hover key={paymentDistribution.id}>
-                      <TableCell>{paymentDistribution.operatorName}</TableCell>
-                      <TableCell>{paymentDistribution.comName}</TableCell>
-
+                  {bettingTransactionsList.map((bettingTransaction) => (
+                    <StyledTableRow hover key={bettingTransaction.id}>
+                      <TableCell>{bettingTransaction.playerID}</TableCell>
+                      <TableCell>{bettingTransaction.gameName}</TableCell>
+                      <TableCell>{bettingTransaction.licenceCatagory}</TableCell>
+                      <TableCell>{bettingTransaction.operatorName}</TableCell>
+                      <TableCell>{bettingTransaction.transactionID}</TableCell>
+                      <TableCell>{bettingTransaction.paymentMethod}</TableCell>
+                      <TableCell>{bettingTransaction.currency}</TableCell>
                       <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
-                        {paymentDistribution.cash}
+                        {bettingTransaction.amount}
+                      </TableCell>
+                      <TableCell>{bettingTransaction.status}</TableCell>
+                      <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
+                        {bettingTransaction.winAmount}
                       </TableCell>
                       <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
-                        {paymentDistribution.bank}
+                        {bettingTransaction.refundAmount}
                       </TableCell>
-                      <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
-                        {paymentDistribution.wallet}
+                      <TableCell align="right">
+                        {format(bettingTransaction.createdAt, 'yyyy-MM-dd HH:MM:SS z')}
                       </TableCell>
                     </StyledTableRow>
                   ))}
@@ -175,7 +191,7 @@ export const PaymentDistributionResults = () => {
                 {isDataNotFound && (
                   <TableBody>
                     <TableRow>
-                      <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
+                      <TableCell align="center" colSpan={12} sx={{ py: 3 }}>
                         <Box>
                           <Typography gutterBottom align="center" variant="subtitle1" color="error.main">
                             No data fetched!

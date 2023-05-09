@@ -1,3 +1,5 @@
+import axios from 'axios';
+
 import { useNavigate, useLocation } from 'react-router-dom';
 
 import { useFormik } from 'formik';
@@ -36,8 +38,10 @@ const Login = () => {
         password: values.password,
       };
 
-      axiosInstance
-        .post(`auth/login`, postData)
+      const baseURL = 'https://hslms-dev-api-dot-duruj-351315.uc.r.appspot.com/api/v1/';
+
+      axios
+        .post(`${baseURL}auth/login`, postData)
         .then((res) => {
           localStorage.setItem('access_token', res.data.access_token);
           localStorage.setItem('refresh_token', res.data.refresh_token);

@@ -31,7 +31,7 @@ export const revenuesFetch = (fetchAPI, setLoading, setRevenuesList, setPaginati
     });
 };
 
-export const bettingTransactionsFetch = (fetchAPI, setLoading, setBettingTransactionsList, setPaginationProps) => {
+export const offlineBettingsFetch = (fetchAPI, setLoading, setBettingTransactionsList, setPaginationProps) => {
   axiosInstance
     .get(fetchAPI)
     .then((res) => {
@@ -40,16 +40,53 @@ export const bettingTransactionsFetch = (fetchAPI, setLoading, setBettingTransac
       setPaginationProps(res.data.pagination);
       const BETTINGTRANSACTIONS = res.data.data.map((bettingTnx) => {
         return {
-          id: uuid(),
-          gameName: bettingTnx.game,
-          licenceCatagory: '-',
-          operatorName: bettingTnx.operator,
+          id: bettingTnx.id,
+          playerID: `${bettingTnx.operator_reference_number}: ${bettingTnx.branch_id}`,
+          gameName: bettingTnx.game.name,
+          licenceCatagory: bettingTnx.game.license.name,
+          operatorName: bettingTnx.operator.name,
           transactionID: bettingTnx.reference_number,
+          paymentMethod: bettingTnx.payment_method,
+          currency: bettingTnx.currency.code,
           amount: bettingTnx.stake,
-          transType: bettingTnx.status,
+          status: bettingTnx.status,
           winAmount: bettingTnx.estimated_payout,
           refundAmount: '$ -',
-          createdAt: new Date(bettingTnx.created_at),
+          createdAt: new Date(bettingTnx.bet_timestamp),
+        };
+      });
+      setLoading(false);
+      setBettingTransactionsList(BETTINGTRANSACTIONS);
+    })
+    .catch((error) => {
+      console.log(error);
+      setLoading(false);
+      setBettingTransactionsList([]);
+    });
+};
+
+export const onlineBettingsFetch = (fetchAPI, setLoading, setBettingTransactionsList, setPaginationProps) => {
+  axiosInstance
+    .get(fetchAPI)
+    .then((res) => {
+      console.log(res.data);
+
+      setPaginationProps(res.data.pagination);
+      const BETTINGTRANSACTIONS = res.data.data.map((bettingTnx) => {
+        return {
+          id: bettingTnx.id,
+          playerID: `${bettingTnx.operator_reference_number}: ${bettingTnx.player_id}`,
+          gameName: bettingTnx.game.name,
+          licenceCatagory: bettingTnx.game.license.name,
+          operatorName: bettingTnx.operator.name,
+          transactionID: bettingTnx.reference_number,
+          paymentMethod: bettingTnx.payment_method,
+          currency: bettingTnx.currency.code,
+          amount: bettingTnx.stake,
+          status: bettingTnx.status,
+          winAmount: bettingTnx.estimated_payout,
+          refundAmount: '$ -',
+          createdAt: new Date(bettingTnx.bet_timestamp),
         };
       });
       setLoading(false);
@@ -100,11 +137,15 @@ export const operatorsWalletFetch = (fetchAPI, setLoading, setOperatorsWalletLis
       const OPERATORSWALLET = res.data.data.map((operWall) => {
         return {
           id: uuid(),
+          playerID: operWall.player_id,
           operatorName: operWall.operator.name,
           comName: operWall.operator.company_name,
-          wallet: operWall.current_balance,
-          credit: operWall.closing_balance,
-          debit: operWall.opening_balance,
+          currency: operWall.currency.code,
+          currentBalance: operWall.current_balance,
+          debit: operWall.debit_amount,
+          credit: operWall.credit_amount,
+          closingBalance: operWall.closing_balance,
+          openningBalance: operWall.opening_balance,
         };
       });
       setLoading(false);

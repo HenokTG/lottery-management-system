@@ -11,21 +11,19 @@ import { Box, Button, Card, Divider, Grid, TextField, Typography, MenuItem } fro
 import { useTheme } from '@mui/material/styles';
 // context and modules
 import { axiosInstance } from '../../utils/axios';
-import { fetchRoleIDs, fetchOperatorIDs } from '../../_apiAxios/managementCreateFetches';
+import { fetchRoleIDs } from '../../_apiAxios/modelCreateFetches';
 
 export const CreateUser = ({ setModalKey }) => {
   const theme = useTheme();
   const navigate = useNavigate();
 
   const [roleIDs, setRoleIDs] = useState([{ id: -1, roleName: 'No role to assign' }]);
-  const [operatorIDs, setOperatorIDs] = useState([{ id: -1, operatorName: 'No role to assign' }]);
 
   useEffect(
     () => {
       const roleFetchAPI = `role?page=${1}&per_page=${25}`;
 
       fetchRoleIDs(roleFetchAPI, setRoleIDs);
-      fetchOperatorIDs(roleFetchAPI, setOperatorIDs);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
@@ -55,7 +53,7 @@ export const CreateUser = ({ setModalKey }) => {
         email: values.email,
         phone: values.phoneNumber,
         role: values.userRole,
-        operator: values.operator,
+        // operator: values.operator,
         password: '12345678',
         is_active: true,
       };
@@ -177,8 +175,9 @@ export const CreateUser = ({ setModalKey }) => {
                   pb: 2,
                 }}
               >
-                Select the User Role and Assigned Operator
+                Select the User Role
               </Typography>
+              {/* and Assigned Operator  */}
             </Box>
             <Grid container spacing={2} sx={{ px: 15 }}>
               <Grid item md={6}>
@@ -198,27 +197,6 @@ export const CreateUser = ({ setModalKey }) => {
                   {roleIDs.map((roleId) => (
                     <MenuItem key={`${roleId.id}-${roleId.roleName}`} value={roleId.id}>
                       {roleId.roleName}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              </Grid>
-              <Grid item md={6}>
-                <TextField
-                  error={Boolean(formik.touched.operator && formik.errors.operator)}
-                  fullWidth
-                  helperText={formik.touched.operator && formik.errors.operator}
-                  label="Operator"
-                  name="operator"
-                  onBlur={formik.handleBlur}
-                  onChange={formik.handleChange}
-                  type="text"
-                  color="success"
-                  value={formik.values.operator}
-                  select
-                >
-                  {operatorIDs.map((operatorId) => (
-                    <MenuItem key={`${operatorId.id}-${operatorId.operatorName}`} value={operatorId.id}>
-                      {operatorId.operatorName}
                     </MenuItem>
                   ))}
                 </TextField>

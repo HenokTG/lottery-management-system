@@ -1,16 +1,6 @@
-import PropTypes from "prop-types";
+import PropTypes from 'prop-types';
 
-import {
-  Avatar,
-  Card,
-  CardContent,
-  Stack,
-  SvgIcon,
-  Typography,
-  TextField,
-  MenuItem,
-  useTheme,
-} from "@mui/material";
+import { Avatar, Card, CardContent, Stack, SvgIcon, Typography, TextField, MenuItem, useTheme } from '@mui/material';
 
 export const OverviewTotals = (props) => {
   const { value, title, icon, iconBg } = props;
@@ -37,27 +27,6 @@ export const OverviewTotals = (props) => {
           >
             <SvgIcon>{icon}</SvgIcon>
           </Avatar>
-        </Stack>
-        <Stack sx={{ mt: 3 }}>
-          <TextField
-            fullWidth
-            name="range"
-            type="text"
-            color={iconBg}
-            InputProps={{
-              style: {
-                border: `1px solid ${theme.palette[`${iconBg}`].main}`,
-                color: theme.palette[`${iconBg}`].main,
-              },
-            }}
-            defaultValue={7}
-            size="small"
-            select
-          >
-            <MenuItem value={7}>7 Days</MenuItem>
-            <MenuItem value={30}>30 Days</MenuItem>
-            <MenuItem value={1}>a Year</MenuItem>
-          </TextField>
         </Stack>
       </CardContent>
     </Card>

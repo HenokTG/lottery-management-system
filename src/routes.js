@@ -16,9 +16,23 @@ import {
   Page404,
 } from './pages';
 
-import { RevenueReport, BettingTransactionsReport, WinningTicketReport, OperatorWalletReport } from './pages/report';
+import {
+  RevenueReport,
+  OnlineBettingTransactionsReport,
+  OfflineBettingTransactionsReport,
+  WinningTicketReport,
+  OperatorWalletReport,
+} from './pages/report';
 import { PaymentDistributionReport, PaymentTransactionsReport, BonusTransactionsReport } from './pages/payment-report';
-import { AppSettings, ManagePaymentMethod } from './pages/app-settings';
+import {
+  AppSettings,
+  ManagePaymentMethod,
+  ManageCurrency,
+  ManageOperatorApps,
+  ManageRegionalLocations,
+  ManageCountryLocations,
+  ManageSystemModules,
+} from './pages/app-settings';
 import { RoleManagnment, UserManagnment } from './pages/management';
 
 // ----------------------------------------------------------------------
@@ -37,7 +51,8 @@ export default function Router() {
           path: 'report/',
           children: [
             { path: 'revenue', element: <RevenueReport /> },
-            { path: 'betting-transactions', element: <BettingTransactionsReport /> },
+            { path: 'online-betting-transactions', element: <OnlineBettingTransactionsReport /> },
+            { path: 'offline-betting-transactions', element: <OfflineBettingTransactionsReport /> },
             { path: 'winning-ticket', element: <WinningTicketReport /> },
             { path: 'operator-wallet', element: <OperatorWalletReport /> },
           ],
@@ -67,6 +82,26 @@ export default function Router() {
             {
               path: 'payment-method',
               element: <ManagePaymentMethod />,
+            },
+            {
+              path: 'currency',
+              element: <ManageCurrency />,
+            },
+            {
+              path: 'system-modules',
+              element: <ManageSystemModules />,
+            },
+            {
+              path: 'operator-apps',
+              element: <ManageOperatorApps />,
+            },
+            {
+              path: 'country-locations',
+              element: <ManageCountryLocations />,
+            },
+            {
+              path: 'regional-locations',
+              element: <ManageRegionalLocations />,
             },
           ],
         },

@@ -19,24 +19,29 @@ axiosInstance.interceptors.response.use(
     const originalRequest = error.config;
 
     if (typeof error.response === 'undefined') {
-      alert(
-        `A server/network error occurred. '
-          'Looks like CORS might be the problem. '
-          'Sorry about this - we will get it fixed shortly.`
-      );
+      // alert(`A server error occurred. Sorry about this - we will get it fixed shortly.`);
+
+      window.location.reload();
       return Promise.reject(error);
     }
 
     if (error.response.status === 401 && originalRequest.url === `${baseURL}auth/refresh`) {
-      window.location.href = '/login';
+      console.log('auth-refresh', error);
+      localStorage.removeItem('refresh_token');
+
+      const prevLocation = window.location;
+      window.location.href = `/login?redirectTo=${prevLocation.pathname}`;
       return Promise.reject(error);
     }
 
     if (
       error.response.data.code === 'token_not_valid' &&
       error.response.status === 401 &&
-      (error.response.statusText === 'Unauthorized' || error.response.statusText === '')
+      error.response.statusText === 'Unauthorized'
     ) {
+      console.log('auth-access', error);
+
+      localStorage.removeItem('access_token');
       const refreshToken = localStorage.getItem('refresh_token');
 
       if (refreshToken) {
@@ -44,11 +49,12 @@ axiosInstance.interceptors.response.use(
 
         // exp date in token is expressed in seconds, while now() returns milliseconds:
         const now = Math.ceil(Date.now() / 1000);
-        console.log(tokenParts.exp > now);
 
         if (tokenParts.exp > now) {
-          axiosInstance
-            .post('auth/refresh', { refresh_token: refreshToken })
+          const postData = { refresh_token: refreshToken };
+
+          return axios
+            .post(`${baseURL}auth/refresh/`, postData)
             .then((response) => {
               localStorage.setItem('access_token', response.data.access_token);
               localStorage.setItem('refresh_token', response.data.refresh_token);
@@ -62,12 +68,13 @@ axiosInstance.interceptors.response.use(
               console.log(err);
             });
         }
-
-        console.log('Refresh token is expired', tokenParts.exp, now);
-        window.location.href = '/login';
+        console.log('Refresh token expired.', tokenParts.exp < now);
+        const prevLocation = window.location;
+        window.location.href = `/login?redirectTo=${prevLocation.pathname}`;
       }
       console.log('Refresh token not available.');
-      window.location.href = '/login';
+      const prevLocation = window.location;
+      window.location.href = `/login?redirectTo=${prevLocation.pathname}`;
     }
 
     // specific error handling done elsewhere

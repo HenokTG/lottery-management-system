@@ -49,7 +49,8 @@ const items = [
     title: 'Report',
     children: [
       { href: '/app/report/revenue', title: 'Revenue' },
-      { href: '/app/report/betting-transactions', title: 'Betting Transactions' },
+      { href: '/app/report/online-betting-transactions', title: 'Online Betting' },
+      { href: '/app/report/offline-betting-transactions', title: 'Offline Betting' },
       {
         href: '/app/report/winning-ticket',
         title: 'Winning Ticket',
@@ -74,21 +75,6 @@ const items = [
     ],
   },
   {
-    href: '/app/app-settings',
-    icon: <CogIcon fontSize="small" />,
-    title: 'App Settings',
-    children: [
-      {
-        href: '/app/app-settings/general',
-        title: 'General',
-      },
-      {
-        href: '/app/app-settings/payment-method',
-        title: 'Payment Methods',
-      },
-    ],
-  },
-  {
     href: '/app/management',
     icon: <UserIcon fontSize="small" />,
     title: 'Management',
@@ -103,6 +89,42 @@ const items = [
       },
     ],
   },
+  {
+    href: '/app/app-settings',
+    icon: <CogIcon fontSize="small" />,
+    title: 'App Settings',
+    children: [
+      {
+        href: '/app/app-settings/general',
+        title: 'General',
+      },
+      {
+        href: '/app/app-settings/system-modules',
+        title: 'System Modules',
+      },
+      {
+        href: '/app/app-settings/operator-apps',
+        title: 'Operator Apps',
+      },
+      {
+        href: '/app/app-settings/payment-method',
+        title: 'Payment Methods',
+      },
+      {
+        href: '/app/app-settings/currency',
+        title: 'Currency Settings',
+      },
+      {
+        href: '/app/app-settings/country-locations',
+        title: 'Locations: Country',
+      },
+      {
+        href: '/app/app-settings/regional-locations',
+        title: 'Locations: Regions',
+      },
+    ],
+  },
+
   {
     href: '/app/activity-logs',
     icon: <Log fontSize="small" />,

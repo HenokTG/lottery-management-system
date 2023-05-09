@@ -3,9 +3,9 @@ import { Container, Box, Typography } from '@mui/material';
 
 // components
 import Page from '../../components/Page';
-import { BettingTransactionsResults } from '../../components/report/betting-transactions';
+import { OfflineBettingResults } from '../../components/report/offline-bettings-list';
 
-const BettingTransactionsReport = () => (
+const OfflineBettingTransactionsReport = () => (
   <Page title="Betting Transactions Report">
     <Box
       component="main"
@@ -17,16 +17,16 @@ const BettingTransactionsReport = () => (
       <Container maxWidth={false}>
         <Box>
           <Typography sx={{ m: 1, mb: 4 }} variant="h4">
-            Betting Transactions Report
+            Offline Betting Transactions Report
           </Typography>
         </Box>
 
         <Box sx={{ mt: 1 }}>
-          <BettingTransactionsResults />
+          <OfflineBettingResults />
         </Box>
       </Container>
     </Box>
   </Page>
 );
 
-export default BettingTransactionsReport;
+export default OfflineBettingTransactionsReport;

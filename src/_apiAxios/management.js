@@ -72,6 +72,7 @@ export const fetchRoles = (fetchAPI, setLoading, setRolesList, setPaginationProp
           },
           status: role.is_active ? 'Active' : 'Inactive',
           noUsers: role.no_users,
+          createdBy: role.created_by,
           createdAt: new Date(role.created_at),
           updatedAt: new Date(role.updated_at),
         };

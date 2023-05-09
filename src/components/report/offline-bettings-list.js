@@ -25,7 +25,7 @@ import {
 import { styled } from '@mui/material/styles';
 // context and modules
 import { useGlobalContext } from '../../context';
-import { bettingTransactionsFetch } from '../../_apiAxios/report';
+import { offlineBettingsFetch } from '../../_apiAxios/report';
 // icons
 import { Search as SearchIcon } from '../../icons/search';
 import { Download as DownloadIcon } from '../../icons/download';
@@ -52,7 +52,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 }));
 // ---------------------------------------------------------------------
 
-export const BettingTransactionsResults = () => {
+export const OfflineBettingResults = () => {
   const { loggedIn } = useGlobalContext();
 
   const prevLocation = useLocation();
@@ -75,9 +75,9 @@ export const BettingTransactionsResults = () => {
         navigate(`/login?redirectTo=${prevLocation.pathname}`);
       }
 
-      const fetchAPI = `online-ticket?page=${page + 1}&per_page=${limit}`;
+      const fetchAPI = `ticket/offline-ticket?page=${page + 1}&per_page=${limit}`;
 
-      bettingTransactionsFetch(fetchAPI, setLoading, setBettingTransactionsList, setPaginationProps);
+      offlineBettingsFetch(fetchAPI, setLoading, setBettingTransactionsList, setPaginationProps);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [limit, page]
@@ -95,11 +95,11 @@ export const BettingTransactionsResults = () => {
     setSearchQuery(e.target.value);
     const searchKey = 'operator';
     const searchValue = e.target.value;
-    const fetchAPI = `online-ticket?page=${
+    const fetchAPI = `ticket/offline-ticket?page=${
       page + 1
     }&per_page=${limit}&search_by=${searchKey}&search_term=${searchValue}`;
 
-    bettingTransactionsFetch(fetchAPI, setLoading, setBettingTransactionsList, setPaginationProps);
+    offlineBettingsFetch(fetchAPI, setLoading, setBettingTransactionsList, setPaginationProps);
   };
 
   const isDataNotFound = bettingTransactionsList.length === 0;
@@ -148,10 +148,13 @@ export const BettingTransactionsResults = () => {
               <Table size="small">
                 <TableHead sx={{ py: 2 }}>
                   <TableRow>
+                    <StyledTableCell align="center">Player Id</StyledTableCell>
                     <StyledTableCell align="center">Game Name</StyledTableCell>
                     <StyledTableCell align="center">Licence Catagory</StyledTableCell>
                     <StyledTableCell align="center">Operator Name</StyledTableCell>
                     <StyledTableCell align="center">Transaction ID</StyledTableCell>
+                    <StyledTableCell align="center">Payment Method</StyledTableCell>
+                    <StyledTableCell align="center">Currency Code</StyledTableCell>
                     <StyledTableCell align="center">Transaction Amount</StyledTableCell>
                     <StyledTableCell align="center">Transaction Type</StyledTableCell>
                     <StyledTableCell align="center">Winning Amount</StyledTableCell>
@@ -162,14 +165,17 @@ export const BettingTransactionsResults = () => {
                 <TableBody>
                   {bettingTransactionsList.map((bettingTransaction) => (
                     <StyledTableRow hover key={bettingTransaction.id}>
+                      <TableCell>{bettingTransaction.playerID}</TableCell>
                       <TableCell>{bettingTransaction.gameName}</TableCell>
                       <TableCell>{bettingTransaction.licenceCatagory}</TableCell>
                       <TableCell>{bettingTransaction.operatorName}</TableCell>
                       <TableCell>{bettingTransaction.transactionID}</TableCell>
+                      <TableCell>{bettingTransaction.paymentMethod}</TableCell>
+                      <TableCell>{bettingTransaction.currency}</TableCell>
                       <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
                         {bettingTransaction.amount}
                       </TableCell>
-                      <TableCell>{bettingTransaction.transType}</TableCell>
+                      <TableCell>{bettingTransaction.status}</TableCell>
                       <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
                         {bettingTransaction.winAmount}
                       </TableCell>
@@ -185,7 +191,7 @@ export const BettingTransactionsResults = () => {
                 {isDataNotFound && (
                   <TableBody>
                     <TableRow>
-                      <TableCell align="center" colSpan={9} sx={{ py: 3 }}>
+                      <TableCell align="center" colSpan={12} sx={{ py: 3 }}>
                         <Box>
                           <Typography gutterBottom align="center" variant="subtitle1" color="error.main">
                             No data fetched!

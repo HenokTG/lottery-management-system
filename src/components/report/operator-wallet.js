@@ -146,26 +146,38 @@ export const OperatorWalletResults = () => {
               <Table size="small">
                 <TableHead sx={{ py: 2 }}>
                   <TableRow>
+                    <StyledTableCell align="center">Player ID</StyledTableCell>
                     <StyledTableCell align="center">Operator Name</StyledTableCell>
                     <StyledTableCell align="center">Company Name</StyledTableCell>
+                    <StyledTableCell align="center">Currency Code</StyledTableCell>
                     <StyledTableCell align="center">Wallet Balance</StyledTableCell>
-                    <StyledTableCell align="center">Credit Amount</StyledTableCell>
                     <StyledTableCell align="center">Debit Amount</StyledTableCell>
+                    <StyledTableCell align="center">Credit Amount</StyledTableCell>
+                    <StyledTableCell align="center">Openning Balance</StyledTableCell>
+                    <StyledTableCell align="center">Closing Balance</StyledTableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {operatorsWalletList.map((wallet) => (
                     <StyledTableRow hover key={wallet.id}>
+                      <TableCell>{wallet.playerID}</TableCell>
                       <TableCell>{wallet.operatorName}</TableCell>
                       <TableCell>{wallet.comName}</TableCell>
+                      <TableCell>{wallet.currency}</TableCell>
                       <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
-                        {wallet.wallet}
+                        {wallet.currentBalance}
+                      </TableCell>
+                      <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
+                        {wallet.debit}
                       </TableCell>
                       <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
                         {wallet.credit}
                       </TableCell>
                       <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
-                        {wallet.debit}
+                        {wallet.closingBalance}
+                      </TableCell>
+                      <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
+                        {wallet.openningBalance}
                       </TableCell>
                     </StyledTableRow>
                   ))}

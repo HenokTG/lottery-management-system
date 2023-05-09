@@ -44,3 +44,26 @@ export const fetchRoleIDs = (fetchAPI, setRoleIDs) => {
       setRoleIDs([]);
     });
 };
+
+export const fetchCountryIDs = (fetchAPI, setCountryIDs) => {
+  axiosInstance
+    .get(fetchAPI)
+    .then((res) => {
+      let CountryIDs = [];
+
+      if (res.data.data.length !== 0) {
+        CountryIDs = res.data.data.map((counrty) => {
+          return {
+            id: counrty.id,
+            countryName: counrty.name,
+          };
+        });
+      }
+
+      setCountryIDs(CountryIDs);
+    })
+    .catch((error) => {
+      console.log(error);
+      setCountryIDs([]);
+    });
+};

@@ -1,5 +1,5 @@
-import PropTypes from 'prop-types';
 import { format } from 'date-fns';
+import PropTypes from 'prop-types';
 
 import { useState, useEffect } from 'react';
 import PerfectScrollbar from 'react-perfect-scrollbar';
@@ -11,8 +11,8 @@ import {
   Card,
   Grid,
   TextField,
-  InputAdornment,
   Typography,
+  InputAdornment,
   SvgIcon,
   Table,
   TableBody,
@@ -25,8 +25,8 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { styled } from '@mui/material/styles';
-// context and modules
-import { fetchRoles } from '../../_apiAxios/management';
+// modules
+import { operatorAppsFetch } from '../../_apiAxios/app-config';
 // icons
 import { Search as SearchIcon } from '../../icons/search';
 import { Download as DownloadIcon } from '../../icons/download';
@@ -44,7 +44,7 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 }));
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   '&:nth-of-type(odd)': {
-    backgroundColor: theme.palette.action.hover,
+    // backgroundColor: theme.palette.action.hover,
   },
   // hide last border
   '&:last-child td, &:last-child th': {
@@ -52,12 +52,12 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-export const RoleListResults = ({ setModalKey }) => {
+export const OperatorsAppList = ({ setModalKey }) => {
   const [loading, setLoading] = useState(true);
 
   const [limit, setLimit] = useState(25);
   const [page, setPage] = useState(0);
-  const [rolesList, setRolesList] = useState([]);
+  const [operatorAppsList, setOperatorAppsList] = useState([]);
   const [paginationProps, setPaginationProps] = useState(null);
 
   const countAll = paginationProps !== null ? paginationProps.per_page * paginationProps.total_pages : -1;
@@ -66,9 +66,9 @@ export const RoleListResults = ({ setModalKey }) => {
 
   useEffect(
     () => {
-      const fetchAPI = `role?page=${page + 1}&per_page=${limit}`;
+      const fetchAPI = `app?page=${page + 1}&per_page=${limit}`;
 
-      fetchRoles(fetchAPI, setLoading, setRolesList, setPaginationProps);
+      operatorAppsFetch(fetchAPI, setLoading, setOperatorAppsList, setPaginationProps);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [limit, page]
@@ -86,12 +86,12 @@ export const RoleListResults = ({ setModalKey }) => {
     setSearchQuery(e.target.value);
     const searchKey = 'name';
     const searchValue = e.target.value;
-    const fetchAPI = `role?page=${page + 1}&per_page=${limit}&search_by=${searchKey}&search_term=${searchValue}`;
+    const fetchAPI = `app?page=${page + 1}&per_page=${limit}&search_by=${searchKey}&search_term=${searchValue}`;
 
-    fetchRoles(fetchAPI, setLoading, setRolesList, setPaginationProps);
+    operatorAppsFetch(fetchAPI, setLoading, setOperatorAppsList, setPaginationProps);
   };
 
-  const isDataNotFound = rolesList.length === 0;
+  const isDataNotFound = operatorAppsList.length === 0;
 
   return (
     <Box
@@ -102,7 +102,7 @@ export const RoleListResults = ({ setModalKey }) => {
       }}
     >
       <Typography sx={{ ml: 4, mt: 1, mb: 3 }} variant="h4">
-        Manage Roles
+        Manage Opertor Apps
       </Typography>
       <Container maxWidth={false}>
         <Card>
@@ -127,52 +127,52 @@ export const RoleListResults = ({ setModalKey }) => {
                             </InputAdornment>
                           ),
                         }}
-                        placeholder="Search role"
+                        placeholder="Search operator app"
                         variant="outlined"
                         color="success"
                         onChange={searchAction}
                       />
                     </Box>
                   </Grid>
-                  <Grid item md={2.65} sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <Grid item md={3.25} sx={{ display: 'flex', justifyContent: 'space-between' }}>
                     <Button color="info" variant="outlined" startIcon={<DownloadIcon fontSize="small" />}>
                       Export
                     </Button>
 
                     <Button color="info" variant="contained" onClick={() => setModalKey(true)} startIcon={<AddIcon />}>
-                      Add Role
+                      Add Operator App
                     </Button>
                   </Grid>
                 </Grid>
-
                 <Card sx={{ mx: 2 }}>
                   <Table size="small">
                     <TableHead sx={{ py: 2 }}>
                       <TableRow>
-                        <StyledTableCell>Role Name</StyledTableCell>
-                        <StyledTableCell>Role Description</StyledTableCell>
-                        <StyledTableCell>Permission</StyledTableCell>
-                        <StyledTableCell>No. of Users</StyledTableCell>
+                        <StyledTableCell>App Name</StyledTableCell>
+                        <StyledTableCell>Operator Name</StyledTableCell>
                         <StyledTableCell>Status</StyledTableCell>
                         <StyledTableCell>Created By</StyledTableCell>
-                        <StyledTableCell>Created ON</StyledTableCell>
-                        <StyledTableCell>Updated ON</StyledTableCell>
+                        <StyledTableCell>Created On</StyledTableCell>
                         <StyledTableCell>Action</StyledTableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      {rolesList.map((role) => (
-                        <StyledTableRow hover key={role.id}>
-                          <TableCell>{role.role}</TableCell>
-                          <TableCell>{role.description}</TableCell>
-                          <TableCell>{role.permission}</TableCell>
-                          <TableCell align="center">{role.noUsers}</TableCell>
-                          <TableCell>{role.status}</TableCell>
-                          <TableCell>{role.createdBy}</TableCell>
-                          <TableCell sx={{ fontSize: 12 }}>{format(role.createdAt, 'MMM dd, yyyy')}</TableCell>
-                          <TableCell sx={{ fontSize: 12 }}>{format(role.updatedAt, 'MMM dd, yyyy')}</TableCell>
+                      {operatorAppsList.map((operatorApp) => (
+                        <StyledTableRow
+                          hover
+                          key={operatorApp.id}
+                          sx={{
+                            backgroundColor: operatorApp.status === 'Active' ? '#43C6B748' : '#DA686848',
+                          }}
+                        >
+                          <TableCell>{operatorApp.name}</TableCell>
+                          <TableCell>{operatorApp.operatorName}</TableCell>
+
+                          <TableCell>{operatorApp.status}</TableCell>
+                          <TableCell>{operatorApp.createdBy}</TableCell>
+                          <TableCell>{format(operatorApp.createdAt, 'MMM dd, yyyy')}</TableCell>
                           <TableCell align="center">
-                            <Button>
+                            <Button onClick={() => setModalKey(true)}>
                               <Edit
                                 fontSize="small"
                                 sx={{
@@ -191,7 +191,7 @@ export const RoleListResults = ({ setModalKey }) => {
                     {isDataNotFound && (
                       <TableBody>
                         <TableRow>
-                          <TableCell align="center" colSpan={10} sx={{ py: 3 }}>
+                          <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
                             <Box>
                               <Typography gutterBottom align="center" variant="subtitle1" color="error.main">
                                 No data fetched!
@@ -228,6 +228,6 @@ export const RoleListResults = ({ setModalKey }) => {
   );
 };
 
-RoleListResults.propTypes = {
+OperatorsAppList.propTypes = {
   setModalKey: PropTypes.func,
 };

@@ -92,7 +92,7 @@ export const HighestWinningTicketes = (props) => {
 
   return (
     <Card sx={{ height: '100%', p: 1 }} {...props}>
-      <CardHeader title="Highest Winning Ticketes" sx={{ py: 2, pl: 1 }} />
+      <CardHeader title="Highest Winning Tickets" sx={{ py: 2, pl: 1 }} />
       <PerfectScrollbar>
         <TableContainer component={Paper}>
           <Table size="small">

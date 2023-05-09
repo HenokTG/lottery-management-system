@@ -149,10 +149,10 @@ export const ActivityLogResults = () => {
                   <TableRow>
                     <StyledTableCell>Module</StyledTableCell>
                     <StyledTableCell>Activity Type</StyledTableCell>
-                    <StyledTableCell>Activity Performed On</StyledTableCell>
                     <StyledTableCell>Description</StyledTableCell>
-                    <StyledTableCell>Activity By / User ID</StyledTableCell>
-                    <StyledTableCell>Created ON</StyledTableCell>
+                    <StyledTableCell> User Name</StyledTableCell>
+                    <StyledTableCell>User Role</StyledTableCell>
+                    <StyledTableCell>Created On</StyledTableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -160,9 +160,9 @@ export const ActivityLogResults = () => {
                     <StyledTableRow hover key={activity.id}>
                       <TableCell>{activity.module}</TableCell>
                       <TableCell>{activity.type}</TableCell>
-                      <TableCell>{activity.performedOn}</TableCell>
                       <TableCell>{activity.description}</TableCell>
                       <TableCell>{activity.createdBy}</TableCell>
+                      <TableCell>{activity.role}</TableCell>
                       <TableCell>{format(activity.createdAt, 'MMM dd, yyyy')}</TableCell>
                     </StyledTableRow>
                   ))}
