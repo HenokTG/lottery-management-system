@@ -1,8 +1,8 @@
 import { format } from 'date-fns';
-import PropTypes from 'prop-types';
 
 import { useState, useEffect } from 'react';
 import PerfectScrollbar from 'react-perfect-scrollbar';
+
 // @mui
 import {
   Box,
@@ -23,15 +23,17 @@ import {
   TableRow,
   CircularProgress,
 } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
 import { styled } from '@mui/material/styles';
+
 // modules
 import { systemModulesFetch } from '../_apiAxios/app-config';
+
 // icons
 import { Search as SearchIcon } from '../icons/search';
 import { Download as DownloadIcon } from '../icons/download';
-import { Edit } from '../icons/edit';
+
 // custom styles
+
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: theme.palette.info.main,
@@ -42,9 +44,10 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
     fontSize: 14,
   },
 }));
+
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   '&:nth-of-type(odd)': {
-    // backgroundColor: theme.palette.action.hover,
+    backgroundColor: theme.palette.action.oddRow,
   },
   // hide last border
   '&:last-child td, &:last-child th': {
@@ -52,7 +55,9 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-export const SystemModulesList = ({ setModalKey }) => {
+// ---------------------------------------------------------------------------------------------------------
+
+export const SystemModulesList = () => {
   const [loading, setLoading] = useState(true);
 
   const [limit, setLimit] = useState(25);
@@ -147,9 +152,7 @@ export const SystemModulesList = ({ setModalKey }) => {
                         <StyledTableCell>Module Name</StyledTableCell>
                         <StyledTableCell>Description</StyledTableCell>
                         <StyledTableCell>Status</StyledTableCell>
-                        <StyledTableCell>Created By</StyledTableCell>
                         <StyledTableCell>Created On</StyledTableCell>
-                        <StyledTableCell>Action</StyledTableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
@@ -165,29 +168,14 @@ export const SystemModulesList = ({ setModalKey }) => {
                           <TableCell>{sysModules.description}</TableCell>
 
                           <TableCell>{sysModules.status}</TableCell>
-                          <TableCell>{sysModules.createdBy}</TableCell>
                           <TableCell>{format(sysModules.createdAt, 'MMM dd, yyyy')}</TableCell>
-                          <TableCell align="center">
-                            <Button onClick={() => setModalKey(true)}>
-                              <Edit
-                                fontSize="small"
-                                sx={{
-                                  p: 0,
-                                  color: 'black',
-                                  '&:hover': {
-                                    color: 'lightseagreen',
-                                  },
-                                }}
-                              />
-                            </Button>
-                          </TableCell>
                         </StyledTableRow>
                       ))}
                     </TableBody>
                     {isDataNotFound && (
                       <TableBody>
                         <TableRow>
-                          <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
+                          <TableCell align="center" colSpan={4} sx={{ py: 3 }}>
                             <Box>
                               <Typography gutterBottom align="center" variant="subtitle1" color="error.main">
                                 No data fetched!
@@ -222,8 +210,4 @@ export const SystemModulesList = ({ setModalKey }) => {
       </Container>
     </Box>
   );
-};
-
-SystemModulesList.propTypes = {
-  setModalKey: PropTypes.func,
 };

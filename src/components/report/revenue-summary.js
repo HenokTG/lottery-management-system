@@ -27,7 +27,7 @@ const RevenueSummary = (props) => (
       </Grid>
       <Grid item md={10}>
         <Grid sx={{ p: 1 }} container direction="column" alignItems="flex-start" justifyContent="center">
-          <Typography color="textSecondary" gutterBottom variant="body">
+          <Typography color="textSecondary" gutterBottom variant="h6">
             {props.title}
           </Typography>
           <Typography color="goldenrod" variant="h5">

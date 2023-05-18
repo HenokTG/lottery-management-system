@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 import PerfectScrollbar from 'react-perfect-scrollbar';
+
 // @mui
 import {
   Box,
@@ -23,16 +24,22 @@ import {
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { theme } from '../../theme';
+
 // componets
 import RevenueSummary from './revenue-summary';
+import AnnualReportFilter from '../auxilary/AnnualReportFilter';
+
 // icons
 import { Search as SearchIcon } from '../../icons/search';
 import { Download as DownloadIcon } from '../../icons/download';
-import { Filter } from '../../icons/filter';
+
 // context and modules
 import { useGlobalContext } from '../../context';
-import { revenuesFetch } from '../../_apiAxios/report';
+import { revenuesFetch, revenueSummary } from '../../_apiAxios/report';
+import { fetchOperatorIDs } from '../../_apiAxios/modelCreateFetches';
+
 // custom style
+
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: theme.palette.info.main,
@@ -43,15 +50,17 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
     fontSize: 14,
   },
 }));
+
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   '&:nth-of-type(odd)': {
-    backgroundColor: theme.palette.action.hover,
+    backgroundColor: theme.palette.action.oddRow,
   },
   // hide last border
   '&:last-child td, &:last-child th': {
     border: 0,
   },
 }));
+
 // ------------------------------------------------------------------------------------------
 
 export const RevenueReportResults = () => {
@@ -64,6 +73,10 @@ export const RevenueReportResults = () => {
 
   const [limit, setLimit] = useState(25);
   const [page, setPage] = useState(0);
+  const [summaryData, setSummaryData] = useState({
+    totalRevenue: '-',
+    totalTax: '-',
+  });
   const [revenuesList, setRevenuesList] = useState([]);
   const [paginationProps, setPaginationProps] = useState(null);
 
@@ -71,18 +84,28 @@ export const RevenueReportResults = () => {
 
   const [searchQuery, setSearchQuery] = useState('');
 
+  const fetchRootAPI = `transaction/revenue?page=${page + 1}&per_page=${limit}`;
+
+  const [fetchAPI, setFetchAPI] = useState(fetchRootAPI);
+
+  const [operatorIDs, setOperatorIDs] = useState([{ id: -1, operatorName: 'No operator to assign' }]);
+
   useEffect(
     () => {
       if (loggedIn === false) {
         navigate(`/login?redirectTo=${prevLocation.pathname}`);
       }
 
-      const fetchAPI = `transaction/bonus?page=${page + 1}&per_page=${limit}`;
+      revenueSummary('transaction/revenue-report', setSummaryData);
 
       revenuesFetch(fetchAPI, setLoading, setRevenuesList, setPaginationProps);
+
+      const operatorFetchAPI = `operator?page=${1}&per_page=${50}`;
+
+      fetchOperatorIDs(operatorFetchAPI, setOperatorIDs);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [limit, page]
+    [limit, page, fetchAPI]
   );
 
   const handleLimitChange = (event) => {
@@ -97,7 +120,7 @@ export const RevenueReportResults = () => {
     setSearchQuery(e.target.value);
     const searchKey = 'operator';
     const searchValue = e.target.value;
-    const fetchAPI = `transaction/bonus?page=${
+    const fetchAPI = `transaction/revenue?page=${
       page + 1
     }&per_page=${limit}&search_by=${searchKey}&search_term=${searchValue}`;
 
@@ -106,15 +129,52 @@ export const RevenueReportResults = () => {
 
   const isDataNotFound = revenuesList.length === 0;
 
+  // For Filter component
+
+  const [dateFrom, setDateFrom] = useState(null);
+  const [dateTo, setDateTo] = useState(null);
+  const [operatorID, setOperatorID] = useState('');
+
+  const filterQueryAPI = `date_from=${dateFrom ? dateFrom.toISOString().split('T')[0] : ''}&date_to=${
+    dateTo ? dateTo.toISOString().split('T')[0] : ''
+  }&operator=${operatorID}`;
+
+  const filterProps = [
+    {
+      fieldName: 'dateFrom',
+      title: 'Date From',
+      child: null,
+      valueSet: dateFrom,
+      callChangeFunc: setDateFrom,
+      fieldType: 'date',
+    },
+    {
+      fieldName: 'dateTO',
+      title: 'Date To',
+      child: null,
+      valueSet: dateTo,
+      callChangeFunc: setDateTo,
+      fieldType: 'date',
+    },
+    {
+      fieldName: 'operatorID',
+      title: 'Select Operator',
+      child: operatorIDs,
+      valueSet: operatorID,
+      callChangeFunc: setOperatorID,
+      fieldType: '',
+    },
+  ];
+
   return (
     <>
       <Card sx={{ mb: 3, pt: 3, pb: 1, px: 5, backgroundColor: theme.palette.neutral[100] }}>
         <Grid container columnSpacing={10} rowSpacing={1} sx={{ mb: 2 }}>
           <Grid item xl={3} lg={6} sm={6} xs={12}>
-            <RevenueSummary badge="Sales" title="Total Sales" amount="$ 9,423,424,476.25" />
+            <RevenueSummary badge="Sales" title="Total Sales" amount={summaryData.totalRevenue} />
           </Grid>
           <Grid item xl={3} lg={6} sm={6} xs={12}>
-            <RevenueSummary badge="tax" title="Total Tax" amount="$ 535,353,645.89" />
+            <RevenueSummary badge="tax" title="Total Tax" amount={summaryData.totalTax} />
           </Grid>
         </Grid>
       </Card>
@@ -151,9 +211,12 @@ export const RevenueReportResults = () => {
                   <Button color="info" variant="outlined" startIcon={<DownloadIcon fontSize="small" />}>
                     Export
                   </Button>
-                  <Button color="info" variant="contained" startIcon={<Filter fontSize="small" />}>
-                    Filter
-                  </Button>
+                  <AnnualReportFilter
+                    filterProps={filterProps}
+                    fetchRootAPI={fetchRootAPI}
+                    filterQueryAPI={filterQueryAPI}
+                    setFetchAPI={setFetchAPI}
+                  />
                 </Grid>
               </Grid>
 

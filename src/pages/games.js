@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 // components
-import Page from '../components/Page';
+import Page from '../components/layout/Page';
 import { GameListResults } from '../components/games/games-list-results';
-import { CreateGame } from '../components/games/create-game-form';
+import CreateGame from '../components/games/create-game-form';
 // context and modules
 import { useGlobalContext } from '../context';
 

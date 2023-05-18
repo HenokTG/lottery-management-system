@@ -1,11 +1,12 @@
 import PropTypes from 'prop-types';
 
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 
 // forms validate
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+
 // @mui
 import {
   Card,
@@ -24,9 +25,12 @@ import {
   Chip,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+
 // context and modules
+import { useGlobalContext } from '../../context';
 import { axiosInstance } from '../../utils/axios';
 import { fetchGameIDs, fetchCountryIDs, fetchStateIDs } from '../../_apiAxios/mainCreateFetches';
+import { operatorUpdateFetch } from '../../_apiAxios/mainFetches';
 
 // multi select styles
 const ITEM_HEIGHT = 48;
@@ -40,13 +44,36 @@ const MenuProps = {
   },
 };
 
-export const CreateOperator = ({ setModalKey }) => {
-  const theme = useTheme();
-  const navigate = useNavigate();
+// -----------------------------------------------------------------------------------------------------------------------
 
-  const [gameIDs, setGameIDs] = useState([{ id: -1, gameName: 'No game to assign' }]);
-  const [countryIDs, setCountryIDs] = useState([{ id: -1, countryName: 'No counrty to assign' }]);
-  const [stateIDs, setStateIDs] = useState([{ id: -1, stateName: 'No state to assign' }]);
+const CreateOperator = ({ setModalKey }) => {
+  const theme = useTheme();
+
+  const navigate = useNavigate();
+  const prevLocation = useLocation();
+
+  const { id } = useParams();
+
+  const { loggedIn } = useGlobalContext();
+
+  const [gameIDs, setGameIDs] = useState([{ id: -1, name: 'No game to assign' }]);
+  const [countryIDs, setCountryIDs] = useState([{ id: -1, name: 'No counrty to assign' }]);
+  const [stateIDs, setStateIDs] = useState([{ id: -1, name: 'No region to assign' }]);
+
+  const [assignedGameList, setAssignedGameList] = useState([]);
+
+  const [intialOperatorData, setIntialOperatorData] = useState({
+    email: '',
+    firstName: '',
+    lastName: '',
+    phoneNumber: '',
+    operatorName: '',
+    companyName: '',
+    about: '',
+    address: '',
+    country: '',
+    region: '',
+  });
 
   useEffect(
     () => {
@@ -57,12 +84,19 @@ export const CreateOperator = ({ setModalKey }) => {
       fetchGameIDs(gameFetchAPI, setGameIDs);
       fetchCountryIDs(countryFetchAPI, setCountryIDs);
       fetchStateIDs(stateAPI, setStateIDs);
+
+      if (id !== undefined) {
+        if (loggedIn === false) {
+          navigate(`/login?redirectTo=${prevLocation.pathname}`);
+        }
+
+        const updateOperatorAPI = `operator/${id}`;
+        operatorUpdateFetch(updateOperatorAPI, setIntialOperatorData);
+      }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [id]
   );
-
-  const [assignedGameList, setAssignedGameList] = useState([]);
 
   const handleMultiSelect = (event) => {
     const {
@@ -74,19 +108,17 @@ export const CreateOperator = ({ setModalKey }) => {
     );
   };
 
+  const handleFormCancel = () => {
+    if (id === undefined) {
+      setModalKey(false);
+    } else {
+      navigate('/app/operators', { replace: true });
+    }
+  };
+
   const formik = useFormik({
-    initialValues: {
-      email: '',
-      firstName: '',
-      lastName: '',
-      phoneNumber: '',
-      operatorName: '',
-      companyName: '',
-      about: '',
-      address: '',
-      country: '',
-      region: '',
-    },
+    initialValues: intialOperatorData,
+    enableReinitialize: true,
     validationSchema: Yup.object({
       email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
       firstName: Yup.string(),
@@ -101,10 +133,6 @@ export const CreateOperator = ({ setModalKey }) => {
     }),
     onSubmit: (values, helpers) => {
       const postData = {
-        // email: values.email,
-        // first_name: values.firstName,
-        // last_name: values.lastName,
-        // phone: values.phoneNumber,
         // assigned_game: assignedGameList,
         name: values.operatorName,
         company_name: values.companyName,
@@ -112,21 +140,40 @@ export const CreateOperator = ({ setModalKey }) => {
         address: values.address,
         country: values.country,
         state: values.region,
-        is_active: true,
+        // contact_persons: [
+        //   {
+        //     email: values.email,
+        //     first_name: values.firstName,
+        //     last_name: values.lastName,
+        //     phone: values.phoneNumber,
+        //   },
+        // ],
       };
 
-      axiosInstance
-        .post(`operator`, postData)
-        .then((res) => {
-          setModalKey(false);
-          // navigate('/app/operators', { replace: true });
-        })
-        .catch((error) => {
-          helpers.setStatus({ success: false });
-          helpers.setErrors({ submit: error.message });
-          helpers.setSubmitting(false);
-          console.log(error);
-        });
+      if (id === undefined) {
+        postData.is_active = true;
+
+        axiosInstance
+          .post('operator', postData)
+          .then(() => {
+            setModalKey(false);
+          })
+          .catch((error) => {
+            helpers.setStatus({ success: false });
+            helpers.setErrors({ submit: error.message });
+            helpers.setSubmitting(false);
+            console.log(error);
+          });
+      } else {
+        axiosInstance
+          .patch(`operator/${id}`, postData)
+          .then(() => {
+            navigate('/app/operators', { replace: true });
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
     },
   });
 
@@ -139,7 +186,7 @@ export const CreateOperator = ({ setModalKey }) => {
       }}
     >
       <Typography sx={{ ml: 4, mt: 1, mb: 3 }} variant="h4">
-        Create Operator
+        {id === undefined ? 'Create' : 'Update'} Operator
       </Typography>
       <Container maxWidth="lg" sx={{ m: 0 }}>
         <form onSubmit={formik.handleSubmit}>
@@ -154,7 +201,7 @@ export const CreateOperator = ({ setModalKey }) => {
                     pb: 3,
                   }}
                 >
-                  Enter Operator Details
+                  {id === undefined ? 'Enter' : 'Edit'} Operator Details
                 </Typography>
                 <Grid container spacing={3}>
                   <Grid item md={6}>
@@ -218,8 +265,8 @@ export const CreateOperator = ({ setModalKey }) => {
                       select
                     >
                       {countryIDs.map((countryId) => (
-                        <MenuItem key={`${countryId.id}-${countryId.countryName}`} value={countryId.id}>
-                          {countryId.countryName}
+                        <MenuItem key={`${countryId.id}-${countryId.name}`} value={countryId.id}>
+                          {countryId.name}
                         </MenuItem>
                       ))}
                     </TextField>
@@ -240,8 +287,8 @@ export const CreateOperator = ({ setModalKey }) => {
                       select
                     >
                       {stateIDs.map((stateId) => (
-                        <MenuItem key={`${stateId.id}-${stateId.stateName}`} value={stateId.id}>
-                          {stateId.stateName}
+                        <MenuItem key={`${stateId.id}-${stateId.name}`} value={stateId.id}>
+                          {stateId.name}
                         </MenuItem>
                       ))}
                     </TextField>
@@ -275,8 +322,8 @@ export const CreateOperator = ({ setModalKey }) => {
                       }}
                     >
                       {gameIDs.map((game) => (
-                        <MenuItem key={`${game.id}-${game.gameName}`} value={game.id}>
-                          {game.gameName}
+                        <MenuItem key={`${game.id}-${game.name}`} value={game.id}>
+                          {game.name}
                         </MenuItem>
                       ))}
                     </TextField>
@@ -411,7 +458,7 @@ export const CreateOperator = ({ setModalKey }) => {
           </Grid>
           <Card sx={{ py: 2, px: 10, mt: 2, display: 'flex', justifyContent: 'space-between' }}>
             <Button
-              onClick={() => window.location.reload()}
+              onClick={handleFormCancel}
               color="error"
               disabled={formik.isSubmitting}
               fullWidth
@@ -422,7 +469,7 @@ export const CreateOperator = ({ setModalKey }) => {
               Cancel
             </Button>
             <Button
-              color="secondary"
+              color={id === undefined ? 'secondary' : 'warning'}
               disabled={formik.isSubmitting}
               fullWidth
               size="large"
@@ -430,7 +477,7 @@ export const CreateOperator = ({ setModalKey }) => {
               variant="contained"
               sx={{ width: '45%' }}
             >
-              Create Operator
+              {id === undefined ? 'Create' : 'Update'} Operator
             </Button>
           </Card>
         </form>
@@ -442,3 +489,5 @@ export const CreateOperator = ({ setModalKey }) => {
 CreateOperator.propTypes = {
   setModalKey: PropTypes.func,
 };
+
+export default CreateOperator;

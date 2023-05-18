@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 // components
-import Page from '../../components/Page';
-import { CreateRegion } from '../../components/regions/create-region-form';
+import Page from '../../components/layout/Page';
+import  CreateRegion from '../../components/regions/create-region-form';
 import { RegionList } from '../../components/regions/regoins-list-results';
 // context and modules
 import { useGlobalContext } from '../../context';

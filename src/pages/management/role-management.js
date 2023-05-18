@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 // components
-import Page from '../../components/Page';
-import { CreateRole } from '../../components/roles/create-role-form';
+import Page from '../../components/layout/Page';
+import CreateRole from '../../components/roles/create-role-form';
 import { RoleListResults } from '../../components/roles/roles-list-results';
 // context and modules
 import { useGlobalContext } from '../../context';

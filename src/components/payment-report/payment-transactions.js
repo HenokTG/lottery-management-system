@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 import { format } from 'date-fns';
-
 import PerfectScrollbar from 'react-perfect-scrollbar';
+
 // @mui
 import {
   Box,
@@ -24,14 +24,21 @@ import {
   CircularProgress,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
+
+// components
+import AnnualReportFilter from '../auxilary/AnnualReportFilter';
+
 // context and modules
 import { useGlobalContext } from '../../context';
 import { paymentTransactionsFetch } from '../../_apiAxios/payment-report';
+import { fetchOperatorIDs } from '../../_apiAxios/modelCreateFetches';
+import { bettingTypeIDs, tnxTypeIDs, fetchCurrencyIDs, fetchPaymentMethodIDs } from '../../_apiAxios/fetchFilterIDs';
 // icons
 import { Search as SearchIcon } from '../../icons/search';
 import { Download as DownloadIcon } from '../../icons/download';
-import { Filter } from '../../icons/filter';
+
 // custom styles
+
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: theme.palette.info.main,
@@ -43,16 +50,18 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   },
 }));
 
-const StyledTableRow = styled(TableRow)(({ theme, payType }) => ({
+const StyledTableRow = styled(TableRow)(({ theme }) => ({
   '&:nth-of-type(odd)': {
-    backgroundColor: theme.palette.action.hover,
+    backgroundColor: theme.palette.action.oddRow,
   },
   // hide last border
   '&:last-child td, &:last-child th': {
     border: 0,
   },
 }));
+
 // ----------------------------------------------------------------------------------
+
 export const PaymentTransactionsResults = () => {
   const { loggedIn } = useGlobalContext();
 
@@ -70,18 +79,32 @@ export const PaymentTransactionsResults = () => {
 
   const [searchQuery, setSearchQuery] = useState('');
 
+  const fetchRootAPI = `transaction/ticket?page=${page + 1}&per_page=${limit}`;
+
+  const [fetchAPI, setFetchAPI] = useState(fetchRootAPI);
+
+  const [operatorIDs, setOperatorIDs] = useState([{ id: -1, operatorName: 'No role to assign' }]);
+  const [currencyIDs, setCurrencyIDs] = useState([{ id: -1, operatorName: 'No currency to assign' }]);
+  const [paymentMethodIDs, setPaymentMethodIDs] = useState([{ id: -1, operatorName: 'No payment method to assign' }]);
+
   useEffect(
     () => {
       if (loggedIn === false) {
         navigate(`/login?redirectTo=${prevLocation.pathname}`);
       }
 
-      const fetchAPI = `transaction/payment?page=${page + 1}&per_page=${limit}`;
-
       paymentTransactionsFetch(fetchAPI, setLoading, setPaymentTransactionsList, setPaginationProps);
+
+      const operatorIDsFetchAPI = `operator?page=${1}&per_page=${50}`;
+      const currencyIDsFetchAPI = `currency?page=${1}&per_page=${50}`;
+      const paymentMethodIDsFetchAPI = `payment-method?page=${1}&per_page=${50}`;
+
+      fetchOperatorIDs(operatorIDsFetchAPI, setOperatorIDs);
+      fetchCurrencyIDs(currencyIDsFetchAPI, setCurrencyIDs);
+      fetchPaymentMethodIDs(paymentMethodIDsFetchAPI, setPaymentMethodIDs);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [limit, page]
+    [limit, page, fetchAPI]
   );
 
   const handleLimitChange = (event) => {
@@ -96,7 +119,7 @@ export const PaymentTransactionsResults = () => {
     setSearchQuery(e.target.value);
     const searchKey = 'operator';
     const searchValue = e.target.value;
-    const fetchAPI = `transaction/payment?page=${
+    const fetchAPI = `transaction/ticket?page=${
       page + 1
     }&per_page=${limit}&search_by=${searchKey}&search_term=${searchValue}`;
 
@@ -104,6 +127,90 @@ export const PaymentTransactionsResults = () => {
   };
 
   const isDataNotFound = paymentTransactionsList.length === 0;
+
+  // For Filter component
+
+  const [dateFrom, setDateFrom] = useState(null);
+  const [dateTo, setDateTo] = useState(null);
+  const [operatorID, setOperatorID] = useState('');
+  const [currencyID, setCurrencyID] = useState('');
+  const [paymentMethodID, setPaymentMethodID] = useState('');
+  const [tnxType, setTnxType] = useState('');
+  const [ticketType, setTicketType] = useState('');
+  const [minAmount, setMinAmount] = useState('');
+  const [maxAmount, setMaxAmount] = useState('');
+
+  const filterQueryAPI = `date_from=${dateFrom ? dateFrom.toISOString().split('T')[0] : ''}&date_to=${
+    dateTo ? dateTo.toISOString().split('T')[0] : ''
+  }&operator=${operatorID}&currency=${currencyID}&payment_method=${paymentMethodID}&ticket_type=${ticketType}&transaction_type=${tnxType}&minimum_amount=${minAmount}&maximum_amount=${maxAmount}`;
+
+  const filterProps = [
+    {
+      fieldName: 'dateFrom',
+      title: 'Date From',
+      child: null,
+      valueSet: dateFrom,
+      callChangeFunc: setDateFrom,
+      fieldType: 'date',
+    },
+    {
+      fieldName: 'dateTO',
+      title: 'Date To',
+      child: null,
+      valueSet: dateTo,
+      callChangeFunc: setDateTo,
+      fieldType: 'date',
+    },
+    {
+      fieldName: 'operatorID',
+      title: 'Select Operator',
+      child: operatorIDs,
+      valueSet: operatorID,
+      callChangeFunc: setOperatorID,
+    },
+    {
+      fieldName: 'currencyID',
+      title: 'Select Currency',
+      child: currencyIDs,
+      valueSet: currencyID,
+      callChangeFunc: setCurrencyID,
+    },
+    {
+      fieldName: 'paymentMethodID',
+      title: 'Select Payment Method',
+      child: paymentMethodIDs,
+      valueSet: paymentMethodID,
+      callChangeFunc: setPaymentMethodID,
+    },
+    {
+      fieldName: 'bettingType',
+      title: 'Select Betting Type',
+      child: bettingTypeIDs(),
+      valueSet: ticketType,
+      callChangeFunc: setTicketType,
+    },
+    {
+      fieldName: 'tnxType',
+      title: 'Select Ticket Type',
+      child: tnxTypeIDs(),
+      valueSet: tnxType,
+      callChangeFunc: setTnxType,
+    },
+    {
+      fieldName: 'minAmount',
+      title: 'Enter Min Amount',
+      child: 'text-input',
+      valueSet: minAmount,
+      callChangeFunc: setMinAmount,
+    },
+    {
+      fieldName: 'maxAmount',
+      title: 'Enter Max Amount',
+      child: 'text-input',
+      valueSet: maxAmount,
+      callChangeFunc: setMaxAmount,
+    },
+  ];
 
   return (
     <Card>
@@ -139,9 +246,12 @@ export const PaymentTransactionsResults = () => {
                 <Button color="info" variant="outlined" startIcon={<DownloadIcon fontSize="small" />}>
                   Export
                 </Button>
-                <Button color="info" variant="contained" startIcon={<Filter fontSize="small" />}>
-                  Filter
-                </Button>
+                <AnnualReportFilter
+                  filterProps={filterProps}
+                  fetchRootAPI={fetchRootAPI}
+                  filterQueryAPI={filterQueryAPI}
+                  setFetchAPI={setFetchAPI}
+                />
               </Grid>
             </Grid>
 
@@ -152,6 +262,8 @@ export const PaymentTransactionsResults = () => {
                     <StyledTableCell align="center">Transaction ID</StyledTableCell>
                     <StyledTableCell align="center">Operator Name</StyledTableCell>
                     <StyledTableCell align="center">Payment Method</StyledTableCell>
+                    <StyledTableCell align="center">Currency Code</StyledTableCell>
+                    <StyledTableCell align="center">Betting Type</StyledTableCell>
                     <StyledTableCell align="center">Transaction Type</StyledTableCell>
                     <StyledTableCell align="center">Transaction Amount</StyledTableCell>
                     <StyledTableCell align="center">Transaction Fee</StyledTableCell>
@@ -167,11 +279,12 @@ export const PaymentTransactionsResults = () => {
                       sx={{
                         backgroundColor: paymentTransaction.paymentType === 'Deposit' ? '#64B6F748' : '#FFBF4C48',
                       }}
-                      // payType={paymentTransaction.paymentType}
                     >
                       <TableCell>{paymentTransaction.transactionID}</TableCell>
                       <TableCell>{paymentTransaction.operatorName}</TableCell>
                       <TableCell>{paymentTransaction.PaymentMethod}</TableCell>
+                      <TableCell>{paymentTransaction.currencyCode}</TableCell>
+                      <TableCell>{paymentTransaction.ticketType}</TableCell>
                       <TableCell>{paymentTransaction.paymentType}</TableCell>
                       <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
                         {paymentTransaction.amount}
@@ -201,7 +314,7 @@ export const PaymentTransactionsResults = () => {
                 {isDataNotFound && (
                   <TableBody>
                     <TableRow>
-                      <TableCell align="center" colSpan={8} sx={{ py: 3 }}>
+                      <TableCell align="center" colSpan={10} sx={{ py: 3 }}>
                         <Box>
                           <Typography gutterBottom align="center" variant="subtitle1" color="error.main">
                             No data fetched!

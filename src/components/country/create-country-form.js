@@ -1,25 +1,64 @@
 import PropTypes from 'prop-types';
 
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 
 // forms validate
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+
 // @mui
 import { Box, Button, Card, Grid, TextField, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+
 // context and modules
 import { axiosInstance } from '../../utils/axios';
+import { useGlobalContext } from '../../context';
+import { countryUpdateFetch } from '../../_apiAxios/app-config';
 
-export const CreateCountry = ({ setModalKey }) => {
+// -----------------------------------------------------------------------------------------------------------------------
+
+const CreateCountry = ({ setModalKey }) => {
   const theme = useTheme();
+
   const navigate = useNavigate();
+  const prevLocation = useLocation();
+
+  const { id } = useParams();
+
+  const { loggedIn } = useGlobalContext();
+
+  const [intialCountryData, setIntialCountryData] = useState({
+    countryName: '',
+    countryCode: '',
+  });
+
+  useEffect(
+    () => {
+      if (id !== undefined) {
+        if (loggedIn === false) {
+          navigate(`/login?redirectTo=${prevLocation.pathname}`);
+        }
+
+        const updateCountryAPI = `country/${id}`;
+        countryUpdateFetch(updateCountryAPI, setIntialCountryData);
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
+
+  const handleFormCancel = () => {
+    if (id === undefined) {
+      setModalKey(false);
+    } else {
+      navigate('/app/app-settings/country-locations', { replace: true });
+    }
+  };
 
   const formik = useFormik({
-    initialValues: {
-      countryName: '',
-      countryCode: '',
-    },
+    initialValues: intialCountryData,
+    enableReinitialize: true,
     validationSchema: Yup.object({
       countryName: Yup.string().max(255).required('Country name is required'),
       countryCode: Yup.string().max(255).required('Country code is required'),
@@ -28,21 +67,32 @@ export const CreateCountry = ({ setModalKey }) => {
       const postData = {
         name: values.countryName,
         code: values.countryCode,
-        is_active: true,
       };
 
-      axiosInstance
-        .post(`country`, postData)
-        .then((res) => {
-          setModalKey(false);
-          // navigate('/app/licence-catagories', { replace: true });
-        })
-        .catch((error) => {
-          helpers.setStatus({ success: false });
-          helpers.setErrors({ submit: error.message });
-          helpers.setSubmitting(false);
-          console.log(error);
-        });
+      if (id === undefined) {
+        postData.is_active = true;
+
+        axiosInstance
+          .post('country', postData)
+          .then(() => {
+            setModalKey(false);
+          })
+          .catch((error) => {
+            helpers.setStatus({ success: false });
+            helpers.setErrors({ submit: error.message });
+            helpers.setSubmitting(false);
+            console.log(error);
+          });
+      } else {
+        axiosInstance
+          .patch(`country/${id}`, postData)
+          .then(() => {
+            navigate('/app/app-settings/country-locations', { replace: true });
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
     },
   });
 
@@ -56,7 +106,7 @@ export const CreateCountry = ({ setModalKey }) => {
         }}
       >
         <Typography sx={{ ml: 4, mt: 1, mb: 3 }} variant="h4">
-          Add Country
+          {id === undefined ? 'Add' : 'Update'} Country
         </Typography>
         <Card sx={{ display: 'flex', justifyContent: 'center', mx: 3, p: 3 }}>
           <form onSubmit={formik.handleSubmit}>
@@ -73,7 +123,7 @@ export const CreateCountry = ({ setModalKey }) => {
                   pb: 2,
                 }}
               >
-                Enter Country Details
+                {id === undefined ? 'Enter' : 'Edit'} Country Details
               </Typography>
             </Box>
             <Grid container spacing={2} minWidth="600px">
@@ -111,7 +161,7 @@ export const CreateCountry = ({ setModalKey }) => {
 
             <Box sx={{ py: 2, mt: 2, display: 'flex', justifyContent: 'space-between' }}>
               <Button
-                onClick={() => window.location.reload()}
+                onClick={handleFormCancel}
                 color="error"
                 disabled={formik.isSubmitting}
                 fullWidth
@@ -122,7 +172,7 @@ export const CreateCountry = ({ setModalKey }) => {
                 Cancel
               </Button>
               <Button
-                color="secondary"
+                color={id === undefined ? 'secondary' : 'warning'}
                 disabled={formik.isSubmitting}
                 fullWidth
                 size="large"
@@ -130,7 +180,7 @@ export const CreateCountry = ({ setModalKey }) => {
                 variant="contained"
                 sx={{ width: '48%' }}
               >
-                Add Country
+                {id === undefined ? 'Add' : 'Update'} Country
               </Button>
             </Box>
           </form>
@@ -143,3 +193,5 @@ export const CreateCountry = ({ setModalKey }) => {
 CreateCountry.propTypes = {
   setModalKey: PropTypes.func,
 };
+
+export default CreateCountry;

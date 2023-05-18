@@ -4,17 +4,25 @@ export const fetchPaymentMethods = (fetchAPI, setLoading, setPaymentMethodList, 
   axiosInstance
     .get(fetchAPI)
     .then((res) => {
-      setPaginationProps(res.data.pagination);
-      const PAYMENTMETHODS = res.data.data.map((payMethod) => {
-        return {
-          id: payMethod.id,
-          method: payMethod.name,
-          description: payMethod.description,
-          status: payMethod.is_active ? 'APPROVED' : 'NOT APPROVED',
-          createdBy: payMethod.created_by,
-          createdAt: new Date(payMethod.created_at),
-        };
-      });
+      if (typeof setPaginationProps === 'function') {
+        setPaginationProps(res.data.pagination === undefined ? null : res.data.pagination);
+      }
+
+      const PAYMENTMETHODS =
+        res.data.data !== undefined
+          ? res.data.data.map((payMethod) => {
+              const newPaymentMethod = {
+                id: payMethod.id,
+                method: payMethod.name,
+                description: payMethod.description,
+                status: payMethod.is_active ? 'APPROVED' : 'NOT APPROVED',
+                createdBy: `${payMethod.created_by.first_name} ${payMethod.created_by.last_name}`,
+                createdAt: new Date(payMethod.created_at),
+              };
+
+              return newPaymentMethod;
+            })
+          : [];
 
       setLoading(false);
       setPaymentMethodList(PAYMENTMETHODS);
@@ -25,24 +33,45 @@ export const fetchPaymentMethods = (fetchAPI, setLoading, setPaymentMethodList, 
       setPaymentMethodList([]);
     });
 };
+
+export const paymentMethodUpdateFetch = (fetchAPI, setPaymentMethod) => {
+  axiosInstance
+    .get(fetchAPI)
+    .then((res) =>
+      setPaymentMethod({
+        paymentMethod: res.data.name ? res.data.name : '',
+        paymentCode: res.data.code ? res.data.code : '',
+        description: res.data.description ? res.data.description : '',
+      })
+    )
+    .catch((error) => {
+      console.log(error);
+    });
+};
+
 export const paymentDistributionsFetch = (fetchAPI, setLoading, setPaymentDistributionsList, setPaginationProps) => {
   axiosInstance
     .get(fetchAPI)
     .then((res) => {
-      // setPaginationProps(res.data.pagination);
-      // const PAYMENTDISTRIBUTIONS = res.data.data.map((payDist) => {
-      //   return {
-      //     id: payDist.id,
-      //     operatorName: payDist.operator,
-      //     comName: payDist.company,
-      //     online: payDist.online,
-      //     cash: payDist.cash,
-      //     bank: payDist.bank,
-      //     wallet: payDist.walllet,
-      //   };
-      // });
+      if (typeof setPaginationProps === 'function') {
+        setPaginationProps(res.data.pagination === undefined ? null : res.data.pagination);
+      }
 
-      const PAYMENTDISTRIBUTIONS = [];
+      const PAYMENTDISTRIBUTIONS =
+        res.data.data !== undefined
+          ? res.data.data.map((payDist) => {
+              const newPayDistrb = {
+                id: payDist.id,
+                operatorName: payDist.operator ? payDist.operator.name : '',
+                comName: payDist.operator ? payDist.operator.company_name : '',
+                payMethod: payDist.payment_method ? payDist.payment_method.name : '',
+                totalAmount: payDist.total_amount,
+              };
+
+              return newPayDistrb;
+            })
+          : [];
+
       setLoading(false);
       setPaymentDistributionsList(PAYMENTDISTRIBUTIONS);
     })
@@ -57,20 +86,30 @@ export const paymentTransactionsFetch = (fetchAPI, setLoading, setPaymentTransac
   axiosInstance
     .get(fetchAPI)
     .then((res) => {
-      setPaginationProps(res.data.pagination);
-      const PAYMENTTRANSACTIONS = res.data.data.map((paymentTnx) => {
-        return {
-          id: paymentTnx.id,
-          transactionID: paymentTnx.id,
-          operatorName: paymentTnx.operator,
-          PaymentMethod: paymentTnx.payment_method,
-          paymentType: paymentTnx.transaction_type,
-          amount: paymentTnx.amount,
-          tnxFee: paymentTnx.transaction_fee,
-          createdAt: new Date(paymentTnx.created_at),
-          paymentStatus: paymentTnx.transaction_status,
-        };
-      });
+      if (typeof setPaginationProps === 'function') {
+        setPaginationProps(res.data.pagination === undefined ? null : res.data.pagination);
+      }
+
+      const PAYMENTTRANSACTIONS =
+        res.data.data !== undefined
+          ? res.data.data.map((paymentTnx) => {
+              const newPaymentTnx = {
+                id: paymentTnx.id,
+                transactionID: paymentTnx.id,
+                operatorName: paymentTnx.operator.name,
+                PaymentMethod: paymentTnx.payment_method.name,
+                currencyCode: paymentTnx.currency.code,
+                ticketType: paymentTnx.ticket_type,
+                paymentType: paymentTnx.transaction_type,
+                amount: paymentTnx.amount,
+                tnxFee: paymentTnx.transaction_fee,
+                createdAt: new Date(paymentTnx.created_at),
+                paymentStatus: paymentTnx.transaction_status,
+              };
+
+              return newPaymentTnx;
+            })
+          : [];
       setLoading(false);
       setPaymentTransactionsList(PAYMENTTRANSACTIONS);
     })
@@ -85,19 +124,27 @@ export const bonusTransactionsFetch = (fetchAPI, setLoading, setBonusTransaction
   axiosInstance
     .get(fetchAPI)
     .then((res) => {
-      setPaginationProps(res.data.pagination);
-      const BONUSTRANSACTIONS = res.data.data.map((bonusTnx) => {
-        return {
-          id: bonusTnx.id,
-          operatorName: bonusTnx.operator_reference_number,
-          playerID: bonusTnx.player_id,
-          bonusID: `${bonusTnx.bonus.id} ${bonusTnx.bonus.code} - ${bonusTnx.bonus.name}`,
-          amount: bonusTnx.amount,
-          status: bonusTnx.bonus.is_active ? 'Valid Bonus' : 'Expired Bonus',
-          remark: 'Terms and Conditions',
-          remarkDetail: bonusTnx.bonus.description,
-        };
-      });
+      if (typeof setPaginationProps === 'function') {
+        setPaginationProps(res.data.pagination === undefined ? null : res.data.pagination);
+      }
+
+      const BONUSTRANSACTIONS =
+        res.data.data !== undefined
+          ? res.data.data.map((bonusTnx) => {
+              const newBonusTnx = {
+                id: bonusTnx.id,
+                operatorName: bonusTnx.operator_reference_number,
+                playerID: bonusTnx.player_id,
+                bonusID: `${bonusTnx.bonus.id} ${bonusTnx.bonus.code} - ${bonusTnx.bonus.name}`,
+                amount: bonusTnx.amount,
+                status: bonusTnx.bonus.is_active ? 'Valid Bonus' : 'Expired Bonus',
+                remark: 'Terms and Conditions',
+                remarkDetail: bonusTnx.bonus.description,
+              };
+
+              return newBonusTnx;
+            })
+          : [];
       setLoading(false);
       setBonusTransactionsList(BONUSTRANSACTIONS);
     })

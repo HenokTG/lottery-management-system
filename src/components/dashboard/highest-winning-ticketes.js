@@ -1,21 +1,19 @@
-import { Link as RouterLink } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { NavLink as RouterLink } from 'react-router-dom';
 
-import { v4 as uuid } from 'uuid';
-import { faker } from '@faker-js/faker';
-
-import { useState } from 'react';
-
+// @mui
 import { styled } from '@mui/material/styles';
-import PerfectScrollbar from 'react-perfect-scrollbar';
 import {
-  useTheme,
   Card,
   CardHeader,
+  CircularProgress,
+  Box,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TableRow,
+  Typography,
   CardActions,
   Button,
   SvgIcon,
@@ -27,33 +25,14 @@ import {
   MenuItem,
 } from '@mui/material';
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
-const operatorName = () => {
-  const fakeName = faker.company.catchPhraseNoun();
-  const capName = fakeName.charAt(0).toUpperCase() + fakeName.slice(1);
-  return faker.helpers.arrayElement([`${capName} Gaming`, `${capName} Bet`, `${capName} Lottery`]);
-};
+// context and modules
+import { fetchHighestWinningTicketes } from '../../_apiAxios/dashboard-summary';
 
-const topWinningTickets = [...Array(10).keys()].map((elem, idx) => {
-  return {
-    id: uuid(),
-    operatorName: operatorName(),
-    gameName: faker.helpers.arrayElement([
-      'Scratch',
-      'G1X',
-      'G2X',
-      'Eksa 900',
-      'Eksa 3000',
-      'AMD RX 6900',
-      'Lotto Mini1',
-      'Doubles',
-      'Sport Saga',
-    ]),
-    ticketRef: faker.random.alpha({ count: 15, casing: 'upper' }),
-    winAmount: faker.finance.amount(18000, 130000, 2, '$ ', true),
-  };
-});
+// components
+import Scrollbar from '../auxilary/Scrollbar';
+
+// custom styles
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
@@ -68,7 +47,7 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   '&:nth-of-type(odd)': {
-    backgroundColor: theme.palette.action.hover,
+    backgroundColor: theme.palette.action.oddRow,
   },
   // hide last border
   '&:last-child td, &:last-child th': {
@@ -76,70 +55,93 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
-export const HighestWinningTicketes = (props) => {
-  const theme = useTheme();
+// ---------------------------------------------------------------------------------------------------
 
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(5);
-  const handleChangePage = (event, newPage) => {
-    setPage(newPage);
-  };
+export const HighestWinningTicketes = () => {
+  const [range, setRange] = useState(7);
+  const [loading, setLoading] = useState(true);
+  const [topWinsData, setTopWinsData] = useState([]);
 
-  const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
+  useEffect(
+    () => {
+      const today = new Date();
+      const backDate = new Date(today.setDate(today.getDate() - range));
+
+      const currentDate = today.toJSON().slice(0, 10);
+      const initialDate = backDate.toJSON().slice(0, 10);
+
+      const highestWinningsAPI = `transaction/highest-winning-tickets?date_from=${initialDate}&date_to=${currentDate}`;
+
+      fetchHighestWinningTicketes(highestWinningsAPI, setLoading, setTopWinsData);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [range]
+  );
 
   return (
-    <Card sx={{ height: '100%', p: 1 }} {...props}>
+    <Card sx={{ p: 1 }}>
       <CardHeader title="Highest Winning Tickets" sx={{ py: 2, pl: 1 }} />
-      <PerfectScrollbar>
-        <TableContainer component={Paper}>
-          <Table size="small">
-            <TableHead>
-              <TableRow>
-                <StyledTableCell>Game Name</StyledTableCell>
-                <StyledTableCell>Operator Name</StyledTableCell>
-                <StyledTableCell>Ticket Reference</StyledTableCell>
-                <StyledTableCell>Paid Amount</StyledTableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {topWinningTickets.map((topWinningTicket) => (
-                <StyledTableRow hover key={topWinningTicket.id}>
-                  <TableCell>{topWinningTicket.gameName}</TableCell>
-                  <TableCell>{topWinningTicket.operatorName}</TableCell>
-                  <TableCell>{topWinningTicket.ticketRef}</TableCell>
-                  <TableCell align="right">{topWinningTicket.winAmount}</TableCell>
-                </StyledTableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </PerfectScrollbar>
+      <Scrollbar>
+        {loading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', my: 5 }}>
+            <CircularProgress />
+          </Box>
+        ) : (
+          <TableContainer component={Paper}>
+            <Table size="small">
+              <TableHead>
+                <TableRow>
+                  <StyledTableCell>Game Name</StyledTableCell>
+                  <StyledTableCell>Operator Name</StyledTableCell>
+                  <StyledTableCell>Ticket Reference</StyledTableCell>
+                  <StyledTableCell>Paid Amount</StyledTableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {topWinsData.map((topWinningTicket) => (
+                  <StyledTableRow hover key={topWinningTicket.id}>
+                    <TableCell>{topWinningTicket.gameName}</TableCell>
+                    <TableCell>{topWinningTicket.operatorName}</TableCell>
+                    <TableCell>{topWinningTicket.ticketRef}</TableCell>
+                    <TableCell align="right">{topWinningTicket.winAmount}</TableCell>
+                  </StyledTableRow>
+                ))}
+              </TableBody>
+              {topWinsData.length === 0 && (
+                <TableBody>
+                  <TableRow>
+                    <TableCell align="center" colSpan={4} sx={{ py: 6 }}>
+                      <Box>
+                        <Typography gutterBottom align="center" variant="subtitle1" color="warning.main">
+                          No data fetched!
+                        </Typography>
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                </TableBody>
+              )}
+            </Table>
+          </TableContainer>
+        )}
+      </Scrollbar>
       <Divider />
       <CardActions sx={{ justifyContent: 'space-between', p: 2 }}>
         <TextField
+          select
           fullWidth
           name="range"
           type="text"
           color="info"
-          sx={{ width: '25%' }}
-          InputProps={{
-            style: {
-              border: `1px solid ${theme.palette.info.main}`,
-              color: theme.palette.info.main,
-            },
-          }}
-          defaultValue={7}
           size="small"
-          select
+          sx={{ width: '25%' }}
+          value={range}
+          onChange={(e) => setRange(e.target.value)}
         >
           <MenuItem value={7}>Last 7 Days</MenuItem>
           <MenuItem value={30}>Last 30 Days</MenuItem>
-          <MenuItem value={1}>Last 365 Days</MenuItem>
+          <MenuItem value={365}>a Year</MenuItem>
         </TextField>
-        <RouterLink to="report/winning-ticket" >
+        <RouterLink to="report/winning-ticket">
           <Button
             color="success"
             endIcon={

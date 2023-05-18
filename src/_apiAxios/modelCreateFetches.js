@@ -6,12 +6,14 @@ export const fetchOperatorIDs = (fetchAPI, setOperatorIDs) => {
     .then((res) => {
       let operatorIDs = [];
 
-      if (res.data.data.length !== 0) {
+      if (res.data.data && res.data.data.length !== 0) {
         operatorIDs = res.data.data.map((operator) => {
-          return {
+          const newOperatorID = {
             id: operator.id,
-            operatorName: operator.name,
+            name: operator.name,
           };
+
+          return newOperatorID;
         });
       }
       setOperatorIDs(operatorIDs);
@@ -28,12 +30,14 @@ export const fetchRoleIDs = (fetchAPI, setRoleIDs) => {
     .then((res) => {
       let RoleIDs = [];
 
-      if (res.data.data.length !== 0) {
+      if (res.data.data && res.data.data.length !== 0) {
         RoleIDs = res.data.data.map((role) => {
-          return {
+          const newRoleID = {
             id: role.id,
-            roleName: role.name,
+            name: role.name,
           };
+
+          return newRoleID;
         });
       }
 
@@ -51,12 +55,14 @@ export const fetchCountryIDs = (fetchAPI, setCountryIDs) => {
     .then((res) => {
       let CountryIDs = [];
 
-      if (res.data.data.length !== 0) {
+      if (res.data.data && res.data.data.length !== 0) {
         CountryIDs = res.data.data.map((counrty) => {
-          return {
+          const newCountryID = {
             id: counrty.id,
-            countryName: counrty.name,
+            name: counrty.name,
           };
+
+          return newCountryID;
         });
       }
 

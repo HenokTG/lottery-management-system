@@ -2,7 +2,10 @@ import PropTypes from 'prop-types';
 import { format } from 'date-fns';
 
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import PerfectScrollbar from 'react-perfect-scrollbar';
+
 // @mui
 import {
   Avatar,
@@ -26,14 +29,20 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { styled } from '@mui/material/styles';
+
 // modules
+import { axiosInstance } from '../../utils/axios';
 import { getInitials } from '../../utils/get-initials';
 import { operatorsFetch } from '../../_apiAxios/mainFetches';
+
 // icons
 import { Search as SearchIcon } from '../../icons/search';
 import { Download as DownloadIcon } from '../../icons/download';
 import { Edit } from '../../icons/edit';
+import { Delete } from '../../icons/delete';
+
 // custom styles
+
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: theme.palette.info.main,
@@ -44,9 +53,10 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
     fontSize: 14,
   },
 }));
+
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   '&:nth-of-type(odd)': {
-    backgroundColor: theme.palette.action.hover,
+    backgroundColor: theme.palette.action.oddRow,
   },
   // hide last border
   '&:last-child td, &:last-child th': {
@@ -54,7 +64,11 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
+// --------------------------------------------------------------------------------------------------------------------
+
 export const OperatorListResults = ({ setModalKey }) => {
+  const navigate = useNavigate();
+
   const [loading, setLoading] = useState(true);
 
   const [limit, setLimit] = useState(25);
@@ -66,6 +80,8 @@ export const OperatorListResults = ({ setModalKey }) => {
 
   const [searchQuery, setSearchQuery] = useState('');
 
+  const [deletedID, setDeletedID] = useState('');
+
   useEffect(
     () => {
       const fetchAPI = `operator?page=${page + 1}&per_page=${limit}`;
@@ -73,7 +89,7 @@ export const OperatorListResults = ({ setModalKey }) => {
       operatorsFetch(fetchAPI, setLoading, setOperatorsList, setPaginationProps);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [limit, page]
+    [limit, page, deletedID]
   );
 
   const handleLimitChange = (event) => {
@@ -91,6 +107,15 @@ export const OperatorListResults = ({ setModalKey }) => {
     const fetchAPI = `operator?page=${page + 1}&per_page=${limit}&search_by=${searchKey}&search_term=${searchValue}`;
 
     operatorsFetch(fetchAPI, setLoading, setOperatorsList, setPaginationProps);
+  };
+
+  const handelDeleteOperator = (id) => {
+    axiosInstance
+      .delete(`operator/${id}`)
+      .then(setDeletedID(id))
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   const isDataNotFound = operatorsList.length === 0;
@@ -152,6 +177,7 @@ export const OperatorListResults = ({ setModalKey }) => {
                       <TableRow>
                         <StyledTableCell>Operator Name</StyledTableCell>
                         <StyledTableCell>Company Name</StyledTableCell>
+                        <StyledTableCell>Contact Person</StyledTableCell>
                         <StyledTableCell>Email</StyledTableCell>
                         <StyledTableCell>Phone Number</StyledTableCell>
                         <StyledTableCell>Location</StyledTableCell>
@@ -159,7 +185,7 @@ export const OperatorListResults = ({ setModalKey }) => {
                         <StyledTableCell>Status</StyledTableCell>
                         <StyledTableCell>Created By</StyledTableCell>
                         <StyledTableCell>Created ON</StyledTableCell>
-                        <StyledTableCell>Action</StyledTableCell>
+                        <StyledTableCell align="center">Actions</StyledTableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
@@ -181,6 +207,7 @@ export const OperatorListResults = ({ setModalKey }) => {
                             </Box>
                           </TableCell>
                           <TableCell>{operator.comName}</TableCell>
+                          <TableCell sx={{ fontSize: 12 }}>{operator.contactName}</TableCell>
                           <TableCell sx={{ fontSize: 12 }}>{operator.email}</TableCell>
                           <TableCell sx={{ fontSize: 12 }}>{operator.phone}</TableCell>
                           <TableCell sx={{ fontSize: 12 }}>{operator.address}</TableCell>
@@ -191,18 +218,31 @@ export const OperatorListResults = ({ setModalKey }) => {
                           <TableCell sx={{ fontSize: 12 }}>{operator.createdBy}</TableCell>
                           <TableCell sx={{ fontSize: 12 }}>{format(operator.createdAt, 'MMM dd, yyyy')}</TableCell>
                           <TableCell align="center">
-                            <Button onClick={() => setModalKey(true)}>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                               <Edit
-                                fontSize="small"
+                                onClick={() => navigate(`/app/operators/update/${operator.id}`, { replace: true })}
                                 sx={{
                                   p: 0,
-                                  color: 'black',
+                                  m: 1,
+                                  color: 'action',
                                   '&:hover': {
-                                    color: 'lightseagreen',
+                                    color: 'success.light',
                                   },
                                 }}
                               />
-                            </Button>
+
+                              <Delete
+                                onClick={() => handelDeleteOperator(operator.id)}
+                                sx={{
+                                  p: 0,
+                                  m: 1,
+                                  color: 'action',
+                                  '&:hover': {
+                                    color: 'error.light',
+                                  },
+                                }}
+                              />
+                            </Box>
                           </TableCell>
                         </StyledTableRow>
                       ))}

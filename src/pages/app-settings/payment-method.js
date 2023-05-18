@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 // components
-import Page from '../../components/Page';
-import { CreatePaymentMethod } from '../../components/payment-method/create-payment-method-form';
+import Page from '../../components/layout/Page';
+import CreatePaymentMethod  from '../../components/payment-method/create-payment-method-form';
 import { PaymentMethodList } from '../../components/payment-method/payment-methods-list-results';
 // context and modules
 import { useGlobalContext } from '../../context';

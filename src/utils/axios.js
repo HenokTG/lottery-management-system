@@ -21,12 +21,10 @@ axiosInstance.interceptors.response.use(
     if (typeof error.response === 'undefined') {
       // alert(`A server error occurred. Sorry about this - we will get it fixed shortly.`);
 
-      window.location.reload();
-      return Promise.reject(error);
+      return axiosInstance(originalRequest);
     }
 
     if (error.response.status === 401 && originalRequest.url === `${baseURL}auth/refresh`) {
-      console.log('auth-refresh', error);
       localStorage.removeItem('refresh_token');
 
       const prevLocation = window.location;
@@ -37,9 +35,8 @@ axiosInstance.interceptors.response.use(
     if (
       error.response.data.code === 'token_not_valid' &&
       error.response.status === 401 &&
-      error.response.statusText === 'Unauthorized'
+      (error.response.statusText === 'Unauthorized' || error.response.statusText === '')
     ) {
-      console.log('auth-access', error);
 
       localStorage.removeItem('access_token');
       const refreshToken = localStorage.getItem('refresh_token');
@@ -54,7 +51,7 @@ axiosInstance.interceptors.response.use(
           const postData = { refresh_token: refreshToken };
 
           return axios
-            .post(`${baseURL}auth/refresh/`, postData)
+            .post(`${baseURL}auth/refresh`, postData)
             .then((response) => {
               localStorage.setItem('access_token', response.data.access_token);
               localStorage.setItem('refresh_token', response.data.refresh_token);

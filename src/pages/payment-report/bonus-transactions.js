@@ -2,7 +2,7 @@
 import { Container, Box, Typography } from '@mui/material';
 
 // components
-import Page from '../../components/Page';
+import Page from '../../components/layout/Page';
 import { BonusTransactionsResults } from '../../components/payment-report/bonus-transactions';
 
 const BonusTransactionsReport = () => (

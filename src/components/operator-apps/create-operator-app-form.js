@@ -1,39 +1,71 @@
 import PropTypes from 'prop-types';
 
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 
 // forms validate
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+
 // @mui
 import { Box, Button, Card, Grid, TextField, Typography, MenuItem } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+
 // context and modules
 import { axiosInstance } from '../../utils/axios';
+import { useGlobalContext } from '../../context';
 import { fetchOperatorIDs } from '../../_apiAxios/modelCreateFetches';
+import { operatorAppUpdateFetch } from '../../_apiAxios/app-config';
 
-export const CreateOperatorApp = ({ setModalKey }) => {
+// -----------------------------------------------------------------------------------------------------------------------
+
+const CreateOperatorApp = ({ setModalKey }) => {
   const theme = useTheme();
-  const navigate = useNavigate();
 
-  const [operatorIDs, setOperatorIDs] = useState([{ id: -1, operatorName: 'No role to assign' }]);
+  const navigate = useNavigate();
+  const prevLocation = useLocation();
+
+  const { id } = useParams();
+
+  const { loggedIn } = useGlobalContext();
+
+  const [operatorIDs, setOperatorIDs] = useState([{ id: -1, name: 'No operator to assign' }]);
+
+  const [intialOperatorAppData, setIntialOperatorAppData] = useState({
+    appName: '',
+    operatorName: '',
+  });
 
   useEffect(
     () => {
       const operatorFetchAPI = `operator?page=${1}&per_page=${25}`;
 
       fetchOperatorIDs(operatorFetchAPI, setOperatorIDs);
+
+      if (id !== undefined) {
+        if (loggedIn === false) {
+          navigate(`/login?redirectTo=${prevLocation.pathname}`);
+        }
+
+        const updateOperatorAppAPI = `app/${id}`;
+        operatorAppUpdateFetch(updateOperatorAppAPI, setIntialOperatorAppData);
+      }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
 
+  const handleFormCancel = () => {
+    if (id === undefined) {
+      setModalKey(false);
+    } else {
+      navigate('/app/app-settings/operator-apps', { replace: true });
+    }
+  };
+
   const formik = useFormik({
-    initialValues: {
-      appName: '',
-      operatorName: '',
-    },
+    initialValues: intialOperatorAppData,
+    enableReinitialize: true,
     validationSchema: Yup.object({
       appName: Yup.string().max(255).required('App name is required'),
       operatorName: Yup.string().max(255).required('Operator Name is required'),
@@ -42,21 +74,32 @@ export const CreateOperatorApp = ({ setModalKey }) => {
       const postData = {
         name: values.appName,
         operator: values.operatorName,
-        is_active: true,
       };
 
-      axiosInstance
-        .post(`app`, postData)
-        .then((res) => {
-          setModalKey(false);
-          // navigate('/app/licence-catagories', { replace: true });
-        })
-        .catch((error) => {
-          helpers.setStatus({ success: false });
-          helpers.setErrors({ submit: error.message });
-          helpers.setSubmitting(false);
-          console.log(error);
-        });
+      if (id === undefined) {
+        postData.is_active = true;
+
+        axiosInstance
+          .post('app', postData)
+          .then(() => {
+            setModalKey(false);
+          })
+          .catch((error) => {
+            helpers.setStatus({ success: false });
+            helpers.setErrors({ submit: error.message });
+            helpers.setSubmitting(false);
+            console.log(error);
+          });
+      } else {
+        axiosInstance
+          .patch(`app/${id}`, postData)
+          .then(() => {
+            navigate('/app/app-settings/operator-apps', { replace: true });
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
     },
   });
 
@@ -70,7 +113,7 @@ export const CreateOperatorApp = ({ setModalKey }) => {
         }}
       >
         <Typography sx={{ ml: 4, mt: 1, mb: 3 }} variant="h4">
-          Add Operator App
+          {id === undefined ? 'Add' : 'Update'} Operator App
         </Typography>
         <Card sx={{ display: 'flex', justifyContent: 'center', mx: 3, p: 3 }}>
           <form onSubmit={formik.handleSubmit}>
@@ -87,7 +130,7 @@ export const CreateOperatorApp = ({ setModalKey }) => {
                   pb: 2,
                 }}
               >
-                Enter App Details
+                {id === undefined ? 'Enter' : 'Edit'} App Details
               </Typography>
             </Box>
             <Grid container spacing={2} minWidth="600px">
@@ -121,8 +164,8 @@ export const CreateOperatorApp = ({ setModalKey }) => {
                   select
                 >
                   {operatorIDs.map((operator) => (
-                    <MenuItem key={`${operator.id}-${operator.operatorName}`} value={operator.id}>
-                      {operator.operatorName}
+                    <MenuItem key={`${operator.id}-${operator.name}`} value={operator.id}>
+                      {operator.name}
                     </MenuItem>
                   ))}
                 </TextField>
@@ -131,7 +174,7 @@ export const CreateOperatorApp = ({ setModalKey }) => {
 
             <Box sx={{ py: 2, mt: 2, display: 'flex', justifyContent: 'space-between' }}>
               <Button
-                onClick={() => window.location.reload()}
+                onClick={handleFormCancel}
                 color="error"
                 disabled={formik.isSubmitting}
                 fullWidth
@@ -142,7 +185,7 @@ export const CreateOperatorApp = ({ setModalKey }) => {
                 Cancel
               </Button>
               <Button
-                color="secondary"
+                color={id === undefined ? 'secondary' : 'warning'}
                 disabled={formik.isSubmitting}
                 fullWidth
                 size="large"
@@ -150,7 +193,7 @@ export const CreateOperatorApp = ({ setModalKey }) => {
                 variant="contained"
                 sx={{ width: '48%' }}
               >
-                Add App
+                {id === undefined ? 'Add' : 'Update'} App
               </Button>
             </Box>
           </form>
@@ -163,3 +206,5 @@ export const CreateOperatorApp = ({ setModalKey }) => {
 CreateOperatorApp.propTypes = {
   setModalKey: PropTypes.func,
 };
+
+export default CreateOperatorApp;

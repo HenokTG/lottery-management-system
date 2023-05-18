@@ -4,7 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 // @mui
 import { Box, Container, Card, CardContent, Typography, Avatar } from '@mui/material';
 // components
-import Page from '../components/Page';
+import Page from '../components/layout/Page';
 // context and modules
 import { useGlobalContext } from '../context';
 

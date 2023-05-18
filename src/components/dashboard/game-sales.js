@@ -1,15 +1,19 @@
+import { useState, useEffect } from 'react';
 import { NavLink as RouterLink } from 'react-router-dom';
 
 // react chartJS
 import { Chart as ChartJS } from 'chart.js/auto';
 import { Bar, Chart } from 'react-chartjs-2';
 
+// @mui
 import {
   Box,
   Button,
   Card,
   CardContent,
+  CircularProgress,
   CardHeader,
+  Typography,
   CardActions,
   TextField,
   MenuItem,
@@ -19,8 +23,33 @@ import {
 } from '@mui/material';
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
 
-export const SalesByGames = (props) => {
+// context and modules
+import { fetchSalesByGamesCatagory } from '../../_apiAxios/dashboard-summary';
+
+// ---------------------------------------------------------------------------------------------------
+
+export const SalesByGames = () => {
   const theme = useTheme();
+
+  const [range, setRange] = useState(7);
+  const [loading, setLoading] = useState(true);
+  const [gameSalesData, setGameSalesData] = useState({ title: [], value: [] });
+
+  useEffect(
+    () => {
+      const today = new Date();
+      const backDate = new Date(today.setDate(today.getDate() - range));
+
+      const currentDate = today.toJSON().slice(0, 10);
+      const initialDate = backDate.toJSON().slice(0, 10);
+
+      const gameCataAPI = `game/sales?date_from=${initialDate}&date_to=${currentDate}`;
+
+      fetchSalesByGamesCatagory(gameCataAPI, setLoading, setGameSalesData);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [range]
+  );
 
   const data = {
     datasets: [
@@ -30,22 +59,12 @@ export const SalesByGames = (props) => {
         barThickness: 30,
         borderRadius: 4,
         categoryPercentage: 0.5,
-        data: [1800, 555, 1119, 2700, 290, 1590, 2000, 1230, 720],
+        data: gameSalesData.value,
         label: 'Sales Total by Game Category',
         maxBarThickness: 50,
       },
     ],
-    labels: [
-      'Scrach Cards',
-      'Hotel Premise Casino',
-      'Other Games',
-      'Public Online Lottery (POL)',
-      'Stand Alone Casino',
-      'Online Sport Betting (OSB)',
-      'Gaming Machine',
-      'Fixed Odd Pool Betting',
-      'Online Casino',
-    ],
+    labels: gameSalesData.title,
   };
 
   const options = {
@@ -115,36 +134,43 @@ export const SalesByGames = (props) => {
       />
       <Divider />
       <CardContent>
-        <Box
-          sx={{
-            height: 400,
-            position: 'relative',
-          }}
-        >
-          <Bar data={data} options={options} />
-        </Box>
+        {loading ? (
+          <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', my: 3 }}>
+            <CircularProgress />
+          </Box>
+        ) : (
+          <Box
+            sx={{
+              // height: 400,
+              position: 'relative',
+            }}
+          >
+            {data.labels.length === 0 ? (
+              <Typography color="warning.main" variant="subtitle1" align="center" sx={{ my: 6 }}>
+                No data fetched!
+              </Typography>
+            ) : (
+              <Bar data={data} options={options} />
+            )}
+          </Box>
+        )}
       </CardContent>
       <Divider />
       <CardActions sx={{ justifyContent: 'space-between', p: 2 }}>
         <TextField
+          select
           fullWidth
           name="range"
           type="text"
           color="info"
-          sx={{ width: '25%' }}
-          InputProps={{
-            style: {
-              border: `1px solid ${theme.palette.info.main}`,
-              color: theme.palette.info.main,
-            },
-          }}
-          defaultValue={7}
           size="small"
-          select
+          sx={{ width: '25%' }}
+          value={range}
+          onChange={(e) => setRange(e.target.value)}
         >
           <MenuItem value={7}>Last 7 Days</MenuItem>
           <MenuItem value={30}>Last 30 Days</MenuItem>
-          <MenuItem value={1}>Last 365 Days</MenuItem>
+          <MenuItem value={365}>a Year</MenuItem>
         </TextField>
         <RouterLink to="app/games">
           <Button

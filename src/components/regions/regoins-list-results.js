@@ -2,7 +2,10 @@ import { format } from 'date-fns';
 import PropTypes from 'prop-types';
 
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import PerfectScrollbar from 'react-perfect-scrollbar';
+
 // @mui
 import {
   Box,
@@ -25,13 +28,19 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 import { styled } from '@mui/material/styles';
+
 // modules
+import { axiosInstance } from '../../utils/axios';
 import { regionsFetch } from '../../_apiAxios/app-config';
+
 // icons
 import { Search as SearchIcon } from '../../icons/search';
 import { Download as DownloadIcon } from '../../icons/download';
 import { Edit } from '../../icons/edit';
+import { Delete } from '../../icons/delete';
+
 // custom styles
+
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: theme.palette.info.main,
@@ -42,9 +51,10 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
     fontSize: 14,
   },
 }));
+
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   '&:nth-of-type(odd)': {
-    // backgroundColor: theme.palette.action.hover,
+    backgroundColor: theme.palette.action.oddRow,
   },
   // hide last border
   '&:last-child td, &:last-child th': {
@@ -52,7 +62,11 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
+// --------------------------------------------------------------------------------------------------------------------
+
 export const RegionList = ({ setModalKey }) => {
+  const navigate = useNavigate();
+
   const [loading, setLoading] = useState(true);
 
   const [limit, setLimit] = useState(25);
@@ -64,6 +78,8 @@ export const RegionList = ({ setModalKey }) => {
 
   const [searchQuery, setSearchQuery] = useState('');
 
+  const [deletedID, setDeletedID] = useState('');
+
   useEffect(
     () => {
       const fetchAPI = `state?page=${page + 1}&per_page=${limit}`;
@@ -71,7 +87,7 @@ export const RegionList = ({ setModalKey }) => {
       regionsFetch(fetchAPI, setLoading, setRegionsList, setPaginationProps);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [limit, page]
+    [limit, page, deletedID]
   );
 
   const handleLimitChange = (event) => {
@@ -89,6 +105,15 @@ export const RegionList = ({ setModalKey }) => {
     const fetchAPI = `state?page=${page + 1}&per_page=${limit}&search_by=${searchKey}&search_term=${searchValue}`;
 
     regionsFetch(fetchAPI, setLoading, setRegionsList, setPaginationProps);
+  };
+
+  const handelDeleteRegion = (id) => {
+    axiosInstance
+      .delete(`state/${id}`)
+      .then(setDeletedID(id))
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   const isDataNotFound = regionsList.length === 0;
@@ -154,7 +179,7 @@ export const RegionList = ({ setModalKey }) => {
                         <StyledTableCell>Status</StyledTableCell>
                         <StyledTableCell>Created By</StyledTableCell>
                         <StyledTableCell>Created On</StyledTableCell>
-                        <StyledTableCell>Action</StyledTableCell>
+                        <StyledTableCell align="center">Actions</StyledTableCell>
                       </TableRow>
                     </TableHead>
                     <TableBody>
@@ -174,18 +199,36 @@ export const RegionList = ({ setModalKey }) => {
                           <TableCell>{region.createdBy}</TableCell>
                           <TableCell>{format(region.createdAt, 'MMM dd, yyyy')}</TableCell>
                           <TableCell align="center">
-                            <Button onClick={() => setModalKey(true)}>
+                            <Box>
                               <Edit
-                                fontSize="small"
+                                onClick={() =>
+                                  navigate(`/app/app-settings/regional-locations/update/${region.id}`, {
+                                    replace: true,
+                                  })
+                                }
                                 sx={{
                                   p: 0,
-                                  color: 'black',
+                                  m: 1,
+                                  color: 'action',
                                   '&:hover': {
-                                    color: 'lightseagreen',
+                                    color: 'success.light',
                                   },
                                 }}
                               />
-                            </Button>
+
+                              <Delete
+                                onClick={() => handelDeleteRegion(region.id)}
+                                sx={{
+                                  p: 0,
+                                  m: 1,
+                                  ml: 2,
+                                  color: 'action',
+                                  '&:hover': {
+                                    color: 'error.light',
+                                  },
+                                }}
+                              />
+                            </Box>
                           </TableCell>
                         </StyledTableRow>
                       ))}

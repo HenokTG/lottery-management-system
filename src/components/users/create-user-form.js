@@ -1,50 +1,82 @@
 import PropTypes from 'prop-types';
 
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 
 // forms validate
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+
 // @mui
 import { Box, Button, Card, Divider, Grid, TextField, Typography, MenuItem } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+
 // context and modules
+import { useGlobalContext } from '../../context';
 import { axiosInstance } from '../../utils/axios';
 import { fetchRoleIDs } from '../../_apiAxios/modelCreateFetches';
+import { userUpdateFetch } from '../../_apiAxios/management';
 
-export const CreateUser = ({ setModalKey }) => {
+// -----------------------------------------------------------------------------------------------------------------------
+
+const CreateUser = ({ setModalKey }) => {
   const theme = useTheme();
-  const navigate = useNavigate();
 
-  const [roleIDs, setRoleIDs] = useState([{ id: -1, roleName: 'No role to assign' }]);
+  const navigate = useNavigate();
+  const prevLocation = useLocation();
+
+  const { id } = useParams();
+
+  const { loggedIn } = useGlobalContext();
+
+  const [roleIDs, setRoleIDs] = useState([{ id: -1, name: 'No role to assign' }]);
+
+  const [intialUserData, setIntialUserData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phoneNumber: '',
+    userRole: '',
+    // operator: '',
+  });
 
   useEffect(
     () => {
       const roleFetchAPI = `role?page=${1}&per_page=${25}`;
 
       fetchRoleIDs(roleFetchAPI, setRoleIDs);
+
+      if (id !== undefined) {
+        if (loggedIn === false) {
+          navigate(`/login?redirectTo=${prevLocation.pathname}`);
+        }
+
+        const updateOperatorAPI = `user/${id}`;
+        userUpdateFetch(updateOperatorAPI, setIntialUserData);
+      }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
 
+  const handleFormCancel = () => {
+    if (id === undefined) {
+      setModalKey(false);
+    } else {
+      navigate('/app/management/user-management', { replace: true });
+    }
+  };
+
   const formik = useFormik({
-    initialValues: {
-      firstName: '',
-      lastName: '',
-      email: '',
-      phoneNumber: '',
-      userRole: '',
-      operator: '',
-    },
+    initialValues: intialUserData,
+    enableReinitialize: true,
     validationSchema: Yup.object({
       firstName: Yup.string().max(255).required('First name is required'),
       lastName: Yup.string().max(255).required('Last name is required'),
       email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
       phoneNumber: Yup.string().max(255).required('Phone number is required'),
       userRole: Yup.string().max(255).required('Please select user role'),
-      operator: Yup.string().max(255).required('Please assign operator for the user'),
+      // operator: Yup.string().max(255).required('Please assign operator for the user'),
     }),
     onSubmit: (values, helpers) => {
       const postData = {
@@ -54,22 +86,33 @@ export const CreateUser = ({ setModalKey }) => {
         phone: values.phoneNumber,
         role: values.userRole,
         // operator: values.operator,
-        password: '12345678',
-        is_active: true,
       };
 
-      axiosInstance
-        .post(`user`, postData)
-        .then((res) => {
-          setModalKey(false);
-          // navigate('/app/games', { replace: true });
-        })
-        .catch((error) => {
-          helpers.setStatus({ success: false });
-          helpers.setErrors({ submit: error.message });
-          helpers.setSubmitting(false);
-          console.log(error);
-        });
+      if (id === undefined) {
+        postData.is_active = true;
+        postData.password = '12345678';
+
+        axiosInstance
+          .post('user', postData)
+          .then(() => {
+            setModalKey(false);
+          })
+          .catch((error) => {
+            helpers.setStatus({ success: false });
+            helpers.setErrors({ submit: error.message });
+            helpers.setSubmitting(false);
+            console.log(error);
+          });
+      } else {
+        axiosInstance
+          .patch(`user/${id}`, postData)
+          .then(() => {
+            navigate('/app/management/user-management', { replace: true });
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
     },
   });
 
@@ -83,7 +126,7 @@ export const CreateUser = ({ setModalKey }) => {
         }}
       >
         <Typography sx={{ ml: 4, mt: 1, mb: 3 }} variant="h4">
-          Create User
+          {id === undefined ? 'Create' : 'Update'} User
         </Typography>
         <Card sx={{ display: 'flex', justifyContent: 'center', mx: 3, p: 3 }}>
           <form onSubmit={formik.handleSubmit}>
@@ -100,7 +143,7 @@ export const CreateUser = ({ setModalKey }) => {
                   pb: 2,
                 }}
               >
-                Basic Detail About the User
+                {id === undefined ? 'Enter' : 'Edit'} Basic Detail About the User
               </Typography>
             </Box>
             <Grid container spacing={3} sx={{ px: 15 }}>
@@ -175,7 +218,7 @@ export const CreateUser = ({ setModalKey }) => {
                   pb: 2,
                 }}
               >
-                Select the User Role
+                {id === undefined ? 'Select' : 'Change'} the User Role
               </Typography>
               {/* and Assigned Operator  */}
             </Box>
@@ -195,8 +238,8 @@ export const CreateUser = ({ setModalKey }) => {
                   select
                 >
                   {roleIDs.map((roleId) => (
-                    <MenuItem key={`${roleId.id}-${roleId.roleName}`} value={roleId.id}>
-                      {roleId.roleName}
+                    <MenuItem key={`${roleId.id}-${roleId.role}`} value={roleId.id}>
+                      {roleId.role}
                     </MenuItem>
                   ))}
                 </TextField>
@@ -205,7 +248,7 @@ export const CreateUser = ({ setModalKey }) => {
 
             <Box sx={{ py: 2, px: 15, mt: 2, display: 'flex', justifyContent: 'space-between' }}>
               <Button
-                onClick={() => window.location.reload()}
+                onClick={handleFormCancel}
                 color="error"
                 disabled={formik.isSubmitting}
                 fullWidth
@@ -216,7 +259,7 @@ export const CreateUser = ({ setModalKey }) => {
                 Cancel
               </Button>
               <Button
-                color="secondary"
+                color={id === undefined ? 'secondary' : 'warning'}
                 disabled={formik.isSubmitting}
                 fullWidth
                 size="large"
@@ -224,7 +267,7 @@ export const CreateUser = ({ setModalKey }) => {
                 variant="contained"
                 sx={{ width: '48%' }}
               >
-                Create User
+                {id === undefined ? 'Create' : 'Update'} User
               </Button>
             </Box>
           </form>
@@ -237,3 +280,5 @@ export const CreateUser = ({ setModalKey }) => {
 CreateUser.propTypes = {
   setModalKey: PropTypes.func,
 };
+
+export default CreateUser;

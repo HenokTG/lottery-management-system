@@ -1,26 +1,65 @@
 import PropTypes from 'prop-types';
 
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 
 // forms validate
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+
 // @mui
 import { Box, Button, Card, Grid, TextField, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+
 // context and modules
 import { axiosInstance } from '../../utils/axios';
+import { useGlobalContext } from '../../context';
+import { paymentMethodUpdateFetch } from '../../_apiAxios/payment-report';
 
-export const CreatePaymentMethod = ({ setModalKey }) => {
+// -----------------------------------------------------------------------------------------------------------------------
+
+const CreatePaymentMethod = ({ setModalKey }) => {
   const theme = useTheme();
+
   const navigate = useNavigate();
+  const prevLocation = useLocation();
+
+  const { id } = useParams();
+
+  const { loggedIn } = useGlobalContext();
+
+  const [intialPaymentMethodData, setIntialPaymentMethodData] = useState({
+    paymentMethod: '',
+    paymentCode: '',
+    description: '',
+  });
+
+  useEffect(
+    () => {
+      if (id !== undefined) {
+        if (loggedIn === false) {
+          navigate(`/login?redirectTo=${prevLocation.pathname}`);
+        }
+
+        const updatePaymentMethodAPI = `payment-method/${id}`;
+        paymentMethodUpdateFetch(updatePaymentMethodAPI, setIntialPaymentMethodData);
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    []
+  );
+
+  const handleFormCancel = () => {
+    if (id === undefined) {
+      setModalKey(false);
+    } else {
+      navigate('/app/app-settings/payment-method', { replace: true });
+    }
+  };
 
   const formik = useFormik({
-    initialValues: {
-      paymentMethod: '',
-      paymentCode: '',
-      description: '',
-    },
+    initialValues: intialPaymentMethodData,
+    enableReinitialize: true,
     validationSchema: Yup.object({
       paymentMethod: Yup.string().max(255).required('Payment method name is required'),
       paymentCode: Yup.string().max(255).required('Payment method code is required'),
@@ -34,18 +73,30 @@ export const CreatePaymentMethod = ({ setModalKey }) => {
         is_active: true,
       };
 
-      axiosInstance
-        .post(`payment-method`, postData)
-        .then((res) => {
-          setModalKey(false);
-          // navigate('/app/licence-catagories', { replace: true });
-        })
-        .catch((error) => {
-          helpers.setStatus({ success: false });
-          helpers.setErrors({ submit: error.message });
-          helpers.setSubmitting(false);
-          console.log(error);
-        });
+      if (id === undefined) {
+        postData.is_active = true;
+
+        axiosInstance
+          .post('payment-method', postData)
+          .then(() => {
+            setModalKey(false);
+          })
+          .catch((error) => {
+            helpers.setStatus({ success: false });
+            helpers.setErrors({ submit: error.message });
+            helpers.setSubmitting(false);
+            console.log(error);
+          });
+      } else {
+        axiosInstance
+          .patch(`payment-method/${id}`, postData)
+          .then(() => {
+            navigate('/app/app-settings/payment-method', { replace: true });
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
     },
   });
 
@@ -59,7 +110,7 @@ export const CreatePaymentMethod = ({ setModalKey }) => {
         }}
       >
         <Typography sx={{ ml: 4, mt: 1, mb: 3 }} variant="h4">
-          Create Payment Method
+          {id === undefined ? 'Add' : 'Update'} Payment Method
         </Typography>
         <Card sx={{ display: 'flex', justifyContent: 'center', mx: 3, p: 3 }}>
           <form onSubmit={formik.handleSubmit}>
@@ -76,7 +127,7 @@ export const CreatePaymentMethod = ({ setModalKey }) => {
                   pb: 2,
                 }}
               >
-                Enter Payment Method Details
+                {id === undefined ? 'Enter' : 'Edit'} Payment Method Details
               </Typography>
             </Box>
             <Grid container spacing={2} minWidth="600px">
@@ -132,7 +183,7 @@ export const CreatePaymentMethod = ({ setModalKey }) => {
 
             <Box sx={{ py: 2, mt: 2, display: 'flex', justifyContent: 'space-between' }}>
               <Button
-                onClick={() => window.location.reload()}
+                onClick={handleFormCancel}
                 color="error"
                 disabled={formik.isSubmitting}
                 fullWidth
@@ -143,7 +194,7 @@ export const CreatePaymentMethod = ({ setModalKey }) => {
                 Cancel
               </Button>
               <Button
-                color="secondary"
+                color={id === undefined ? 'secondary' : 'warning'}
                 disabled={formik.isSubmitting}
                 fullWidth
                 size="large"
@@ -151,7 +202,7 @@ export const CreatePaymentMethod = ({ setModalKey }) => {
                 variant="contained"
                 sx={{ width: '48%' }}
               >
-                Create Payment Method
+                {id === undefined ? 'Add' : 'Update'} Payment Method
               </Button>
             </Box>
           </form>
@@ -164,3 +215,5 @@ export const CreatePaymentMethod = ({ setModalKey }) => {
 CreatePaymentMethod.propTypes = {
   setModalKey: PropTypes.func,
 };
+
+export default CreatePaymentMethod;

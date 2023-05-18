@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { NavLink as RouterLink, useNavigate, useLocation } from 'react-router-dom';
 
 import PerfectScrollbar from 'react-perfect-scrollbar';
+
 // @mui
 import {
   Box,
@@ -22,14 +23,22 @@ import {
   CircularProgress,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
+
+// components
+import AnnualReportFilter from '../auxilary/AnnualReportFilter';
+
 // context and modules
 import { useGlobalContext } from '../../context';
 import { bonusTransactionsFetch } from '../../_apiAxios/payment-report';
+import { fetchOperatorIDs } from '../../_apiAxios/modelCreateFetches';
+import { boolianIDs } from '../../_apiAxios/fetchFilterIDs';
+
 // icons
 import { Search as SearchIcon } from '../../icons/search';
 import { Download as DownloadIcon } from '../../icons/download';
-import { Filter } from '../../icons/filter';
+
 // custom styles
+
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: theme.palette.info.main,
@@ -43,14 +52,16 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   '&:nth-of-type(odd)': {
-    backgroundColor: theme.palette.action.hover,
+    backgroundColor: theme.palette.action.oddRow,
   },
   // hide last border
   '&:last-child td, &:last-child th': {
     border: 0,
   },
 }));
+
 // ----------------------------------------------------------------------------------
+
 export const BonusTransactionsResults = () => {
   const { loggedIn } = useGlobalContext();
 
@@ -68,18 +79,26 @@ export const BonusTransactionsResults = () => {
 
   const [searchQuery, setSearchQuery] = useState('');
 
+  const fetchRootAPI = `bonus?page=${page + 1}&per_page=${limit}`;
+
+  const [fetchAPI, setFetchAPI] = useState(fetchRootAPI);
+
+  const [operatorIDs, setOperatorIDs] = useState([{ id: -1, operatorName: 'No role to assign' }]);
+
   useEffect(
     () => {
       if (loggedIn === false) {
         navigate(`/login?redirectTo=${prevLocation.pathname}`);
       }
 
-      const fetchAPI = `transaction/bonus?page=${page + 1}&per_page=${limit}`;
-
       bonusTransactionsFetch(fetchAPI, setLoading, setBonusTransactionsList, setPaginationProps);
+
+      const operatorIDsFetchAPI = `operator?page=${1}&per_page=${50}`;
+
+      fetchOperatorIDs(operatorIDsFetchAPI, setOperatorIDs);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [limit, page]
+    [limit, page, fetchAPI]
   );
 
   const handleLimitChange = (event) => {
@@ -94,14 +113,57 @@ export const BonusTransactionsResults = () => {
     setSearchQuery(e.target.value);
     const searchKey = 'operator';
     const searchValue = e.target.value;
-    const fetchAPI = `transaction/bonus?page=${
-      page + 1
-    }&per_page=${limit}&search_by=${searchKey}&search_term=${searchValue}`;
+    const fetchAPI = `bonus?page=${page + 1}&per_page=${limit}&search_by=${searchKey}&search_term=${searchValue}`;
 
     bonusTransactionsFetch(fetchAPI, setLoading, setBonusTransactionsList, setPaginationProps);
   };
 
   const isDataNotFound = bonusTransactionsList.length === 0;
+
+  // For Filter component
+
+  const [dateFrom, setDateFrom] = useState(null);
+  const [dateTo, setDateTo] = useState(null);
+  const [bonusStatus, setBonusStatus] = useState('');
+  const [operatorID, setOperatorID] = useState('');
+
+  const filterQueryAPI = `date_from=${dateFrom ? dateFrom.toISOString().split('T')[0] : ''}&date_to=${
+    dateTo ? dateTo.toISOString().split('T')[0] : ''
+  }&is_active=${bonusStatus}&operator=${operatorID}`;
+
+  const filterProps = [
+    {
+      fieldName: 'dateFrom',
+      title: 'Date From',
+      child: null,
+      valueSet: dateFrom,
+      callChangeFunc: setDateFrom,
+      fieldType: 'date',
+    },
+    {
+      fieldName: 'dateTO',
+      title: 'Date To',
+      child: null,
+      valueSet: dateTo,
+      callChangeFunc: setDateTo,
+      fieldType: 'date',
+    },
+
+    {
+      fieldName: 'isActive',
+      title: 'Select Bonus Status',
+      child: boolianIDs(),
+      valueSet: bonusStatus,
+      callChangeFunc: setBonusStatus,
+    },
+    {
+      fieldName: 'operatorID',
+      title: 'Select Operator',
+      child: operatorIDs,
+      valueSet: operatorID,
+      callChangeFunc: setOperatorID,
+    },
+  ];
 
   return (
     <Card>
@@ -137,9 +199,12 @@ export const BonusTransactionsResults = () => {
                 <Button color="info" variant="outlined" startIcon={<DownloadIcon fontSize="small" />}>
                   Export
                 </Button>
-                <Button color="info" variant="contained" startIcon={<Filter fontSize="small" />}>
-                  Filter
-                </Button>
+                <AnnualReportFilter
+                  filterProps={filterProps}
+                  fetchRootAPI={fetchRootAPI}
+                  filterQueryAPI={filterQueryAPI}
+                  setFetchAPI={setFetchAPI}
+                />
               </Grid>
             </Grid>
             <Card sx={{ mx: 2 }}>
@@ -186,7 +251,8 @@ export const BonusTransactionsResults = () => {
                           </Typography>
                           <Typography variant="body2" align="center" color="warning.main">
                             No results found for &nbsp;
-                            <strong style={{color:"success.light"}}>&quot;{searchQuery}&quot;</strong>. Try checking for typos or internet connection.
+                            <strong style={{ color: 'success.light' }}>&quot;{searchQuery}&quot;</strong>. Try checking
+                            for typos or internet connection.
                           </Typography>
                         </Box>
                       </TableCell>

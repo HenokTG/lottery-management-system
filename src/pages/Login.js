@@ -7,7 +7,7 @@ import * as Yup from 'yup';
 // @mui
 import { Box, Button, Container, TextField, Typography } from '@mui/material';
 // components
-import Page from '../components/Page';
+import Page from '../components/layout/Page';
 // context and modules
 import { axiosInstance } from '../utils/axios';
 import { useGlobalContext } from '../context';

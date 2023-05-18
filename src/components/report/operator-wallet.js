@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 import PerfectScrollbar from 'react-perfect-scrollbar';
+
 // @mui
 import {
   Box,
@@ -22,14 +23,22 @@ import {
   CircularProgress,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
+
+// components
+import AnnualReportFilter from '../auxilary/AnnualReportFilter';
+
 // context and modules
 import { useGlobalContext } from '../../context';
 import { operatorsWalletFetch } from '../../_apiAxios/report';
+import { fetchOperatorIDs } from '../../_apiAxios/modelCreateFetches';
+import { fetchCurrencyIDs } from '../../_apiAxios/fetchFilterIDs';
+
 // icons
 import { Search as SearchIcon } from '../../icons/search';
 import { Download as DownloadIcon } from '../../icons/download';
-import { Filter } from '../../icons/filter';
+
 // custom styles
+
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: theme.palette.info.main,
@@ -40,15 +49,17 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
     fontSize: 14,
   },
 }));
+
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   '&:nth-of-type(odd)': {
-    backgroundColor: theme.palette.action.hover,
+    backgroundColor: theme.palette.action.oddRow,
   },
   // hide last border
   '&:last-child td, &:last-child th': {
     border: 0,
   },
 }));
+
 // -------------------------------------------------------------------------------
 
 export const OperatorWalletResults = () => {
@@ -68,18 +79,29 @@ export const OperatorWalletResults = () => {
 
   const [searchQuery, setSearchQuery] = useState('');
 
+  const fetchRootAPI = `operator-wallet?page=${page + 1}&per_page=${limit}`;
+
+  const [fetchAPI, setFetchAPI] = useState(fetchRootAPI);
+
+  const [operatorIDs, setOperatorIDs] = useState([{ id: -1, operatorName: 'No role to assign' }]);
+  const [currencyIDs, setCurrencyIDs] = useState([{ id: -1, operatorName: 'No currency to assign' }]);
+
   useEffect(
     () => {
       if (loggedIn === false) {
         navigate(`/login?redirectTo=${prevLocation.pathname}`);
       }
 
-      const fetchAPI = `operator-wallet?page=${page + 1}&per_page=${limit}`;
-
       operatorsWalletFetch(fetchAPI, setLoading, setOperatorsWalletList, setPaginationProps);
+
+      const operatorFetchAPI = `operator?page=${1}&per_page=${25}`;
+      const currencyIDsFetchAPI = `currency?page=${1}&per_page=${50}`;
+
+      fetchOperatorIDs(operatorFetchAPI, setOperatorIDs);
+      fetchCurrencyIDs(currencyIDsFetchAPI, setCurrencyIDs);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [limit, page]
+    [limit, page, fetchAPI]
   );
 
   const handleLimitChange = (event) => {
@@ -102,6 +124,66 @@ export const OperatorWalletResults = () => {
   };
 
   const isDataNotFound = operatorsWalletList.length === 0;
+
+  // For Filter component
+
+  const [dateFrom, setDateFrom] = useState(null);
+  const [dateTo, setDateTo] = useState(null);
+  const [operatorID, setOperatorID] = useState('');
+  const [currencyID, setCurrencyID] = useState('');
+  const [minAmount, setMinAmount] = useState('');
+  const [maxAmount, setMaxAmount] = useState('');
+
+  const filterQueryAPI = `date_from=${dateFrom ? dateFrom.toISOString().split('T')[0] : ''}&date_to=${
+    dateTo ? dateTo.toISOString().split('T')[0] : ''
+  }&operator=${operatorID}&currency=${currencyID}&minimum_amount=${minAmount}&maximum_amount=${maxAmount}`;
+
+  const filterProps = [
+    {
+      fieldName: 'dateFrom',
+      title: 'Date From',
+      child: null,
+      valueSet: dateFrom,
+      callChangeFunc: setDateFrom,
+      fieldType: 'date',
+    },
+    {
+      fieldName: 'dateTO',
+      title: 'Date To',
+      child: null,
+      valueSet: dateTo,
+      callChangeFunc: setDateTo,
+      fieldType: 'date',
+    },
+    {
+      fieldName: 'operatorID',
+      title: 'Select Operator',
+      child: operatorIDs,
+      valueSet: operatorID,
+      callChangeFunc: setOperatorID,
+    },
+    {
+      fieldName: 'currencyID',
+      title: 'Select Currency',
+      child: currencyIDs,
+      valueSet: currencyID,
+      callChangeFunc: setCurrencyID,
+    },
+    {
+      fieldName: 'minAmount',
+      title: 'Enter Min Winning Amount',
+      child: 'text-input',
+      valueSet: minAmount,
+      callChangeFunc: setMinAmount,
+    },
+    {
+      fieldName: 'maxAmount',
+      title: 'Enter Max Winning Amount',
+      child: 'text-input',
+      valueSet: maxAmount,
+      callChangeFunc: setMaxAmount,
+    },
+  ];
 
   return (
     <Card>
@@ -137,9 +219,12 @@ export const OperatorWalletResults = () => {
                 <Button color="info" variant="outlined" startIcon={<DownloadIcon fontSize="small" />}>
                   Export
                 </Button>
-                <Button color="info" variant="contained" startIcon={<Filter fontSize="small" />}>
-                  Filter
-                </Button>
+                <AnnualReportFilter
+                  filterProps={filterProps}
+                  fetchRootAPI={fetchRootAPI}
+                  filterQueryAPI={filterQueryAPI}
+                  setFetchAPI={setFetchAPI}
+                />
               </Grid>
             </Grid>
             <Card sx={{ mx: 2 }}>
@@ -153,6 +238,7 @@ export const OperatorWalletResults = () => {
                     <StyledTableCell align="center">Wallet Balance</StyledTableCell>
                     <StyledTableCell align="center">Debit Amount</StyledTableCell>
                     <StyledTableCell align="center">Credit Amount</StyledTableCell>
+                    <StyledTableCell align="center">Wallet Status</StyledTableCell>
                     <StyledTableCell align="center">Openning Balance</StyledTableCell>
                     <StyledTableCell align="center">Closing Balance</StyledTableCell>
                   </TableRow>
@@ -173,11 +259,12 @@ export const OperatorWalletResults = () => {
                       <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
                         {wallet.credit}
                       </TableCell>
-                      <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
-                        {wallet.closingBalance}
-                      </TableCell>
+                      <TableCell align="center">{wallet.walletStatus}</TableCell>
                       <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
                         {wallet.openningBalance}
+                      </TableCell>
+                      <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
+                        {wallet.closingBalance}
                       </TableCell>
                     </StyledTableRow>
                   ))}
@@ -185,7 +272,7 @@ export const OperatorWalletResults = () => {
                 {isDataNotFound && (
                   <TableBody>
                     <TableRow>
-                      <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
+                      <TableCell align="center" colSpan={10} sx={{ py: 3 }}>
                         <Box>
                           <Typography gutterBottom align="center" variant="subtitle1" color="error.main">
                             No data fetched!

@@ -1,16 +1,23 @@
 import PropTypes from 'prop-types';
 
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 
 // forms validate
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+
 // @mui
 import { Box, Button, Card, Grid, TextField, Typography, MenuItem, OutlinedInput, Chip } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+
+// components
+import PermissionsForm from './permissions_form';
+
 // context and modules
 import { axiosInstance } from '../../utils/axios';
+import { useGlobalContext } from '../../context';
+import { roleUpdateFetch } from '../../_apiAxios/management';
 
 // multi select styles
 const ITEM_HEIGHT = 48;
@@ -24,11 +31,41 @@ const MenuProps = {
   },
 };
 
-export const CreateRole = ({ setModalKey }) => {
+// -----------------------------------------------------------------------------------------------------------------------
+
+const CreateRole = ({ setModalKey }) => {
   const theme = useTheme();
   const navigate = useNavigate();
+  const prevLocation = useLocation();
+
+  const { id } = useParams();
+
+  const { loggedIn } = useGlobalContext();
+
+  const [permissionsObject, setPermissionsObject] = useState({});
+  const [isPermissions, setIsPermissions] = useState(false);
 
   const [assignedPermissionsList, setAssignedPermissionsList] = useState([]);
+
+  const [intialRoleData, setIntialRoleData] = useState({
+    roleName: '',
+    roleDescription: '',
+  });
+
+  useEffect(
+    () => {
+      if (id !== undefined) {
+        if (loggedIn === false) {
+          navigate(`/login?redirectTo=${prevLocation.pathname}`);
+        }
+
+        const updateLicenceAPI = `role/${id}`;
+        roleUpdateFetch(updateLicenceAPI, setIntialRoleData);
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [id]
+  );
 
   const handleMultiSelect = (event) => {
     const {
@@ -40,11 +77,17 @@ export const CreateRole = ({ setModalKey }) => {
     );
   };
 
+  const handleFormCancel = () => {
+    if (id === undefined) {
+      setModalKey(false);
+    } else {
+      navigate('/app/management/role-management', { replace: true });
+    }
+  };
+
   const formik = useFormik({
-    initialValues: {
-      roleName: '',
-      roleDescription: '',
-    },
+    initialValues: intialRoleData,
+    enableReinitialize: true,
     validationSchema: Yup.object({
       roleName: Yup.string().max(255).required('Role name is required'),
       roleDescription: Yup.string(),
@@ -53,38 +96,45 @@ export const CreateRole = ({ setModalKey }) => {
       const postData = {
         name: values.roleName,
         description: values.roleDescription,
-        is_active: true,
-        permissions: {
-          module: {
-            can_create: assignedPermissionsList.includes('can_create'),
-            can_view: assignedPermissionsList.includes('can_view'),
-            can_update: assignedPermissionsList.includes('can_update'),
-            can_delete: assignedPermissionsList.includes('can_delete'),
-            can_list: assignedPermissionsList.includes('can_list'),
-            can_enable: assignedPermissionsList.includes('can_enable'),
-            can_disable: assignedPermissionsList.includes('can_disable'),
-          },
-        },
-        // permissions_list: assignedPermissionsList,
+        permissions: permissionsObject,
       };
 
-      axiosInstance
-        .post(`role`, postData)
-        .then((res) => {
-          setModalKey(false);
-          // navigate('/app/licence-catagories', { replace: true });
-        })
-        .catch((error) => {
-          helpers.setStatus({ success: false });
-          helpers.setErrors({ submit: error.message });
-          helpers.setSubmitting(false);
-          console.log(error);
-        });
+      if (id === undefined) {
+        postData.is_active = true;
+
+        axiosInstance
+          .post('role', postData)
+          .then(() => {
+            setModalKey(false);
+          })
+          .catch((error) => {
+            helpers.setStatus({ success: false });
+            helpers.setErrors({ submit: error.message });
+            helpers.setSubmitting(false);
+            console.log(error);
+          });
+      } else {
+        axiosInstance
+          .patch(`role/${id}`, postData)
+          .then(() => {
+            navigate('/app/management/role-management', { replace: true });
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
     },
   });
 
   return (
     <>
+      {isPermissions && (
+        <PermissionsForm
+          isPermissionOpen={isPermissions}
+          permOpenFunc={setIsPermissions}
+          setPermissionsObject={setPermissionsObject}
+        />
+      )}
       <Box
         component="main"
         sx={{
@@ -93,7 +143,7 @@ export const CreateRole = ({ setModalKey }) => {
         }}
       >
         <Typography sx={{ ml: 4, mt: 1, mb: 3 }} variant="h4">
-          Create Role
+          {id === undefined ? 'Create' : 'Update'} Role
         </Typography>
         <Card sx={{ display: 'flex', justifyContent: 'center', mx: 3, p: 3 }}>
           <form onSubmit={formik.handleSubmit}>
@@ -110,7 +160,7 @@ export const CreateRole = ({ setModalKey }) => {
                   pb: 2,
                 }}
               >
-                Role Deatail
+                {id === undefined ? 'Enter' : 'Edit'} Role Deatails
               </Typography>
             </Box>
             <Grid container spacing={2}>
@@ -131,42 +181,16 @@ export const CreateRole = ({ setModalKey }) => {
               </Grid>
 
               <Grid item md={6}>
-                <TextField
-                  error={Boolean(formik.touched.permissions && formik.errors.permissions)}
+                <Button
+                  onClick={() => setIsPermissions(true)}
+                  color="primary"
                   fullWidth
-                  helperText={formik.touched.permissions && formik.errors.permissions}
-                  label="Permissions"
-                  name="permissions"
-                  onBlur={formik.handleBlur}
-                  onChange={formik.handleChange}
-                  type="text"
-                  value={formik.values.permissions}
                   size="medium"
-                  color="success"
-                  select
-                  SelectProps={{
-                    multiple: true,
-                    value: assignedPermissionsList,
-                    onChange: handleMultiSelect,
-                    input: <OutlinedInput id="select-multiple-chip" label="Chip" />,
-                    renderValue: (selected) => (
-                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                        {selected.map((value) => (
-                          <Chip key={value} label={value} />
-                        ))}
-                      </Box>
-                    ),
-                    menuprops: { MenuProps },
-                  }}
+                  variant="contained"
+                  sx={{ width: '75%', mt: 0.75, ml: 3 }}
                 >
-                  <MenuItem value={'can_create'}>Can Create</MenuItem>
-                  <MenuItem value={'can_update'}>Can Update</MenuItem>
-                  <MenuItem value={'can_list'}>Can View List</MenuItem>
-                  <MenuItem value={'can_view'}>Can View Detail</MenuItem>
-                  <MenuItem value={'can_delet'}>Can Delete</MenuItem>
-                  <MenuItem value={'can_enable'}>Can Enable</MenuItem>
-                  <MenuItem value={'can_disable'}>Can Disable</MenuItem>
-                </TextField>
+                  Set Permissions
+                </Button>
               </Grid>
               <Grid item md={12}>
                 <TextField
@@ -189,7 +213,7 @@ export const CreateRole = ({ setModalKey }) => {
 
             <Box sx={{ py: 2, mt: 2, display: 'flex', justifyContent: 'space-between' }}>
               <Button
-                onClick={() => window.location.reload()}
+                onClick={handleFormCancel}
                 color="error"
                 disabled={formik.isSubmitting}
                 fullWidth
@@ -200,7 +224,7 @@ export const CreateRole = ({ setModalKey }) => {
                 Cancel
               </Button>
               <Button
-                color="secondary"
+                color={id === undefined ? 'secondary' : 'warning'}
                 disabled={formik.isSubmitting}
                 fullWidth
                 size="large"
@@ -208,7 +232,7 @@ export const CreateRole = ({ setModalKey }) => {
                 variant="contained"
                 sx={{ width: '48%' }}
               >
-                Create Role
+                {id === undefined ? 'Create' : 'Update'} Role
               </Button>
             </Box>
           </form>
@@ -221,3 +245,5 @@ export const CreateRole = ({ setModalKey }) => {
 CreateRole.propTypes = {
   setModalKey: PropTypes.func,
 };
+
+export default CreateRole;

@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 // components
-import Page from '../../components/Page';
-import { CreateOperatorApp } from '../../components/operator-apps/create-operator-app-form';
+import Page from '../../components/layout/Page';
+import CreateOperatorApp from '../../components/operator-apps/create-operator-app-form';
 import { OperatorsAppList } from '../../components/operator-apps/operators-app-list-results';
 // context and modules
 import { useGlobalContext } from '../../context';

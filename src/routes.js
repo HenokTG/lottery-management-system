@@ -1,7 +1,7 @@
 import { Navigate, useRoutes } from 'react-router-dom';
 // layouts
-import { DashboardLayout } from './components/dashboard-layout';
-import LogoOnlyLayout from './components/LogoOnlyLayout';
+import { DashboardLayout } from './components/layout/dashboard-layout';
+import LogoOnlyLayout from './components/layout/LogoOnlyLayout';
 //
 
 import {
@@ -23,18 +23,35 @@ import {
   WinningTicketReport,
   OperatorWalletReport,
 } from './pages/report';
+
 import { PaymentDistributionReport, PaymentTransactionsReport, BonusTransactionsReport } from './pages/payment-report';
+
 import {
   AppSettings,
   ManagePaymentMethod,
   ManageCurrency,
   ManageOperatorApps,
+  ManageTaxRules,
   ManageRegionalLocations,
   ManageCountryLocations,
   ManageSystemModules,
 } from './pages/app-settings';
+
 import { RoleManagnment, UserManagnment } from './pages/management';
 
+import {
+  UpdateCountry,
+  UpdateCurrency,
+  UpdateGame,
+  UpdateLicenceCatagory,
+  UpdateOperatorApp,
+  UpdateOperator,
+  UpdatePaymentMethod,
+  UpdateRegion,
+  UpdateRole,
+  UpdateTaxRule,
+  UpdateUser,
+} from './pages/index-update-forms';
 // ----------------------------------------------------------------------
 
 export default function Router() {
@@ -44,9 +61,27 @@ export default function Router() {
       element: <DashboardLayout />,
       children: [
         { path: 'dashboard', element: <DashboardApp /> },
-        { path: 'licence-catagories', element: <LicenceCatagory /> },
-        { path: 'games', element: <Games /> },
-        { path: 'operators', element: <Operators /> },
+        {
+          path: 'operators',
+          children: [
+            { path: '', element: <Operators /> },
+            { path: 'update/:id', element: <UpdateOperator /> },
+          ],
+        },
+        {
+          path: 'licence-catagories',
+          children: [
+            { path: '', element: <LicenceCatagory /> },
+            { path: 'update/:id', element: <UpdateLicenceCatagory /> },
+          ],
+        },
+        {
+          path: 'games',
+          children: [
+            { path: '', element: <Games /> },
+            { path: 'update/:id', element: <UpdateGame /> },
+          ],
+        },
         {
           path: 'report/',
           children: [
@@ -68,8 +103,20 @@ export default function Router() {
         {
           path: 'management/',
           children: [
-            { path: 'role-management', element: <RoleManagnment /> },
-            { path: 'user-management', element: <UserManagnment /> },
+            {
+              path: 'role-management',
+              children: [
+                { path: '', element: <RoleManagnment /> },
+                { path: 'update/:id', element: <UpdateRole /> },
+              ],
+            },
+            {
+              path: 'user-management',
+              children: [
+                { path: '', element: <UserManagnment /> },
+                { path: 'update/:id', element: <UpdateUser /> },
+              ],
+            },
           ],
         },
         {
@@ -80,28 +127,50 @@ export default function Router() {
               element: <AppSettings />,
             },
             {
-              path: 'payment-method',
-              element: <ManagePaymentMethod />,
-            },
-            {
-              path: 'currency',
-              element: <ManageCurrency />,
-            },
-            {
               path: 'system-modules',
               element: <ManageSystemModules />,
             },
             {
+              path: 'payment-method',
+              children: [
+                { path: '', element: <ManagePaymentMethod /> },
+                { path: 'update/:id', element: <UpdatePaymentMethod /> },
+              ],
+            },
+            {
+              path: 'currency',
+              children: [
+                { path: '', element: <ManageCurrency /> },
+                { path: 'update/:id', element: <UpdateCurrency /> },
+              ],
+            },
+            {
               path: 'operator-apps',
-              element: <ManageOperatorApps />,
+              children: [
+                { path: '', element: <ManageOperatorApps /> },
+                { path: 'update/:id', element: <UpdateOperatorApp /> },
+              ],
+            },
+            {
+              path: 'tax-rules',
+              children: [
+                { path: '', element: <ManageTaxRules /> },
+                { path: 'update/:id', element: <UpdateTaxRule /> },
+              ],
             },
             {
               path: 'country-locations',
-              element: <ManageCountryLocations />,
+              children: [
+                { path: '', element: <ManageCountryLocations /> },
+                { path: 'update/:id', element: <UpdateCountry /> },
+              ],
             },
             {
               path: 'regional-locations',
-              element: <ManageRegionalLocations />,
+              children: [
+                { path: '', element: <ManageRegionalLocations /> },
+                { path: 'update/:id', element: <UpdateRegion /> },
+              ],
             },
           ],
         },

@@ -9,11 +9,11 @@ import MenuIcon from '@mui/icons-material/Menu';
 import SearchIcon from '@mui/icons-material/Search';
 
 // components
-import { AccountPopover } from './account-popover';
+import { AccountPopover } from '../auxilary/account-popover';
 // icons
-import { Bell as BellIcon } from '../icons/bell';
-import { UserCircle as UserCircleIcon } from '../icons/user-circle';
-import { Users as UsersIcon } from '../icons/users';
+import { Bell as BellIcon } from '../../icons/bell';
+import { UserCircle as UserCircleIcon } from '../../icons/user-circle';
+import { Users as UsersIcon } from '../../icons/users';
 
 const DashboardNavbarRoot = styled(AppBar)(({ theme }) => ({
   backgroundColor: theme.palette.background.paper,

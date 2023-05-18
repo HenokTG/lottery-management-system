@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 import PerfectScrollbar from 'react-perfect-scrollbar';
+
 // @mui
 import {
   Box,
@@ -22,14 +23,22 @@ import {
   CircularProgress,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
+
+// components
+import AnnualReportFilter from '../auxilary/AnnualReportFilter';
+
 // context and modules
 import { useGlobalContext } from '../../context';
 import { paymentDistributionsFetch } from '../../_apiAxios/payment-report';
+import { fetchOperatorIDs } from '../../_apiAxios/modelCreateFetches';
+import { fetchPaymentMethodIDs } from '../../_apiAxios/fetchFilterIDs';
+
 // icons
 import { Search as SearchIcon } from '../../icons/search';
 import { Download as DownloadIcon } from '../../icons/download';
-import { Filter } from '../../icons/filter';
+
 // custom styles
+
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: theme.palette.info.main,
@@ -43,14 +52,16 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   '&:nth-of-type(odd)': {
-    backgroundColor: theme.palette.action.hover,
+    backgroundColor: theme.palette.action.oddRow,
   },
   // hide last border
   '&:last-child td, &:last-child th': {
     border: 0,
   },
 }));
+
 // ---------------------------------------------------------------------------------
+
 export const PaymentDistributionResults = () => {
   const { loggedIn } = useGlobalContext();
 
@@ -68,18 +79,29 @@ export const PaymentDistributionResults = () => {
 
   const [searchQuery, setSearchQuery] = useState('');
 
+  const fetchRootAPI = `transaction/operator-payment-methods?page=${page + 1}&per_page=${limit}`;
+
+  const [fetchAPI, setFetchAPI] = useState(fetchRootAPI);
+
+  const [operatorIDs, setOperatorIDs] = useState([{ id: -1, operatorName: 'No role to assign' }]);
+  const [paymentMethodIDs, setPaymentMethodIDs] = useState([{ id: -1, operatorName: 'No payment method to assign' }]);
+
   useEffect(
     () => {
       if (loggedIn === false) {
         navigate(`/login?redirectTo=${prevLocation.pathname}`);
       }
 
-      const fetchAPI = `transaction/bonus?page=${page + 1}&per_page=${limit}`; // this needs to be changed
-
       paymentDistributionsFetch(fetchAPI, setLoading, setPaymentDistributionsList, setPaginationProps);
+
+      const operatorIDsFetchAPI = `operator?page=${1}&per_page=${50}`;
+      const paymentMethodIDsFetchAPI = `payment-method?page=${1}&per_page=${50}`;
+
+      fetchOperatorIDs(operatorIDsFetchAPI, setOperatorIDs);
+      fetchPaymentMethodIDs(paymentMethodIDsFetchAPI, setPaymentMethodIDs);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [limit, page]
+    [limit, page, fetchAPI]
   );
 
   const handleLimitChange = (event) => {
@@ -94,14 +116,59 @@ export const PaymentDistributionResults = () => {
     setSearchQuery(e.target.value);
     const searchKey = 'description';
     const searchValue = e.target.value;
-    const fetchAPI = `transaction/bonus?page=${
+    const fetchAPI = `transaction/operator-payment-methods?page=${
       page + 1
     }&per_page=${limit}&search_by=${searchKey}&search_term=${searchValue}`;
 
     paymentDistributionsFetch(fetchAPI, setLoading, setPaymentDistributionsList, setPaginationProps);
+    
   };
 
   const isDataNotFound = paymentDistributionsList.length === 0;
+
+  // For Filter component
+
+  const [dateFrom, setDateFrom] = useState(null);
+  const [dateTo, setDateTo] = useState(null);
+  const [operatorID, setOperatorID] = useState('');
+  const [paymentMethodID, setPaymentMethodID] = useState('');
+
+  const filterQueryAPI = `date_from=${dateFrom ? dateFrom.toISOString().split('T')[0] : ''}&date_to=${
+    dateTo ? dateTo.toISOString().split('T')[0] : ''
+  }&operator=${operatorID}&payment_method=${paymentMethodID}`;
+
+  const filterProps = [
+    {
+      fieldName: 'dateFrom',
+      title: 'Date From',
+      child: null,
+      valueSet: dateFrom,
+      callChangeFunc: setDateFrom,
+      fieldType: 'date',
+    },
+    {
+      fieldName: 'dateTO',
+      title: 'Date To',
+      child: null,
+      valueSet: dateTo,
+      callChangeFunc: setDateTo,
+      fieldType: 'date',
+    },
+    {
+      fieldName: 'operatorID',
+      title: 'Select Operator',
+      child: operatorIDs,
+      valueSet: operatorID,
+      callChangeFunc: setOperatorID,
+    },
+    {
+      fieldName: 'paymentMethodID',
+      title: 'Select Payment Method',
+      child: paymentMethodIDs,
+      valueSet: paymentMethodID,
+      callChangeFunc: setPaymentMethodID,
+    },
+  ];
 
   return (
     <Card>
@@ -137,9 +204,12 @@ export const PaymentDistributionResults = () => {
                 <Button color="info" variant="outlined" startIcon={<DownloadIcon fontSize="small" />}>
                   Export
                 </Button>
-                <Button color="info" variant="contained" startIcon={<Filter fontSize="small" />}>
-                  Filter
-                </Button>
+                <AnnualReportFilter
+                  filterProps={filterProps}
+                  fetchRootAPI={fetchRootAPI}
+                  filterQueryAPI={filterQueryAPI}
+                  setFetchAPI={setFetchAPI}
+                />
               </Grid>
             </Grid>
 
@@ -149,9 +219,8 @@ export const PaymentDistributionResults = () => {
                   <TableRow>
                     <StyledTableCell align="center">Operator Name</StyledTableCell>
                     <StyledTableCell align="center">Company Name</StyledTableCell>
-                    <StyledTableCell align="center">Cash</StyledTableCell>
-                    <StyledTableCell align="center">Babk</StyledTableCell>
-                    <StyledTableCell align="center">Wallet</StyledTableCell>
+                    <StyledTableCell align="center">Payment Method</StyledTableCell>
+                    <StyledTableCell align="center">Total Amount</StyledTableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -159,15 +228,9 @@ export const PaymentDistributionResults = () => {
                     <StyledTableRow hover key={paymentDistribution.id}>
                       <TableCell>{paymentDistribution.operatorName}</TableCell>
                       <TableCell>{paymentDistribution.comName}</TableCell>
-
+                      <TableCell>{paymentDistribution.payMethod}</TableCell>
                       <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
-                        {paymentDistribution.cash}
-                      </TableCell>
-                      <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
-                        {paymentDistribution.bank}
-                      </TableCell>
-                      <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
-                        {paymentDistribution.wallet}
+                        {paymentDistribution.totalAmount}
                       </TableCell>
                     </StyledTableRow>
                   ))}

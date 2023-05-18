@@ -4,7 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { Box, Container, Typography } from '@mui/material';
 
 // components
-import Page from '../components/Page';
+import Page from '../components/layout/Page';
 import { SettingsPersonalInfo } from '../components/settings/settings-personal-info';
 import { SettingsPassword } from '../components/settings/settings-password';
 // context and modules

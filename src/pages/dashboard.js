@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 // @mui
-import { Typography, Box, Container, Grid, Card, CardContent, TextField, MenuItem } from '@mui/material';
+import { Typography, Box, Container, Grid, Card, TextField, MenuItem } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 // components
-import Page from '../components/Page';
+import Page from '../components/layout/Page';
 import { OverviewTotals } from '../components/dashboard/overview-totals';
 import { SalesByGames } from '../components/dashboard/game-sales';
 import { OverviewPaymentDistributions } from '../components/dashboard/payment-distributions';
@@ -19,20 +19,32 @@ import { Withdrawals } from '../icons/withdrawal';
 
 // context and modules
 import { useGlobalContext } from '../context';
-import { axiosInstance } from '../utils/axios';
 import { fetchOperatorIDs } from '../_apiAxios/modelCreateFetches';
+import { fetchDashboardOverview } from '../_apiAxios/dashboard-summary';
+
+// --------------------------------------------------------------------------------------------------------------------
 
 const DashboardApp = () => {
   const theme = useTheme();
 
-  const { loggedIn, profilePk } = useGlobalContext();
+  const { loggedIn } = useGlobalContext();
 
   const navigate = useNavigate();
   const prevLocation = useLocation();
 
-  const [operatorIDs, setOperatorIDs] = useState([{ id: -1, operatorName: 'No role to assign' }]);
-  const [operator, setOperator] = useState('');
+  const [operatorIDs, setOperatorIDs] = useState([{ id: -1, operatorName: 'No operator to assign' }]);
+  const [operatorId, setOperatorId] = useState('');
+
   const [range, setRange] = useState(7);
+  const [loading, setLoading] = useState(true);
+
+  const [summaryData, setSummaryData] = useState({
+    totalRevenue: '-',
+    totalPayout: '-',
+    totalTax: '-',
+    totalDeposit: '-',
+    totalWithdrawal: '-',
+  });
 
   useEffect(
     () => {
@@ -44,12 +56,18 @@ const DashboardApp = () => {
 
       fetchOperatorIDs(operatorFetchAPI, setOperatorIDs);
 
-      // const summaryAPI = `transactions/summary?operator=${operatorId}&date_from=${initial_date}&date_to=${today}`;
+      const today = new Date();
+      const backDate = new Date(today.setDate(today.getDate() - range));
 
-      // fetchDashboardSummary(profilePk, summaryAPI, setSummaryList);
+      const currentDate = today.toJSON().slice(0, 10);
+      const initialDate = backDate.toJSON().slice(0, 10);
+
+      const summaryAPI = `transaction/statistics?date_from=${initialDate}&date_to=${currentDate}&operator=${operatorId}`;
+
+      fetchDashboardOverview(summaryAPI, setLoading, setSummaryData);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
+    [range, operatorId]
   );
   return (
     <Page title="Overview">
@@ -64,26 +82,10 @@ const DashboardApp = () => {
           Overview
         </Typography>
         <Container maxWidth={false}>
-          <Card sx={{ p: 1, backgroundColor: theme.palette.neutral[200] }}>
+          <Card sx={{ px: 1, py: 2, backgroundColor: theme.palette.neutral[200] }}>
             <Grid container columnSpacing={1}>
-              <Grid item lg={2.4} sm={6} xs={12}>
-                <OverviewTotals value={'$ 643k'} title="Total Sales" icon={<Sales />} iconBg="primary" />
-              </Grid>
-              <Grid item lg={2.4} sm={6} xs={12}>
-                <OverviewTotals value={'$ 64k'} title="Won Amount" icon={<WonAmounts />} iconBg="secondary" />
-              </Grid>
-              <Grid item lg={2.4} sm={6} xs={12}>
-                <OverviewTotals value={'$ 180k'} title="Total Tax" icon={<Tax />} iconBg="warning" />
-              </Grid>
-              <Grid item lg={2.4} sm={6} xs={12}>
-                <OverviewTotals value={'$ 400k'} title="Total Deposit" icon={<Deposit />} iconBg="info" />
-              </Grid>
-              <Grid item lg={2.4} sm={6} xs={12}>
-                <OverviewTotals value={'$ 110k'} title="Total Withdraw" icon={<Withdrawals />} iconBg="error" />
-              </Grid>
-              <Grid item lg={7} />
               <Grid item lg={5}>
-                <Card sx={{ mt: 2, mb: 1, px: 2, py: 1.5 }}>
+                <Card sx={{ mb: 2, px: 2, py: 1.5 }}>
                   <Grid container columnSpacing={2}>
                     <Grid item lg={8}>
                       <TextField
@@ -94,12 +96,15 @@ const DashboardApp = () => {
                         type="text"
                         color="success"
                         size="small"
-                        value={operator}
-                        onChange={(e) => setOperator(e.target.value)}
+                        value={operatorId}
+                        onChange={(e) => setOperatorId(e.target.value)}
                       >
+                        {/* <MenuItem key="all" value="all">
+                          All Operators
+                        </MenuItem> */}
                         {operatorIDs.map((operator) => (
-                          <MenuItem key={`${operator.id}-${operator.operatorName}`} value={operator.id}>
-                            {operator.operatorName}
+                          <MenuItem key={`${operator.id}-${operator.name}`} value={operator.id}>
+                            {operator.name}
                           </MenuItem>
                         ))}
                       </TextField>
@@ -122,6 +127,53 @@ const DashboardApp = () => {
                     </Grid>
                   </Grid>
                 </Card>
+              </Grid>
+              <Grid item lg={7} />
+
+              <Grid item lg={2.4} sm={6} xs={12}>
+                <OverviewTotals
+                  value={summaryData.totalRevenue.toString()}
+                  title="Total Sales"
+                  icon={<Sales />}
+                  iconBg="primary"
+                  loading={loading}
+                />
+              </Grid>
+              <Grid item lg={2.4} sm={6} xs={12}>
+                <OverviewTotals
+                  value={summaryData.totalPayout.toString()}
+                  title="Won Amount"
+                  icon={<WonAmounts />}
+                  iconBg="secondary"
+                  loading={loading}
+                />
+              </Grid>
+              <Grid item lg={2.4} sm={6} xs={12}>
+                <OverviewTotals
+                  value={summaryData.totalTax.toString()}
+                  title="Total Tax"
+                  icon={<Tax />}
+                  iconBg="warning"
+                  loading={loading}
+                />
+              </Grid>
+              <Grid item lg={2.4} sm={6} xs={12}>
+                <OverviewTotals
+                  value={summaryData.totalDeposit.toString()}
+                  title="Total Deposit"
+                  icon={<Deposit />}
+                  iconBg="info"
+                  loading={loading}
+                />
+              </Grid>
+              <Grid item lg={2.4} sm={6} xs={12}>
+                <OverviewTotals
+                  value={summaryData.totalWithdrawal.toString()}
+                  title="Total Withdraw"
+                  icon={<Withdrawals />}
+                  iconBg="error"
+                  loading={loading}
+                />
               </Grid>
             </Grid>
           </Card>

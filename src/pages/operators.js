@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 // components
-import Page from '../components/Page';
+import Page from '../components/layout/Page';
 import { OperatorListResults } from '../components/operators/operators-list-results';
-import { CreateOperator } from '../components/operators/create-operator-form';
+import CreateOperator from '../components/operators/create-operator-form';
 // context and modules
 import { useGlobalContext } from '../context';
 

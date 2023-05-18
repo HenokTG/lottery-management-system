@@ -4,8 +4,8 @@ import { Link as RouterLink, useNavigate } from 'react-router-dom';
 // @mui
 import { Box, MenuItem, MenuList, Popover, Typography, Button } from '@mui/material';
 // context and modules
-import { axiosInstance } from '../utils/axios';
-import { useGlobalContext } from '../context';
+import { axiosInstance } from '../../utils/axios';
+import { useGlobalContext } from '../../context';
 
 export const AccountPopover = (props) => {
   const { setLoggedIn, setProfilePk, setProfile } = useGlobalContext();

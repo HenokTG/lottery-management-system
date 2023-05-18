@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { NavLink as RouterLink } from 'react-router-dom';
 
 // react chartJS
@@ -10,6 +11,7 @@ import {
   Button,
   Card,
   CardContent,
+  CircularProgress,
   CardHeader,
   CardActions,
   SvgIcon,
@@ -19,23 +21,52 @@ import {
   MenuItem,
 } from '@mui/material';
 import ArrowRightAltIcon from '@mui/icons-material/ArrowRightAlt';
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 
-export const OverviewPaymentDistributions = (props) => {
+// context and modules
+import { fetchOverviewPaymentDistributions } from '../../_apiAxios/dashboard-summary';
+
+// ---------------------------------------------------------------------------------------------------
+
+export const OverviewPaymentDistributions = () => {
   const theme = useTheme();
+
+  const [range, setRange] = useState(7);
+  const [loading, setLoading] = useState(true);
+  const [payDistribData, setPayDistribData] = useState({ title: [], value: [], bgColorCode: [] });
+
+  useEffect(
+    () => {
+      const today = new Date();
+      const backDate = new Date(today.setDate(today.getDate() - range));
+
+      const currentDate = today.toJSON().slice(0, 10);
+      const initialDate = backDate.toJSON().slice(0, 10);
+
+      const payDistribAPI = `payment-method/distribution?date_from=${initialDate}&date_to=${currentDate}`;
+
+      fetchOverviewPaymentDistributions(payDistribAPI, setLoading, setPayDistribData);
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [range]
+  );
 
   const data = {
     datasets: [
       {
-        data: [23, 15, 5, 12, 5, 16, 24],
-        backgroundColor: ['#3F51B5', '#c094d6', '#6ac460', '#e53935', '#a6cade', '#c2eb91', '#FB8C00'],
+        data: payDistribData.value,
+        backgroundColor: payDistribData.bgColorCode,
         borderWidth: 8,
         borderColor: '#FFFFFF',
         hoverBorderColor: '#FFFFFF',
       },
     ],
-    labels: ['Cash', 'M-pesa', 'MTN', 'Telebirr', 'Standard Bank', 'Eco Bank', 'Commercial Bank Of Ethiopia (CBE)'],
+    labels: payDistribData.title,
   };
+
+  const payments = payDistribData.title.map((title, idx) => {
+    const payment = { title, value: payDistribData.value[idx], color: payDistribData.bgColorCode[idx] };
+    return payment;
+  });
 
   const options = {
     animation: false,
@@ -59,44 +90,6 @@ export const OverviewPaymentDistributions = (props) => {
     },
   };
 
-  const devices = [
-    {
-      title: 'Cash',
-      value: 23,
-      color: '#3F51B5',
-    },
-    {
-      title: 'M-pesa',
-      value: 15,
-      color: '#c094d6',
-    },
-    {
-      title: 'MTN',
-      value: 5,
-      color: '#6ac460',
-    },
-    {
-      title: 'Telebirr',
-      value: 12,
-      color: '#e53935',
-    },
-    {
-      title: 'Standard Bank',
-      value: 5,
-      color: '#a6cade',
-    },
-    {
-      title: 'Eco Bank',
-      value: 16,
-      color: '#c2eb91',
-    },
-    {
-      title: 'CBE',
-      value: 24,
-      color: '#FB8C00',
-    },
-  ];
-
   return (
     <Card>
       <CardHeader
@@ -114,40 +107,54 @@ export const OverviewPaymentDistributions = (props) => {
         sx={{ p: 2 }}
       />
       <Divider />
-      <CardContent>
-        <Box
-          sx={{
-            height: 322,
-          }}
-        >
-          <Doughnut data={data} options={options} />
+      {loading ? (
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', my: 3 }}>
+          <CircularProgress />
         </Box>
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'center',
-            flexWrap: 'wrap',
-            pt: 2,
-          }}
-        >
-          {devices.map(({ color, icon: Icon, title, value }) => (
-            <Box
-              key={title}
-              sx={{
-                p: 1,
-                textAlign: 'center',
-              }}
-            >
-              <Typography color="textPrimary" variant="caption">
-                {title}
-              </Typography>
-              <Typography style={{ color }} variant="subtitle2">
-                {value}%
-              </Typography>
+      ) : (
+        <CardContent>
+          {payments.length === 0 ? (
+            <Typography color="warning.main" variant="subtitle1" align="center" sx={{ my: 6 }}>
+              No data fetched!
+            </Typography>
+          ) : (
+            <Box>
+              <Box
+                sx={{
+                  height: 322,
+                }}
+              >
+                <Doughnut data={data} options={options} />
+              </Box>
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'center',
+                  flexWrap: 'wrap',
+                  pt: 2,
+                }}
+              >
+                {payments.map(({ color, title, value }) => (
+                  <Box
+                    key={title}
+                    sx={{
+                      p: 1,
+                      textAlign: 'center',
+                    }}
+                  >
+                    <Typography color="textPrimary" variant="caption">
+                      {title}
+                    </Typography>
+                    <Typography style={{ color }} variant="subtitle2">
+                      {value}%
+                    </Typography>
+                  </Box>
+                ))}
+              </Box>
             </Box>
-          ))}
-        </Box>
-      </CardContent>
+          )}
+        </CardContent>
+      )}
       <Divider />
       <CardActions sx={{ justifyContent: 'space-between', p: 2 }}>
         <TextField
@@ -155,20 +162,15 @@ export const OverviewPaymentDistributions = (props) => {
           name="range"
           type="text"
           color="info"
-          sx={{ width: '35%' }}
-          InputProps={{
-            style: {
-              border: `1px solid ${theme.palette.info.main}`,
-              color: theme.palette.info.main,
-            },
-          }}
-          defaultValue={7}
           size="small"
           select
+          sx={{ width: '35%' }}
+          value={range}
+          onChange={(e) => setRange(e.target.value)}
         >
           <MenuItem value={7}>Last 7 Days</MenuItem>
           <MenuItem value={30}>Last 30 Days</MenuItem>
-          <MenuItem value={1}>Last 365 Days</MenuItem>
+          <MenuItem value={365}>a Year</MenuItem>
         </TextField>
         <RouterLink to="payment-report/payment-distribution">
           <Button

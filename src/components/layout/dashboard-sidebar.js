@@ -7,16 +7,14 @@ import { Box, Divider, Drawer, Typography, useMediaQuery } from '@mui/material';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import ExtensionIcon from '@mui/icons-material/Extension';
 
-import { ChartBar as ChartBarIcon } from '../icons/chart-bar';
-
 // icons
-import { Cog as CogIcon } from '../icons/cog';
-import { Selector as SelectorIcon } from '../icons/selector';
-import { User as UserIcon } from '../icons/user';
-import { Users as UsersIcon } from '../icons/users';
-import { Report } from '../icons/report';
-import { ActivityLog as Log } from '../icons/activity-log';
-import { Logo } from './logo';
+import { ChartBar as ChartBarIcon } from '../../icons/chart-bar';
+import { User as UserIcon } from '../../icons/user';
+import { Users as UsersIcon } from '../../icons/users';
+import { Report } from '../../icons/report';
+import { ActivityLog as Log } from '../../icons/activity-log';
+import { Cog as CogIcon } from '../../icons/cog';
+import { Logo } from '../auxilary/logo';
 
 // components
 import { NavItem } from './nav-item';
@@ -122,6 +120,10 @@ const items = [
         href: '/app/app-settings/regional-locations',
         title: 'Locations: Regions',
       },
+      {
+        href: '/app/app-settings/tax-rules',
+        title: 'Tax Rules',
+      },
     ],
   },
 
@@ -161,6 +163,20 @@ export const DashboardSidebar = (props) => {
           display: 'flex',
           flexDirection: 'column',
           height: '100%',
+          overflow: 'auto',
+          scrollbarWidth: 'thin',
+          '&::-webkit-scrollbar': {
+            width: '0.2em',
+          },
+          '&::-webkit-scrollbar-track': {
+            background: '#f1f1f1',
+          },
+          '&::-webkit-scrollbar-thumb': {
+            backgroundColor: '#888',
+          },
+          '&::-webkit-scrollbar-thumb:hover': {
+            background: '#555',
+          },
         }}
       >
         <div>

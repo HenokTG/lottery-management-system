@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 // components
-import Page from '../../components/Page';
-import { CreateCurrency } from '../../components/currency/create-currency-form';
+import Page from '../../components/layout/Page';
+import CreateCurrency from '../../components/currency/create-currency-form';
 import { CurrencyList } from '../../components/currency/currency-list-results';
 // context and modules
 import { useGlobalContext } from '../../context';

@@ -1,40 +1,72 @@
 import PropTypes from 'prop-types';
 
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 
 // forms validate
 import { useFormik } from 'formik';
 import * as Yup from 'yup';
+
 // @mui
 import { Box, Button, Card, Grid, TextField, Typography, MenuItem } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+
 // context and modules
 import { axiosInstance } from '../../utils/axios';
 import { fetchCountryIDs } from '../../_apiAxios/modelCreateFetches';
+import { useGlobalContext } from '../../context';
+import { regionUpdateFetch } from '../../_apiAxios/app-config';
 
-export const CreateRegion = ({ setModalKey }) => {
+// -----------------------------------------------------------------------------------------------------------------------
+
+const CreateRegion = ({ setModalKey }) => {
   const theme = useTheme();
-  const navigate = useNavigate();
 
-  const [countryIDs, setCountryIDs] = useState([{ id: -1, operatorName: 'No role to assign' }]);
+  const navigate = useNavigate();
+  const prevLocation = useLocation();
+
+  const { id } = useParams();
+
+  const { loggedIn } = useGlobalContext();
+
+  const [countryIDs, setCountryIDs] = useState([{ id: -1, name: 'No country to assign' }]);
+
+  const [intialRegionData, setIntialRegionData] = useState({
+    regionName: '',
+    regionCode: '',
+    countryName: '',
+  });
 
   useEffect(
     () => {
       const countryFetchAPI = `country?page=${1}&per_page=${25}`;
 
       fetchCountryIDs(countryFetchAPI, setCountryIDs);
+
+      if (id !== undefined) {
+        if (loggedIn === false) {
+          navigate(`/login?redirectTo=${prevLocation.pathname}`);
+        }
+
+        const updateRegionAPI = `state/${id}`;
+        regionUpdateFetch(updateRegionAPI, setIntialRegionData);
+      }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
 
+  const handleFormCancel = () => {
+    if (id === undefined) {
+      setModalKey(false);
+    } else {
+      navigate('/app/app-settings/regional-locations', { replace: true });
+    }
+  };
+
   const formik = useFormik({
-    initialValues: {
-      regionName: '',
-      regionCode: '',
-      countryName: '',
-    },
+    initialValues: intialRegionData,
+    enableReinitialize: true,
     validationSchema: Yup.object({
       regionName: Yup.string().max(255).required('Region name is required'),
       regionCode: Yup.string().max(255).required('Region code is required'),
@@ -45,21 +77,32 @@ export const CreateRegion = ({ setModalKey }) => {
         name: values.regionName,
         code: values.regionCode,
         country: values.countryName,
-        is_active: true,
       };
 
-      axiosInstance
-        .post(`state`, postData)
-        .then((res) => {
-          setModalKey(false);
-          // navigate('/app/licence-catagories', { replace: true });
-        })
-        .catch((error) => {
-          helpers.setStatus({ success: false });
-          helpers.setErrors({ submit: error.message });
-          helpers.setSubmitting(false);
-          console.log(error);
-        });
+      if (id === undefined) {
+        postData.is_active = true;
+
+        axiosInstance
+          .post('state', postData)
+          .then(() => {
+            setModalKey(false);
+          })
+          .catch((error) => {
+            helpers.setStatus({ success: false });
+            helpers.setErrors({ submit: error.message });
+            helpers.setSubmitting(false);
+            console.log(error);
+          });
+      } else {
+        axiosInstance
+          .patch(`state/${id}`, postData)
+          .then(() => {
+            navigate('/app/app-settings/regional-locations', { replace: true });
+          })
+          .catch((error) => {
+            console.log(error);
+          });
+      }
     },
   });
 
@@ -73,7 +116,7 @@ export const CreateRegion = ({ setModalKey }) => {
         }}
       >
         <Typography sx={{ ml: 4, mt: 1, mb: 3 }} variant="h4">
-          Add Region
+          {id === undefined ? 'Add' : 'Update'} Region
         </Typography>
         <Card sx={{ display: 'flex', justifyContent: 'center', mx: 3, p: 3 }}>
           <form onSubmit={formik.handleSubmit}>
@@ -90,7 +133,7 @@ export const CreateRegion = ({ setModalKey }) => {
                   pb: 2,
                 }}
               >
-                Enter Region Details
+                {id === undefined ? 'Enter' : 'Edit'} Region Details
               </Typography>
             </Box>
             <Grid container spacing={2} minWidth="600px">
@@ -140,8 +183,8 @@ export const CreateRegion = ({ setModalKey }) => {
                   select
                 >
                   {countryIDs.map((counrty) => (
-                    <MenuItem key={`${counrty.id}-${counrty.countryName}`} value={counrty.id}>
-                      {counrty.countryName}
+                    <MenuItem key={`${counrty.id}-${counrty.name}`} value={counrty.id}>
+                      {counrty.name}
                     </MenuItem>
                   ))}
                 </TextField>
@@ -150,7 +193,7 @@ export const CreateRegion = ({ setModalKey }) => {
 
             <Box sx={{ py: 2, mt: 2, display: 'flex', justifyContent: 'space-between' }}>
               <Button
-                onClick={() => window.location.reload()}
+                onClick={handleFormCancel}
                 color="error"
                 disabled={formik.isSubmitting}
                 fullWidth
@@ -161,7 +204,7 @@ export const CreateRegion = ({ setModalKey }) => {
                 Cancel
               </Button>
               <Button
-                color="secondary"
+                color={id === undefined ? 'secondary' : 'warning'}
                 disabled={formik.isSubmitting}
                 fullWidth
                 size="large"
@@ -169,7 +212,7 @@ export const CreateRegion = ({ setModalKey }) => {
                 variant="contained"
                 sx={{ width: '48%' }}
               >
-                Create Payment Method
+                {id === undefined ? 'Add' : 'Update'} Payment Method
               </Button>
             </Box>
           </form>
@@ -182,3 +225,5 @@ export const CreateRegion = ({ setModalKey }) => {
 CreateRegion.propTypes = {
   setModalKey: PropTypes.func,
 };
+
+export default CreateRegion;

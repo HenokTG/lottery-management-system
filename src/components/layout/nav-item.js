@@ -7,7 +7,7 @@ import { NavLink as RouterLink, matchPath, useLocation } from 'react-router-dom'
 import { Button, ListItem, Box, List, Collapse } from '@mui/material';
 
 // components
-import Iconify from './Iconify';
+import Iconify from '../auxilary/Iconify';
 
 // Styles
 const ListItemStyle = {
@@ -15,7 +15,7 @@ const ListItemStyle = {
   color: 'neutral.300',
   justifyContent: 'flex-start',
   textAlign: 'left',
-  px: 3,
+  pl: 3,
   textTransform: 'none',
   width: '100%',
   '& .MuiButton-startIcon': {
@@ -78,7 +78,7 @@ export const NavItem = (props) => {
               ...(subGroupOpen && ActiveListItemStyle),
             }}
           >
-            <Box sx={{ flexGrow: 1 }}>{title}</Box>{' '}
+            <Box sx={{ flexGrow: 1 }}>{title}</Box>
           </Button>
         </ListItem>
 
@@ -98,9 +98,8 @@ export const NavItem = (props) => {
                   key={title}
                   disableGutters
                   sx={{
-                    display: 'flex',
                     mb: 0.5,
-                    ml: 4,
+                    pl: 4,
                     py: 0,
                   }}
                   {...others}
@@ -115,7 +114,7 @@ export const NavItem = (props) => {
                       ...(childActive && ActiveListItemStyle),
                     }}
                   >
-                    <Box sx={{ flexGrow: 1 }}>{title}</Box>
+                    <Box>{title}</Box>
                   </Button>
                 </ListItem>
               );

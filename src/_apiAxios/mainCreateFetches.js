@@ -6,12 +6,14 @@ export const fetchLicenceCatIDs = (fetchAPI, setLicenceCatIDs) => {
     .then((res) => {
       let licenceCatIDs = [];
 
-      if (res.data.data.length !== 0) {
+      if (res.data.data && res.data.data.length !== 0) {
         licenceCatIDs = res.data.data.map((liceCat) => {
-          return {
+          const newLicence = {
             id: liceCat.id,
-            liceCatName: liceCat.name,
+            name: liceCat.name,
           };
+
+          return newLicence;
         });
       }
       setLicenceCatIDs(licenceCatIDs);
@@ -28,12 +30,14 @@ export const fetchGameIDs = (fetchAPI, setGameIDs) => {
     .then((res) => {
       let GameIDs = [];
 
-      if (res.data.data.length !== 0) {
+      if (res.data.data && res.data.data.length !== 0) {
         GameIDs = res.data.data.map((game) => {
-          return {
+          const newGame = {
             id: game.id,
-            gameName: game.name,
+            name: game.name,
           };
+
+          return newGame;
         });
       }
 
@@ -51,12 +55,14 @@ export const fetchCountryIDs = (fetchAPI, setCountryIDs) => {
     .then((res) => {
       let CountryIDs = [];
 
-      if (res.data.data.length !== 0) {
-        CountryIDs = res.data.data.map((game) => {
-          return {
-            id: game.id,
-            countryName: game.name,
+      if (res.data.data && res.data.data.length !== 0) {
+        CountryIDs = res.data.data.map((country) => {
+          const newCountry = {
+            id: country.id,
+            name: country.name,
           };
+
+          return newCountry;
         });
       }
 
@@ -74,12 +80,14 @@ export const fetchStateIDs = (fetchAPI, setStateIDs) => {
     .then((res) => {
       let StateIDs = [];
 
-      if (res.data.data.length !== 0) {
-        StateIDs = res.data.data.map((game) => {
-          return {
-            id: game.id,
-            stateName: game.name,
+      if (res.data.data && res.data.data.length !== 0) {
+        StateIDs = res.data.data.map((region) => {
+          const newState = {
+            id: region.id,
+            name: region.name,
           };
+
+          return newState;
         });
       }
 

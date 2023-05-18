@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 // components
-import Page from '../../components/Page';
+import Page from '../../components/layout/Page';
 import { SystemModulesList } from '../../components/system-modules-list-results';
 // context and modules
 import { useGlobalContext } from '../../context';

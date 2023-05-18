@@ -2,7 +2,7 @@
 import { Container, Box, Typography } from '@mui/material';
 
 // components
-import Page from '../components/Page';
+import Page from '../components/layout/Page';
 import { ActivityLogResults } from '../components/activity-log-results';
 
 const ActivityLogs = () => (

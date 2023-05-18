@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 // components
-import Page from '../components/Page';
-import { CreateLicenceCatagory } from '../components/licence-catagory/create-licence-catagory-form';
+import Page from '../components/layout/Page';
+import CreateLicenceCatagory from '../components/licence-catagory/create-licence-catagory-form';
 import { LicenceCatagoryList } from '../components/licence-catagory/licence-catagories-list-results';
 // context and modules
 import { useGlobalContext } from '../context';

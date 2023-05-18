@@ -2,8 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 // components
-import Page from '../../components/Page';
-import { CreateUser } from '../../components/users/create-user-form';
+import Page from '../../components/layout/Page';
+import CreateUser from '../../components/users/create-user-form';
 import { UserListResults } from '../../components/users/users-list-results';
 // context and modules
 import { useGlobalContext } from '../../context';

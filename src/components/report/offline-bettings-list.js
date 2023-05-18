@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import { format } from 'date-fns';
+
 // @mui
 import {
   Box,
@@ -23,14 +24,23 @@ import {
   CircularProgress,
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
+
+// components
+import AnnualReportFilter from '../auxilary/AnnualReportFilter';
+
 // context and modules
 import { useGlobalContext } from '../../context';
 import { offlineBettingsFetch } from '../../_apiAxios/report';
+import { fetchOperatorIDs } from '../../_apiAxios/modelCreateFetches';
+import { fetchGameIDs } from '../../_apiAxios/mainCreateFetches';
+import { statusIDs, fetchCurrencyIDs, fetchPaymentMethodIDs } from '../../_apiAxios/fetchFilterIDs';
+
 // icons
 import { Search as SearchIcon } from '../../icons/search';
 import { Download as DownloadIcon } from '../../icons/download';
-import { Filter } from '../../icons/filter';
+
 // custom styles
+
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: theme.palette.info.main,
@@ -41,15 +51,17 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
     fontSize: 14,
   },
 }));
+
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   '&:nth-of-type(odd)': {
-    backgroundColor: theme.palette.action.hover,
+    backgroundColor: theme.palette.action.oddRow,
   },
   // hide last border
   '&:last-child td, &:last-child th': {
     border: 0,
   },
 }));
+
 // ---------------------------------------------------------------------
 
 export const OfflineBettingResults = () => {
@@ -69,18 +81,35 @@ export const OfflineBettingResults = () => {
 
   const [searchQuery, setSearchQuery] = useState('');
 
+  const fetchRootAPI = `ticket/offline-ticket?page=${page + 1}&per_page=${limit}`;
+
+  const [fetchAPI, setFetchAPI] = useState(fetchRootAPI);
+
+  const [operatorIDs, setOperatorIDs] = useState([{ id: -1, operatorName: 'No operator to assign' }]);
+  const [gameIDs, setGameIDs] = useState([{ id: -1, operatorName: 'No game to assign' }]);
+  const [currencyIDs, setCurrencyIDs] = useState([{ id: -1, operatorName: 'No currency to assign' }]);
+  const [paymentMethodIDs, setPaymentMethodIDs] = useState([{ id: -1, operatorName: 'No payment method to assign' }]);
+
   useEffect(
     () => {
       if (loggedIn === false) {
         navigate(`/login?redirectTo=${prevLocation.pathname}`);
       }
 
-      const fetchAPI = `ticket/offline-ticket?page=${page + 1}&per_page=${limit}`;
-
       offlineBettingsFetch(fetchAPI, setLoading, setBettingTransactionsList, setPaginationProps);
+
+      const operatorIDsFetchAPI = `operator?page=${1}&per_page=${50}`;
+      const gameIDsFetchAPI = `game?page=${1}&per_page=${50}`;
+      const currencyIDsFetchAPI = `currency?page=${1}&per_page=${50}`;
+      const paymentMethodIDsFetchAPI = `payment-method?page=${1}&per_page=${50}`;
+
+      fetchOperatorIDs(operatorIDsFetchAPI, setOperatorIDs);
+      fetchGameIDs(gameIDsFetchAPI, setGameIDs);
+      fetchCurrencyIDs(currencyIDsFetchAPI, setCurrencyIDs);
+      fetchPaymentMethodIDs(paymentMethodIDsFetchAPI, setPaymentMethodIDs);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [limit, page]
+    [limit, page, fetchAPI]
   );
 
   const handleLimitChange = (event) => {
@@ -103,6 +132,98 @@ export const OfflineBettingResults = () => {
   };
 
   const isDataNotFound = bettingTransactionsList.length === 0;
+
+  // For Filter component
+
+  const [dateFrom, setDateFrom] = useState(null);
+  const [dateTo, setDateTo] = useState(null);
+  const [branchID, setBranchID] = useState('');
+  const [gameID, setGameID] = useState('');
+  const [tnxStatus, setTnxStatus] = useState('');
+  const [operatorID, setOperatorID] = useState('');
+  const [currencyID, setCurrencyID] = useState('');
+  const [paymentMethodID, setPaymentMethodID] = useState('');
+  const [minAmount, setMinAmount] = useState('');
+  const [maxAmount, setMaxAmount] = useState('');
+
+  const filterQueryAPI = `date_from=${dateFrom ? dateFrom.toISOString().split('T')[0] : ''}&date_to=${
+    dateTo ? dateTo.toISOString().split('T')[0] : ''
+  }&branch_id=${branchID}&game=${gameID}&status=${tnxStatus}&operator=${operatorID}&currency=${currencyID}&payment_method=${paymentMethodID}&minimum_amount=${minAmount}&maximum_amount=${maxAmount}`;
+
+  const filterProps = [
+    {
+      fieldName: 'dateFrom',
+      title: 'Date From',
+      child: null,
+      valueSet: dateFrom,
+      callChangeFunc: setDateFrom,
+      fieldType: 'date',
+    },
+    {
+      fieldName: 'dateTO',
+      title: 'Date To',
+      child: null,
+      valueSet: dateTo,
+      callChangeFunc: setDateTo,
+      fieldType: 'date',
+    },
+    {
+      fieldName: 'branchID',
+      title: 'Enter Branch ID',
+      child: 'text-input',
+      valueSet: branchID,
+      callChangeFunc: setBranchID,
+    },
+    {
+      fieldName: 'gameID',
+      title: 'Select Game',
+      child: gameIDs,
+      valueSet: gameID,
+      callChangeFunc: setGameID,
+    },
+    {
+      fieldName: 'tnxStatus',
+      title: 'Select Ticket Status',
+      child: statusIDs(),
+      valueSet: tnxStatus,
+      callChangeFunc: setTnxStatus,
+    },
+    {
+      fieldName: 'operatorID',
+      title: 'Select Operator',
+      child: operatorIDs,
+      valueSet: operatorID,
+      callChangeFunc: setOperatorID,
+    },
+    {
+      fieldName: 'currencyID',
+      title: 'Select Currency',
+      child: currencyIDs,
+      valueSet: currencyID,
+      callChangeFunc: setCurrencyID,
+    },
+    {
+      fieldName: 'paymentMethodID',
+      title: 'Select Payment Method',
+      child: paymentMethodIDs,
+      valueSet: paymentMethodID,
+      callChangeFunc: setPaymentMethodID,
+    },
+    {
+      fieldName: 'minAmount',
+      title: 'Enter Min Amount',
+      child: 'text-input',
+      valueSet: minAmount,
+      callChangeFunc: setMinAmount,
+    },
+    {
+      fieldName: 'maxAmount',
+      title: 'Enter Max Amount',
+      child: 'text-input',
+      valueSet: maxAmount,
+      callChangeFunc: setMaxAmount,
+    },
+  ];
 
   return (
     <Card>
@@ -138,9 +259,12 @@ export const OfflineBettingResults = () => {
                 <Button color="info" variant="outlined" startIcon={<DownloadIcon fontSize="small" />}>
                   Export
                 </Button>
-                <Button color="info" variant="contained" startIcon={<Filter fontSize="small" />}>
-                  Filter
-                </Button>
+                <AnnualReportFilter
+                  filterProps={filterProps}
+                  fetchRootAPI={fetchRootAPI}
+                  filterQueryAPI={filterQueryAPI}
+                  setFetchAPI={setFetchAPI}
+                />
               </Grid>
             </Grid>
 
@@ -148,7 +272,7 @@ export const OfflineBettingResults = () => {
               <Table size="small">
                 <TableHead sx={{ py: 2 }}>
                   <TableRow>
-                    <StyledTableCell align="center">Player Id</StyledTableCell>
+                    <StyledTableCell align="center">Branch Id</StyledTableCell>
                     <StyledTableCell align="center">Game Name</StyledTableCell>
                     <StyledTableCell align="center">Licence Catagory</StyledTableCell>
                     <StyledTableCell align="center">Operator Name</StyledTableCell>
@@ -156,7 +280,7 @@ export const OfflineBettingResults = () => {
                     <StyledTableCell align="center">Payment Method</StyledTableCell>
                     <StyledTableCell align="center">Currency Code</StyledTableCell>
                     <StyledTableCell align="center">Transaction Amount</StyledTableCell>
-                    <StyledTableCell align="center">Transaction Type</StyledTableCell>
+                    <StyledTableCell align="center">Transaction Status</StyledTableCell>
                     <StyledTableCell align="center">Winning Amount</StyledTableCell>
                     <StyledTableCell align="center">Refund Amount</StyledTableCell>
                     <StyledTableCell align="center">Date & Time</StyledTableCell>

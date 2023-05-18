@@ -2,7 +2,10 @@ import { format } from 'date-fns';
 import PropTypes from 'prop-types';
 
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import PerfectScrollbar from 'react-perfect-scrollbar';
+
 // @mui
 import {
   Box,
@@ -22,14 +25,22 @@ import {
   CircularProgress,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+
 // modules
+import { axiosInstance } from '../../utils/axios';
 import { fetchGames } from '../../_apiAxios/mainFetches';
+
 // icons
 import { Search as SearchIcon } from '../../icons/search';
 import { Download as DownloadIcon } from '../../icons/download';
 import { Edit } from '../../icons/edit';
+import { Delete } from '../../icons/delete';
+
+// -----------------------------------------------------------------------------------------------------
 
 export const GameListResults = ({ setModalKey }) => {
+  const navigate = useNavigate();
+
   const [loading, setLoading] = useState(true);
 
   const [page, setPage] = useState(1);
@@ -40,6 +51,8 @@ export const GameListResults = ({ setModalKey }) => {
 
   const [searchQuery, setSearchQuery] = useState('');
 
+  const [deletedID, setDeletedID] = useState(null);
+
   useEffect(
     () => {
       const fetchAPI = `game?page=${page}&per_page=${9}`;
@@ -47,7 +60,7 @@ export const GameListResults = ({ setModalKey }) => {
       fetchGames(fetchAPI, setLoading, setGamesList, setPaginationProps);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [page]
+    [page, deletedID]
   );
 
   const handlePageChange = (event, newPage) => {
@@ -61,6 +74,15 @@ export const GameListResults = ({ setModalKey }) => {
     const fetchAPI = `game?page=${page}&per_page=${9}&search_by=${searchKey}&search_term=${searchValue}`;
 
     fetchGames(fetchAPI, setLoading, setGamesList, setPaginationProps);
+  };
+
+  const handelDeleteGame = (id) => {
+    axiosInstance
+      .delete(`game/${id}`)
+      .then(setDeletedID(id))
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   const isDataNotFound = gamesList.length === 0;
@@ -126,15 +148,15 @@ export const GameListResults = ({ setModalKey }) => {
                           sx={{
                             display: 'flex',
                             justifyContent: 'center',
-                            pb: 3,
+                            pb: 1,
                           }}
                         >
                           <Avatar
                             src={game.logo}
                             variant="square"
                             sx={{
-                              height: 60,
-                              width: 60,
+                              height: 80,
+                              width: 80,
                             }}
                           />
                         </Box>
@@ -147,23 +169,38 @@ export const GameListResults = ({ setModalKey }) => {
                           >
                             {game.gameName}
                           </Typography>
-                          <Button onClick={() => setModalKey(true)}>
+                          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                             <Edit
-                              fontSize="small"
+                              onClick={() => navigate(`/app/games/update/${game.id}`, { replace: true })}
                               sx={{
                                 p: 0,
-                                color: 'black',
+                                m: 1,
+                                color: 'action',
                                 '&:hover': {
-                                  color: 'lightseagreen',
+                                  color: 'success.light',
                                 },
                               }}
                             />
-                          </Button>
+
+                            <Delete
+                              onClick={() => handelDeleteGame(game.id)}
+                              sx={{
+                                p: 0,
+                                m: 1,
+                                color: 'action',
+                                '&:hover': {
+                                  color: 'error.light',
+                                },
+                              }}
+                            />
+                          </Box>
                         </Box>
-                        <Typography align="center" variant="subtitle2">
-                          {game.licenceCatagory}
-                        </Typography>
-                        <Typography align="center" variant="body2" sx={{ mt: 2, height: '3rem' }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', px: 1 }}>
+                          <Typography variant="subtitle2">Licence Catagory:</Typography>
+                          <Typography variant="subtitle2">{game.licenceCatagory}</Typography>
+                        </Box>
+
+                        <Typography variant="body2" sx={{ mt: 2, height: '3rem' }}>
                           {game.description}
                         </Typography>
                         <Box
