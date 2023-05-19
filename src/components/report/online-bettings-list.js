@@ -45,10 +45,12 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: theme.palette.info.main,
     color: theme.palette.common.white,
-    padding: 14,
+    paddingTop: 14,
+    paddingBottom: 14,
   },
   [`&.${tableCellClasses.body}`]: {
     fontSize: 14,
+    border: '1px solid rgba(224, 224, 224, 1)',
   },
 }));
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
@@ -105,7 +107,6 @@ export const OnlineBettingResults = () => {
       fetchGameIDs(gameIDsFetchAPI, setGameIDs);
       fetchCurrencyIDs(currencyIDsFetchAPI, setCurrencyIDs);
       fetchPaymentMethodIDs(paymentMethodIDsFetchAPI, setPaymentMethodIDs);
-    
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [limit, page, fetchAPI]
@@ -285,8 +286,8 @@ export const OnlineBettingResults = () => {
                     <StyledTableCell align="center">Transaction Amount</StyledTableCell>
                     <StyledTableCell align="center">Transaction Status</StyledTableCell>
                     <StyledTableCell align="center">Winning Amount</StyledTableCell>
-                    <StyledTableCell align="center">Refund Amount</StyledTableCell>
-                    <StyledTableCell align="center">Date & Time</StyledTableCell>
+                    {/* <StyledTableCell align="center">Refund Amount</StyledTableCell> */}
+                    {/* <StyledTableCell align="center">Date & Time</StyledTableCell> */}
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -306,12 +307,12 @@ export const OnlineBettingResults = () => {
                       <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
                         {bettingTransaction.winAmount}
                       </TableCell>
-                      <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
+                      {/* <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
                         {bettingTransaction.refundAmount}
                       </TableCell>
                       <TableCell align="right">
                         {format(bettingTransaction.createdAt, 'yyyy-MM-dd HH:MM:SS z')}
-                      </TableCell>
+                      </TableCell> */}
                     </StyledTableRow>
                   ))}
                 </TableBody>

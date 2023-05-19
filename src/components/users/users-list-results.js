@@ -175,10 +175,10 @@ export const UserListResults = ({ setModalKey }) => {
                       <TableRow>
                         <StyledTableCell>User Name</StyledTableCell>
                         <StyledTableCell>Role</StyledTableCell>
+                        <StyledTableCell>Linked Operator</StyledTableCell>
                         <StyledTableCell>Email ID</StyledTableCell>
                         <StyledTableCell>Phone Number</StyledTableCell>
                         <StyledTableCell>Status</StyledTableCell>
-                        <StyledTableCell>Created By</StyledTableCell>
                         <StyledTableCell>Created On</StyledTableCell>
                         <StyledTableCell align="center">Actions</StyledTableCell>
                       </TableRow>
@@ -199,10 +199,10 @@ export const UserListResults = ({ setModalKey }) => {
                             </Box>
                           </TableCell>
                           <TableCell>{user.role}</TableCell>
+                          <TableCell>{user.operator}</TableCell>
                           <TableCell>{user.email}</TableCell>
                           <TableCell>{user.phoneNumber}</TableCell>
                           <TableCell>{user.status}</TableCell>
-                          <TableCell>{user.createdBy}</TableCell>
                           <TableCell>{format(user.createdAt, 'MMM dd, yyyy')}</TableCell>
                           <TableCell align="center">
                             <Box sx={{ display: 'flex', justifyContent: 'space-evenly' }}>

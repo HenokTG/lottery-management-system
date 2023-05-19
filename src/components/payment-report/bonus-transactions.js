@@ -79,7 +79,7 @@ export const BonusTransactionsResults = () => {
 
   const [searchQuery, setSearchQuery] = useState('');
 
-  const fetchRootAPI = `bonus?page=${page + 1}&per_page=${limit}`;
+  const fetchRootAPI = `transaction/bonus?page=${page + 1}&per_page=${limit}`;
 
   const [fetchAPI, setFetchAPI] = useState(fetchRootAPI);
 
@@ -113,7 +113,9 @@ export const BonusTransactionsResults = () => {
     setSearchQuery(e.target.value);
     const searchKey = 'operator';
     const searchValue = e.target.value;
-    const fetchAPI = `bonus?page=${page + 1}&per_page=${limit}&search_by=${searchKey}&search_term=${searchValue}`;
+    const fetchAPI = `transaction/bonus?page=${
+      page + 1
+    }&per_page=${limit}&search_by=${searchKey}&search_term=${searchValue}`;
 
     bonusTransactionsFetch(fetchAPI, setLoading, setBonusTransactionsList, setPaginationProps);
   };
@@ -214,6 +216,7 @@ export const BonusTransactionsResults = () => {
                     <StyledTableCell align="center">Bonus ID</StyledTableCell>
                     <StyledTableCell align="center">Player ID</StyledTableCell>
                     <StyledTableCell align="center">Operator Name</StyledTableCell>
+                    <StyledTableCell align="center">Payment Method</StyledTableCell>
                     <StyledTableCell align="center">Bonus Amount</StyledTableCell>
                     <StyledTableCell align="center">Bonus Status</StyledTableCell>
                     <StyledTableCell align="center">Remark</StyledTableCell>
@@ -225,6 +228,7 @@ export const BonusTransactionsResults = () => {
                       <TableCell>{bonusTransactions.bonusID}</TableCell>
                       <TableCell>{bonusTransactions.playerID}</TableCell>
                       <TableCell>{bonusTransactions.operatorName}</TableCell>
+                      <TableCell>{bonusTransactions.paymentMethod}</TableCell>
                       <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
                         {bonusTransactions.amount}
                       </TableCell>

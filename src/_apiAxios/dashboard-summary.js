@@ -28,6 +28,8 @@ export const fetchDashboardOverview = (fetchAPI, setLoading, setSummaryData) => 
   axiosInstance
     .get(fetchAPI)
     .then((res) => {
+      console.log(res.config.url);
+
       setSummaryData({
         totalRevenue: res.data.data.total_sale === '' ? '-' : res.data.data.total_sale,
         totalTax: res.data.data.total_tax === '' ? '-' : res.data.data.total_tax,
@@ -54,6 +56,8 @@ export const fetchSalesByGamesCatagory = (gameCataAPI, setLoading, setGameSalesD
   axiosInstance
     .get(gameCataAPI)
     .then((res) => {
+      console.log(res.data.data);
+
       const titleArray = [];
       const valueArray = [];
       res.data.data.map((gameSales) => {
@@ -84,9 +88,13 @@ export const fetchOverviewPaymentDistributions = (payDistribAPI, setLoading, set
   axiosInstance
     .get(payDistribAPI)
     .then((res) => {
+      console.log(res.data.data);
+
       const titleArray = [];
       const valueArray = [];
       const bgColorArray = [];
+
+      console.log(res.data.data);
       res.data.data.map((payment, idx) => {
         titleArray.push(payment.payment_method);
         valueArray.push(payment.total_sale);
@@ -118,6 +126,8 @@ export const fetchOperatorSalesDetail = (topOperatorsAPI, setLoading, setOperato
   axiosInstance
     .get(topOperatorsAPI)
     .then((res) => {
+      console.log(res.data.data);
+
       const TOPOPERATORS = res.data.data.map((topOperator) => {
         const newtTopOperator = {
           id: topOperator.operator_name,
@@ -142,6 +152,8 @@ export const fetchHighestWinningTicketes = (highestWinningsAPI, setLoading, setT
   axiosInstance
     .get(highestWinningsAPI)
     .then((res) => {
+      console.log(res.data.data);
+
       const TOPWINS = res.data.data.map((topWin, idx) => {
         const newTopWin = {
           id: `${idx}: ${topWin.operator}-${topWin.ticket_reference}`,

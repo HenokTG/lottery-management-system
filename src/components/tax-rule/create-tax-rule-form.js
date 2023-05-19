@@ -8,7 +8,7 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 
 // @mui
-import { Box, Button, Card, Grid, TextField, Typography, MenuItem } from '@mui/material';
+import { Box, Button, Card, Grid, TextField, Typography, MenuItem, CircularProgress } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
 // context and modules
@@ -28,6 +28,8 @@ const CreateTaxRule = ({ setModalKey }) => {
   const { id } = useParams();
 
   const { loggedIn } = useGlobalContext();
+
+  const [loading, setLoading] = useState(true);
 
   const [countryIDs, setCountryIDs] = useState([{ id: -1, name: 'No country to assign' }]);
 
@@ -50,7 +52,7 @@ const CreateTaxRule = ({ setModalKey }) => {
         }
 
         const updateTaxRuleAPI = `tax-rule/${id}`;
-        taxRuleUpdateFetch(updateTaxRuleAPI, setIntialTaxRuleData);
+        taxRuleUpdateFetch(updateTaxRuleAPI, setIntialTaxRuleData, setLoading);
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -122,125 +124,131 @@ const CreateTaxRule = ({ setModalKey }) => {
           {id === undefined ? 'Add' : 'Update'} Tax Rule
         </Typography>
         <Card sx={{ display: 'flex', justifyContent: 'center', mx: 3, p: 3 }}>
-          <form onSubmit={formik.handleSubmit}>
-            <Box
-              sx={{
-                pb: 1,
-              }}
-            >
-              <Typography
-                align="center"
-                color={theme.palette.info.main}
-                variant="body1"
+          {loading && id !== undefined ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', my: 10 }}>
+              <CircularProgress />
+            </Box>
+          ) : (
+            <form onSubmit={formik.handleSubmit}>
+              <Box
                 sx={{
-                  pb: 2,
+                  pb: 1,
                 }}
               >
-                {id === undefined ? 'Enter' : 'Edit'} Tax Rule Details
-              </Typography>
-            </Box>
-            <Grid container spacing={2} minWidth="600px">
-              <Grid item md={6}>
-                <TextField
-                  error={Boolean(formik.touched.taxName && formik.errors.taxName)}
-                  fullWidth
-                  helperText={formik.touched.taxName && formik.errors.taxName}
-                  label="Tax Name"
-                  name="taxName"
-                  onBlur={formik.handleBlur}
-                  onChange={formik.handleChange}
-                  type="text"
-                  color="success"
-                  value={formik.values.taxName}
-                  size="medium"
-                />
-              </Grid>
-              <Grid item md={6}>
-                <TextField
-                  error={Boolean(formik.touched.taxType && formik.errors.taxType)}
-                  fullWidth
-                  helperText={formik.touched.taxType && formik.errors.taxType}
-                  label="Tax Type"
-                  name="taxType"
-                  onBlur={formik.handleBlur}
-                  onChange={formik.handleChange}
-                  type="text"
-                  color="success"
-                  value={formik.values.taxType}
-                  size="medium"
-                  select
+                <Typography
+                  align="center"
+                  color={theme.palette.info.main}
+                  variant="body1"
+                  sx={{
+                    pb: 2,
+                  }}
                 >
-                  <MenuItem key="percentage" value="percentage">
-                    Percentage
-                  </MenuItem>
-                  <MenuItem key="decimal" value="decimal">
-                    Decimal
-                  </MenuItem>
-                </TextField>
-              </Grid>
-              <Grid item md={6}>
-                <TextField
-                  error={Boolean(formik.touched.taxValue && formik.errors.taxValue)}
-                  fullWidth
-                  helperText={formik.touched.taxValue && formik.errors.taxValue}
-                  label="Tax Amount"
-                  name="taxValue"
-                  onBlur={formik.handleBlur}
-                  onChange={formik.handleChange}
-                  type="text"
-                  color="success"
-                  value={formik.values.taxValue}
-                  size="medium"
-                />
-              </Grid>
-              <Grid item md={6}>
-                <TextField
-                  error={Boolean(formik.touched.countryName && formik.errors.countryName)}
-                  fullWidth
-                  helperText={formik.touched.countryName && formik.errors.countryName}
-                  label="Select Country"
-                  name="countryName"
-                  onBlur={formik.handleBlur}
-                  onChange={formik.handleChange}
-                  type="text"
-                  color="success"
-                  value={formik.values.countryName}
-                  select
-                >
-                  {countryIDs.map((counrty) => (
-                    <MenuItem key={`${counrty.id}-${counrty.countryName}`} value={counrty.id}>
-                      {counrty.name}
+                  {id === undefined ? 'Enter' : 'Edit'} Tax Rule Details
+                </Typography>
+              </Box>
+              <Grid container spacing={2} minWidth="600px">
+                <Grid item md={6}>
+                  <TextField
+                    error={Boolean(formik.touched.taxName && formik.errors.taxName)}
+                    fullWidth
+                    helperText={formik.touched.taxName && formik.errors.taxName}
+                    label="Tax Name"
+                    name="taxName"
+                    onBlur={formik.handleBlur}
+                    onChange={formik.handleChange}
+                    type="text"
+                    color="success"
+                    value={formik.values.taxName}
+                    size="medium"
+                  />
+                </Grid>
+                <Grid item md={6}>
+                  <TextField
+                    error={Boolean(formik.touched.taxType && formik.errors.taxType)}
+                    fullWidth
+                    helperText={formik.touched.taxType && formik.errors.taxType}
+                    label="Tax Type"
+                    name="taxType"
+                    onBlur={formik.handleBlur}
+                    onChange={formik.handleChange}
+                    type="text"
+                    color="success"
+                    value={formik.values.taxType}
+                    size="medium"
+                    select
+                  >
+                    <MenuItem key="percentage" value="percentage">
+                      Percentage
                     </MenuItem>
-                  ))}
-                </TextField>
+                    <MenuItem key="decimal" value="decimal">
+                      Decimal
+                    </MenuItem>
+                  </TextField>
+                </Grid>
+                <Grid item md={6}>
+                  <TextField
+                    error={Boolean(formik.touched.taxValue && formik.errors.taxValue)}
+                    fullWidth
+                    helperText={formik.touched.taxValue && formik.errors.taxValue}
+                    label="Tax Amount"
+                    name="taxValue"
+                    onBlur={formik.handleBlur}
+                    onChange={formik.handleChange}
+                    type="text"
+                    color="success"
+                    value={formik.values.taxValue}
+                    size="medium"
+                  />
+                </Grid>
+                <Grid item md={6}>
+                  <TextField
+                    error={Boolean(formik.touched.countryName && formik.errors.countryName)}
+                    fullWidth
+                    helperText={formik.touched.countryName && formik.errors.countryName}
+                    label="Select Country"
+                    name="countryName"
+                    onBlur={formik.handleBlur}
+                    onChange={formik.handleChange}
+                    type="text"
+                    color="success"
+                    value={formik.values.countryName}
+                    select
+                  >
+                    {countryIDs.map((counrty) => (
+                      <MenuItem key={`${counrty.id}-${counrty.countryName}`} value={counrty.id}>
+                        {counrty.name}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                </Grid>
               </Grid>
-            </Grid>
 
-            <Box sx={{ py: 2, mt: 2, display: 'flex', justifyContent: 'space-between' }}>
-              <Button
-                onClick={handleFormCancel}
-                color="error"
-                disabled={formik.isSubmitting}
-                fullWidth
-                size="large"
-                variant="contained"
-                sx={{ width: '48%' }}
-              >
-                Cancel
-              </Button>
-              <Button
-                color={id === undefined ? 'secondary' : 'warning'}
-                disabled={formik.isSubmitting}
-                fullWidth
-                size="large"
-                type="submit"
-                variant="contained"
-                sx={{ width: '48%' }}
-              >
-                {id === undefined ? 'Add' : 'Update'} Tax Rule
-              </Button>
-            </Box>
-          </form>
+              <Box sx={{ py: 2, mt: 2, display: 'flex', justifyContent: 'space-between' }}>
+                <Button
+                  onClick={handleFormCancel}
+                  color="error"
+                  disabled={formik.isSubmitting}
+                  fullWidth
+                  size="large"
+                  variant="contained"
+                  sx={{ width: '48%' }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  color={id === undefined ? 'secondary' : 'warning'}
+                  disabled={formik.isSubmitting}
+                  fullWidth
+                  size="large"
+                  type="submit"
+                  variant="contained"
+                  sx={{ width: '48%' }}
+                >
+                  {id === undefined ? 'Add' : 'Update'} Tax Rule
+                </Button>
+              </Box>
+            </form>
+          )}
         </Card>
       </Box>
     </>

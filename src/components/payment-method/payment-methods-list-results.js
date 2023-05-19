@@ -236,7 +236,7 @@ export const PaymentMethodList = ({ setModalKey }) => {
                     {isDataNotFound && (
                       <TableBody>
                         <TableRow>
-                          <TableCell align="center" colSpan={5} sx={{ py: 3 }}>
+                          <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
                             <Box>
                               <Typography gutterBottom align="center" variant="subtitle1" color="error.main">
                                 No data fetched!

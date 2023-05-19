@@ -2,6 +2,11 @@ import PropTypes from 'prop-types';
 
 import { Avatar, Card, CardContent, Stack, SvgIcon, Typography, Box, CircularProgress } from '@mui/material';
 
+// utility
+import { fShortenNumber } from '../../utils/formatNumber';
+
+// ---------------------------------------------------------------------------------
+
 export const OverviewTotals = (props) => {
   const { value, loading, title, icon, iconBg } = props;
 
@@ -18,7 +23,7 @@ export const OverviewTotals = (props) => {
               <Typography color="text.secondary" variant="overline">
                 {title}
               </Typography>
-              <Typography variant="h4">{value}</Typography>
+              <Typography variant="h4">{fShortenNumber(value)}</Typography>
             </Stack>
             <Avatar
               sx={{

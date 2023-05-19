@@ -8,7 +8,7 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 
 // @mui
-import { Box, Button, Card, Grid, TextField, Typography, MenuItem, OutlinedInput, Chip } from '@mui/material';
+import { Box, Button, Card, Grid, TextField, Typography, CircularProgress } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
 // components
@@ -18,18 +18,6 @@ import PermissionsForm from './permissions_form';
 import { axiosInstance } from '../../utils/axios';
 import { useGlobalContext } from '../../context';
 import { roleUpdateFetch } from '../../_apiAxios/management';
-
-// multi select styles
-const ITEM_HEIGHT = 48;
-const ITEM_PADDING_TOP = 8;
-const MenuProps = {
-  PaperProps: {
-    style: {
-      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      width: 250,
-    },
-  },
-};
 
 // -----------------------------------------------------------------------------------------------------------------------
 
@@ -42,10 +30,10 @@ const CreateRole = ({ setModalKey }) => {
 
   const { loggedIn } = useGlobalContext();
 
+  const [loading, setLoading] = useState(true);
+
   const [permissionsObject, setPermissionsObject] = useState({});
   const [isPermissions, setIsPermissions] = useState(false);
-
-  const [assignedPermissionsList, setAssignedPermissionsList] = useState([]);
 
   const [intialRoleData, setIntialRoleData] = useState({
     roleName: '',
@@ -60,22 +48,12 @@ const CreateRole = ({ setModalKey }) => {
         }
 
         const updateLicenceAPI = `role/${id}`;
-        roleUpdateFetch(updateLicenceAPI, setIntialRoleData);
+        roleUpdateFetch(updateLicenceAPI, setIntialRoleData, setLoading);
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [id]
   );
-
-  const handleMultiSelect = (event) => {
-    const {
-      target: { value },
-    } = event;
-    setAssignedPermissionsList(
-      // On autofill we get a stringified value.
-      typeof value === 'string' ? value.split(',') : value
-    );
-  };
 
   const handleFormCancel = () => {
     if (id === undefined) {
@@ -146,96 +124,102 @@ const CreateRole = ({ setModalKey }) => {
           {id === undefined ? 'Create' : 'Update'} Role
         </Typography>
         <Card sx={{ display: 'flex', justifyContent: 'center', mx: 3, p: 3 }}>
-          <form onSubmit={formik.handleSubmit}>
-            <Box
-              sx={{
-                pb: 1,
-              }}
-            >
-              <Typography
-                align="center"
-                color={theme.palette.info.main}
-                variant="body1"
+          {loading && id !== undefined ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', my: 10 }}>
+              <CircularProgress />
+            </Box>
+          ) : (
+            <form onSubmit={formik.handleSubmit}>
+              <Box
                 sx={{
-                  pb: 2,
+                  pb: 1,
                 }}
               >
-                {id === undefined ? 'Enter' : 'Edit'} Role Deatails
-              </Typography>
-            </Box>
-            <Grid container spacing={2}>
-              <Grid item md={6}>
-                <TextField
-                  error={Boolean(formik.touched.roleName && formik.errors.roleName)}
-                  fullWidth
-                  helperText={formik.touched.roleName && formik.errors.roleName}
-                  label="Role Name"
-                  name="roleName"
-                  onBlur={formik.handleBlur}
-                  onChange={formik.handleChange}
-                  type="text"
-                  value={formik.values.roleName}
-                  size="medium"
-                  color="success"
-                />
-              </Grid>
-
-              <Grid item md={6}>
-                <Button
-                  onClick={() => setIsPermissions(true)}
-                  color="primary"
-                  fullWidth
-                  size="medium"
-                  variant="contained"
-                  sx={{ width: '75%', mt: 0.75, ml: 3 }}
+                <Typography
+                  align="center"
+                  color={theme.palette.info.main}
+                  variant="body1"
+                  sx={{
+                    pb: 2,
+                  }}
                 >
-                  Set Permissions
-                </Button>
-              </Grid>
-              <Grid item md={12}>
-                <TextField
-                  error={Boolean(formik.touched.roleDescription && formik.errors.roleDescription)}
-                  fullWidth
-                  helperText={formik.touched.roleDescription && formik.errors.roleDescription}
-                  label="Role Description"
-                  name="roleDescription"
-                  onBlur={formik.handleBlur}
-                  onChange={formik.handleChange}
-                  type="text"
-                  value={formik.values.roleDescription}
-                  size="small"
-                  color="success"
-                  multiline
-                  rows={4}
-                />
-              </Grid>
-            </Grid>
+                  {id === undefined ? 'Enter' : 'Edit'} Role Deatails
+                </Typography>
+              </Box>
+              <Grid container spacing={2}>
+                <Grid item md={6}>
+                  <TextField
+                    error={Boolean(formik.touched.roleName && formik.errors.roleName)}
+                    fullWidth
+                    helperText={formik.touched.roleName && formik.errors.roleName}
+                    label="Role Name"
+                    name="roleName"
+                    onBlur={formik.handleBlur}
+                    onChange={formik.handleChange}
+                    type="text"
+                    value={formik.values.roleName}
+                    size="medium"
+                    color="success"
+                  />
+                </Grid>
 
-            <Box sx={{ py: 2, mt: 2, display: 'flex', justifyContent: 'space-between' }}>
-              <Button
-                onClick={handleFormCancel}
-                color="error"
-                disabled={formik.isSubmitting}
-                fullWidth
-                size="large"
-                variant="contained"
-                sx={{ width: '48%' }}
-              >
-                Cancel
-              </Button>
-              <Button
-                color={id === undefined ? 'secondary' : 'warning'}
-                disabled={formik.isSubmitting}
-                fullWidth
-                size="large"
-                type="submit"
-                variant="contained"
-                sx={{ width: '48%' }}
-              >
-                {id === undefined ? 'Create' : 'Update'} Role
-              </Button>
-            </Box>
-          </form>
+                <Grid item md={6}>
+                  <Button
+                    onClick={() => setIsPermissions(true)}
+                    color="primary"
+                    fullWidth
+                    size="medium"
+                    variant="contained"
+                    sx={{ width: '75%', mt: 0.75, ml: 3 }}
+                  >
+                    Set Permissions
+                  </Button>
+                </Grid>
+                <Grid item md={12}>
+                  <TextField
+                    error={Boolean(formik.touched.roleDescription && formik.errors.roleDescription)}
+                    fullWidth
+                    helperText={formik.touched.roleDescription && formik.errors.roleDescription}
+                    label="Role Description"
+                    name="roleDescription"
+                    onBlur={formik.handleBlur}
+                    onChange={formik.handleChange}
+                    type="text"
+                    value={formik.values.roleDescription}
+                    size="small"
+                    color="success"
+                    multiline
+                    rows={4}
+                  />
+                </Grid>
+              </Grid>
+
+              <Box sx={{ py: 2, mt: 2, display: 'flex', justifyContent: 'space-between' }}>
+                <Button
+                  onClick={handleFormCancel}
+                  color="error"
+                  disabled={formik.isSubmitting}
+                  fullWidth
+                  size="large"
+                  variant="contained"
+                  sx={{ width: '48%' }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  color={id === undefined ? 'secondary' : 'warning'}
+                  disabled={formik.isSubmitting}
+                  fullWidth
+                  size="large"
+                  type="submit"
+                  variant="contained"
+                  sx={{ width: '48%' }}
+                >
+                  {id === undefined ? 'Create' : 'Update'} Role
+                </Button>
+              </Box>
+            </form>
+          )}
         </Card>
       </Box>
     </>

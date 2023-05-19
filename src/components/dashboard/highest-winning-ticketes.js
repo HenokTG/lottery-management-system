@@ -67,7 +67,7 @@ export const HighestWinningTicketes = () => {
       const today = new Date();
       const backDate = new Date(today.setDate(today.getDate() - range));
 
-      const currentDate = today.toJSON().slice(0, 10);
+      const currentDate = new Date().toJSON().slice(0, 10);
       const initialDate = backDate.toJSON().slice(0, 10);
 
       const highestWinningsAPI = `transaction/highest-winning-tickets?date_from=${initialDate}&date_to=${currentDate}`;

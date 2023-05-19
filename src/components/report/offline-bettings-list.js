@@ -281,9 +281,9 @@ export const OfflineBettingResults = () => {
                     <StyledTableCell align="center">Currency Code</StyledTableCell>
                     <StyledTableCell align="center">Transaction Amount</StyledTableCell>
                     <StyledTableCell align="center">Transaction Status</StyledTableCell>
-                    <StyledTableCell align="center">Winning Amount</StyledTableCell>
-                    <StyledTableCell align="center">Refund Amount</StyledTableCell>
-                    <StyledTableCell align="center">Date & Time</StyledTableCell>
+                    <StyledTableCell align="center">Bet Amount</StyledTableCell>
+                    {/* <StyledTableCell align="center">Refund Amount</StyledTableCell>
+                    <StyledTableCell align="center">Date & Time</StyledTableCell> */}
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -303,12 +303,12 @@ export const OfflineBettingResults = () => {
                       <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
                         {bettingTransaction.winAmount}
                       </TableCell>
-                      <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
+                      {/* <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
                         {bettingTransaction.refundAmount}
                       </TableCell>
                       <TableCell align="right">
                         {format(bettingTransaction.createdAt, 'yyyy-MM-dd HH:MM:SS z')}
-                      </TableCell>
+                      </TableCell> */}
                     </StyledTableRow>
                   ))}
                 </TableBody>

@@ -34,18 +34,20 @@ export const fetchPaymentMethods = (fetchAPI, setLoading, setPaymentMethodList, 
     });
 };
 
-export const paymentMethodUpdateFetch = (fetchAPI, setPaymentMethod) => {
+export const paymentMethodUpdateFetch = (fetchAPI, setPaymentMethod, setLoading) => {
   axiosInstance
     .get(fetchAPI)
-    .then((res) =>
+    .then((res) => {
       setPaymentMethod({
         paymentMethod: res.data.name ? res.data.name : '',
         paymentCode: res.data.code ? res.data.code : '',
         description: res.data.description ? res.data.description : '',
-      })
-    )
+      });
+      setLoading(false);
+    })
     .catch((error) => {
       console.log(error);
+      setLoading(false);
     });
 };
 
@@ -90,12 +92,14 @@ export const paymentTransactionsFetch = (fetchAPI, setLoading, setPaymentTransac
         setPaginationProps(res.data.pagination === undefined ? null : res.data.pagination);
       }
 
+      console.log(res.data.data);
+
       const PAYMENTTRANSACTIONS =
         res.data.data !== undefined
           ? res.data.data.map((paymentTnx) => {
               const newPaymentTnx = {
                 id: paymentTnx.id,
-                transactionID: paymentTnx.id,
+                transactionID: paymentTnx.payment_id,
                 operatorName: paymentTnx.operator.name,
                 PaymentMethod: paymentTnx.payment_method.name,
                 currencyCode: paymentTnx.currency.code,
@@ -128,16 +132,18 @@ export const bonusTransactionsFetch = (fetchAPI, setLoading, setBonusTransaction
         setPaginationProps(res.data.pagination === undefined ? null : res.data.pagination);
       }
 
+      console.log(res.data.data);
       const BONUSTRANSACTIONS =
         res.data.data !== undefined
           ? res.data.data.map((bonusTnx) => {
               const newBonusTnx = {
                 id: bonusTnx.id,
-                operatorName: bonusTnx.operator_reference_number,
+                operatorName: bonusTnx.operator.name,
                 playerID: bonusTnx.player_id,
-                bonusID: `${bonusTnx.bonus.id} ${bonusTnx.bonus.code} - ${bonusTnx.bonus.name}`,
+                bonusID: bonusTnx.bonus.name, // `${bonusTnx.bonus.id} ${bonusTnx.bonus.code} - ${bonusTnx.bonus.name}`,
+                paymentMethod: bonusTnx.payment_method.name,
                 amount: bonusTnx.amount,
-                status: bonusTnx.bonus.is_active ? 'Valid Bonus' : 'Expired Bonus',
+                status: bonusTnx.transaction_status, // bonusTnx.transaction_status ? 'Valid Bonus' : 'Expired Bonus',
                 remark: 'Terms and Conditions',
                 remarkDetail: bonusTnx.bonus.description,
               };

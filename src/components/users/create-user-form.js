@@ -8,7 +8,7 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 
 // @mui
-import { Box, Button, Card, Divider, Grid, TextField, Typography, MenuItem } from '@mui/material';
+import { Box, Button, Card, Divider, Grid, TextField, Typography, MenuItem, CircularProgress } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
 // context and modules
@@ -28,6 +28,8 @@ const CreateUser = ({ setModalKey }) => {
   const { id } = useParams();
 
   const { loggedIn } = useGlobalContext();
+
+  const [loading, setLoading] = useState(true);
 
   const [roleIDs, setRoleIDs] = useState([{ id: -1, name: 'No role to assign' }]);
 
@@ -52,7 +54,7 @@ const CreateUser = ({ setModalKey }) => {
         }
 
         const updateOperatorAPI = `user/${id}`;
-        userUpdateFetch(updateOperatorAPI, setIntialUserData);
+        userUpdateFetch(updateOperatorAPI, setIntialUserData, setLoading);
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -129,148 +131,154 @@ const CreateUser = ({ setModalKey }) => {
           {id === undefined ? 'Create' : 'Update'} User
         </Typography>
         <Card sx={{ display: 'flex', justifyContent: 'center', mx: 3, p: 3 }}>
-          <form onSubmit={formik.handleSubmit}>
-            <Box
-              sx={{
-                py: 1,
-              }}
-            >
-              <Typography
-                align="center"
-                color={theme.palette.info.main}
-                variant="body1"
+          {loading && id !== undefined ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', my: 10 }}>
+              <CircularProgress />
+            </Box>
+          ) : (
+            <form onSubmit={formik.handleSubmit}>
+              <Box
                 sx={{
-                  pb: 2,
+                  py: 1,
                 }}
               >
-                {id === undefined ? 'Enter' : 'Edit'} Basic Detail About the User
-              </Typography>
-            </Box>
-            <Grid container spacing={3} sx={{ px: 15 }}>
-              <Grid item md={6}>
-                <TextField
-                  error={Boolean(formik.touched.firstName && formik.errors.firstName)}
-                  fullWidth
-                  helperText={formik.touched.firstName && formik.errors.firstName}
-                  label="First Name"
-                  name="firstName"
-                  onBlur={formik.handleBlur}
-                  onChange={formik.handleChange}
-                  type="text"
-                  color="success"
-                  value={formik.values.firstName}
-                />
-              </Grid>
-              <Grid item md={6}>
-                <TextField
-                  error={Boolean(formik.touched.lastName && formik.errors.lastName)}
-                  fullWidth
-                  helperText={formik.touched.lastName && formik.errors.lastName}
-                  label="Last Name"
-                  name="lastName"
-                  onBlur={formik.handleBlur}
-                  onChange={formik.handleChange}
-                  type="text"
-                  color="success"
-                  value={formik.values.lastName}
-                />
-              </Grid>
-              <Grid item md={6}>
-                <TextField
-                  error={Boolean(formik.touched.email && formik.errors.email)}
-                  fullWidth
-                  helperText={formik.touched.email && formik.errors.email}
-                  label="Email Address"
-                  name="email"
-                  onBlur={formik.handleBlur}
-                  onChange={formik.handleChange}
-                  type="email"
-                  color="success"
-                  value={formik.values.email}
-                />
-              </Grid>
-              <Grid item md={6}>
-                <TextField
-                  error={Boolean(formik.touched.phoneNumber && formik.errors.phoneNumber)}
-                  fullWidth
-                  helperText={formik.touched.phoneNumber && formik.errors.phoneNumber}
-                  label="Phone Number"
-                  name="phoneNumber"
-                  onBlur={formik.handleBlur}
-                  onChange={formik.handleChange}
-                  type="number"
-                  color="success"
-                  value={formik.values.phoneNumber}
-                />
-              </Grid>
-            </Grid>
-            <Divider sx={{ backgroundColor: 'black', my: 3 }} />
-            <Box
-              sx={{
-                pb: 1,
-              }}
-            >
-              <Typography
-                align="center"
-                color={theme.palette.info.main}
-                variant="body1"
-                sx={{
-                  pb: 2,
-                }}
-              >
-                {id === undefined ? 'Select' : 'Change'} the User Role
-              </Typography>
-              {/* and Assigned Operator  */}
-            </Box>
-            <Grid container spacing={2} sx={{ px: 15 }}>
-              <Grid item md={6}>
-                <TextField
-                  error={Boolean(formik.touched.userRole && formik.errors.userRole)}
-                  fullWidth
-                  helperText={formik.touched.userRole && formik.errors.userRole}
-                  label="Role"
-                  name="userRole"
-                  onBlur={formik.handleBlur}
-                  onChange={formik.handleChange}
-                  type="text"
-                  color="success"
-                  value={formik.values.userRole}
-                  select
+                <Typography
+                  align="center"
+                  color={theme.palette.info.main}
+                  variant="body1"
+                  sx={{
+                    pb: 2,
+                  }}
                 >
-                  {roleIDs.map((roleId) => (
-                    <MenuItem key={`${roleId.id}-${roleId.role}`} value={roleId.id}>
-                      {roleId.role}
-                    </MenuItem>
-                  ))}
-                </TextField>
+                  {id === undefined ? 'Enter' : 'Edit'} Basic Detail About the User
+                </Typography>
+              </Box>
+              <Grid container spacing={3} sx={{ px: 15 }}>
+                <Grid item md={6}>
+                  <TextField
+                    error={Boolean(formik.touched.firstName && formik.errors.firstName)}
+                    fullWidth
+                    helperText={formik.touched.firstName && formik.errors.firstName}
+                    label="First Name"
+                    name="firstName"
+                    onBlur={formik.handleBlur}
+                    onChange={formik.handleChange}
+                    type="text"
+                    color="success"
+                    value={formik.values.firstName}
+                  />
+                </Grid>
+                <Grid item md={6}>
+                  <TextField
+                    error={Boolean(formik.touched.lastName && formik.errors.lastName)}
+                    fullWidth
+                    helperText={formik.touched.lastName && formik.errors.lastName}
+                    label="Last Name"
+                    name="lastName"
+                    onBlur={formik.handleBlur}
+                    onChange={formik.handleChange}
+                    type="text"
+                    color="success"
+                    value={formik.values.lastName}
+                  />
+                </Grid>
+                <Grid item md={6}>
+                  <TextField
+                    error={Boolean(formik.touched.email && formik.errors.email)}
+                    fullWidth
+                    helperText={formik.touched.email && formik.errors.email}
+                    label="Email Address"
+                    name="email"
+                    onBlur={formik.handleBlur}
+                    onChange={formik.handleChange}
+                    type="email"
+                    color="success"
+                    value={formik.values.email}
+                  />
+                </Grid>
+                <Grid item md={6}>
+                  <TextField
+                    error={Boolean(formik.touched.phoneNumber && formik.errors.phoneNumber)}
+                    fullWidth
+                    helperText={formik.touched.phoneNumber && formik.errors.phoneNumber}
+                    label="Phone Number"
+                    name="phoneNumber"
+                    onBlur={formik.handleBlur}
+                    onChange={formik.handleChange}
+                    type="number"
+                    color="success"
+                    value={formik.values.phoneNumber}
+                  />
+                </Grid>
               </Grid>
-            </Grid>
+              <Divider sx={{ backgroundColor: 'black', my: 3 }} />
+              <Box
+                sx={{
+                  pb: 1,
+                }}
+              >
+                <Typography
+                  align="center"
+                  color={theme.palette.info.main}
+                  variant="body1"
+                  sx={{
+                    pb: 2,
+                  }}
+                >
+                  {id === undefined ? 'Select' : 'Change'} the User Role
+                </Typography>
+                {/* and Assigned Operator  */}
+              </Box>
+              <Grid container spacing={2} sx={{ px: 15 }}>
+                <Grid item md={6}>
+                  <TextField
+                    error={Boolean(formik.touched.userRole && formik.errors.userRole)}
+                    fullWidth
+                    helperText={formik.touched.userRole && formik.errors.userRole}
+                    label="Role"
+                    name="userRole"
+                    onBlur={formik.handleBlur}
+                    onChange={formik.handleChange}
+                    type="text"
+                    color="success"
+                    value={formik.values.userRole}
+                    select
+                  >
+                    {roleIDs.map((roleId) => (
+                      <MenuItem key={`${roleId.id}-${roleId.name}`} value={roleId.id}>
+                        {roleId.name}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                </Grid>
+              </Grid>
 
-            <Box sx={{ py: 2, px: 15, mt: 2, display: 'flex', justifyContent: 'space-between' }}>
-              <Button
-                onClick={handleFormCancel}
-                color="error"
-                disabled={formik.isSubmitting}
-                fullWidth
-                size="large"
-                variant="contained"
-                sx={{ width: '48%' }}
-              >
-                Cancel
-              </Button>
-              <Button
-                color={id === undefined ? 'secondary' : 'warning'}
-                disabled={formik.isSubmitting}
-                fullWidth
-                size="large"
-                type="submit"
-                variant="contained"
-                sx={{ width: '48%' }}
-              >
-                {id === undefined ? 'Create' : 'Update'} User
-              </Button>
-            </Box>
-          </form>
+              <Box sx={{ py: 2, px: 15, mt: 2, display: 'flex', justifyContent: 'space-between' }}>
+                <Button
+                  onClick={handleFormCancel}
+                  color="error"
+                  disabled={formik.isSubmitting}
+                  fullWidth
+                  size="large"
+                  variant="contained"
+                  sx={{ width: '48%' }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  color={id === undefined ? 'secondary' : 'warning'}
+                  disabled={formik.isSubmitting}
+                  fullWidth
+                  size="large"
+                  type="submit"
+                  variant="contained"
+                  sx={{ width: '48%' }}
+                >
+                  {id === undefined ? 'Create' : 'Update'} User
+                </Button>
+              </Box>
+            </form>
+          )}
         </Card>
       </Box>
     </>

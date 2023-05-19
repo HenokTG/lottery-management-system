@@ -79,7 +79,7 @@ export const PaymentTransactionsResults = () => {
 
   const [searchQuery, setSearchQuery] = useState('');
 
-  const fetchRootAPI = `transaction/ticket?page=${page + 1}&per_page=${limit}`;
+  const fetchRootAPI = `transaction/payment?page=${page + 1}&per_page=${limit}`;
 
   const [fetchAPI, setFetchAPI] = useState(fetchRootAPI);
 
@@ -119,7 +119,7 @@ export const PaymentTransactionsResults = () => {
     setSearchQuery(e.target.value);
     const searchKey = 'operator';
     const searchValue = e.target.value;
-    const fetchAPI = `transaction/ticket?page=${
+    const fetchAPI = `transaction/payment?page=${
       page + 1
     }&per_page=${limit}&search_by=${searchKey}&search_term=${searchValue}`;
 
@@ -263,7 +263,7 @@ export const PaymentTransactionsResults = () => {
                     <StyledTableCell align="center">Operator Name</StyledTableCell>
                     <StyledTableCell align="center">Payment Method</StyledTableCell>
                     <StyledTableCell align="center">Currency Code</StyledTableCell>
-                    <StyledTableCell align="center">Betting Type</StyledTableCell>
+                    {/* <StyledTableCell align="center">Betting Type</StyledTableCell> */}
                     <StyledTableCell align="center">Transaction Type</StyledTableCell>
                     <StyledTableCell align="center">Transaction Amount</StyledTableCell>
                     <StyledTableCell align="center">Transaction Fee</StyledTableCell>
@@ -276,15 +276,15 @@ export const PaymentTransactionsResults = () => {
                     <StyledTableRow
                       hover
                       key={paymentTransaction.id}
-                      sx={{
-                        backgroundColor: paymentTransaction.paymentType === 'Deposit' ? '#64B6F748' : '#FFBF4C48',
-                      }}
+                      // sx={{
+                      //   backgroundColor: paymentTransaction.paymentType === 'Deposit' ? '#64B6F748' : '#FFBF4C48',
+                      // }}
                     >
                       <TableCell>{paymentTransaction.transactionID}</TableCell>
                       <TableCell>{paymentTransaction.operatorName}</TableCell>
                       <TableCell>{paymentTransaction.PaymentMethod}</TableCell>
                       <TableCell>{paymentTransaction.currencyCode}</TableCell>
-                      <TableCell>{paymentTransaction.ticketType}</TableCell>
+                      {/* <TableCell>{paymentTransaction.ticketType}</TableCell> */}
                       <TableCell>{paymentTransaction.paymentType}</TableCell>
                       <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
                         {paymentTransaction.amount}
@@ -297,14 +297,14 @@ export const PaymentTransactionsResults = () => {
                       </TableCell>
                       <TableCell
                         align="center"
-                        sx={{
-                          color:
-                            paymentTransaction.paymentStatus === 'Success'
-                              ? '#43C6B7'
-                              : // : paymentTransaction.paymentStatus === "Failed"
-                                // ? "#D14343"
-                                '#00F',
-                        }}
+                        // sx={{
+                        //   color:
+                        //     paymentTransaction.paymentStatus === 'Success'
+                        //       ? '#43C6B7'
+                        //       : // : paymentTransaction.paymentStatus === "Failed"
+                        //         // ? "#D14343"
+                        //         '#00F',
+                        // }}
                       >
                         {paymentTransaction.paymentStatus}
                       </TableCell>

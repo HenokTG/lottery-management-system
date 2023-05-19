@@ -59,10 +59,14 @@ const DashboardApp = () => {
       const today = new Date();
       const backDate = new Date(today.setDate(today.getDate() - range));
 
-      const currentDate = today.toJSON().slice(0, 10);
+      console.log(today, backDate);
+
+      const currentDate = new Date().toJSON().slice(0, 10);
       const initialDate = backDate.toJSON().slice(0, 10);
 
       const summaryAPI = `transaction/statistics?date_from=${initialDate}&date_to=${currentDate}&operator=${operatorId}`;
+
+      console.log('summaryAPI', summaryAPI);
 
       fetchDashboardOverview(summaryAPI, setLoading, setSummaryData);
     },

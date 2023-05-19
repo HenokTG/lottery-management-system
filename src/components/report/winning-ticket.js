@@ -252,31 +252,35 @@ export const WinTicketResults = () => {
               <Table size="small">
                 <TableHead sx={{ py: 2 }}>
                   <TableRow>
-                    <StyledTableCell align="center">Game Name</StyledTableCell>
-                    <StyledTableCell align="center">Licence Catagory</StyledTableCell>
-                    <StyledTableCell align="center">Operator Name</StyledTableCell>
+                    <StyledTableCell align="center">Player / Branch ID</StyledTableCell>
                     <StyledTableCell align="center">Ticket Reference</StyledTableCell>
+                    <StyledTableCell align="center">Game Name</StyledTableCell>
+                    <StyledTableCell align="center">Operator Name</StyledTableCell>
+                    <StyledTableCell align="center">Bet Type</StyledTableCell>
                     <StyledTableCell align="center">Bet Amount</StyledTableCell>
-                    <StyledTableCell align="center">Transaction Type</StyledTableCell>
+                    <StyledTableCell align="center">Payment Method</StyledTableCell>
+                    <StyledTableCell align="center">Currency Code</StyledTableCell>
                     <StyledTableCell align="center">Winning Amount</StyledTableCell>
                     <StyledTableCell align="center">Date & Time</StyledTableCell>
+                    <StyledTableCell align="center">Payment Status</StyledTableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
                   {winningTicketsList.map((winTicket) => (
                     <StyledTableRow hover key={winTicket.id}>
-                      <TableCell>{winTicket.operatorName}</TableCell>
+                      <TableCell>{winTicket.playerId}</TableCell>
+                      <TableCell>{winTicket.ticketRef}</TableCell>
                       <TableCell>{winTicket.gameName}</TableCell>
                       <TableCell>{winTicket.operatorName}</TableCell>
-                      <TableCell>{winTicket.ticketRef}</TableCell>
-                      <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
-                        {winTicket.amount}
-                      </TableCell>
-                      <TableCell>{winTicket.paymentType}</TableCell>
+                      <TableCell>{winTicket.ticketType}</TableCell>
+                      <TableCell>{winTicket.betAmount}</TableCell>
+                      <TableCell>{winTicket.paymentMethod}</TableCell>
+                      <TableCell>{winTicket.currency}</TableCell>
                       <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
                         {winTicket.winAmount}
                       </TableCell>
                       <TableCell align="right">{format(winTicket.createdAt, 'yyyy-MM-dd HH:MM:SS z')}</TableCell>
+                      <TableCell>{winTicket.tnxStatus}</TableCell>
                     </StyledTableRow>
                   ))}
                 </TableBody>

@@ -40,7 +40,7 @@ export const SalesByGames = () => {
       const today = new Date();
       const backDate = new Date(today.setDate(today.getDate() - range));
 
-      const currentDate = today.toJSON().slice(0, 10);
+      const currentDate = new Date().toJSON().slice(0, 10);
       const initialDate = backDate.toJSON().slice(0, 10);
 
       const gameCataAPI = `game/sales?date_from=${initialDate}&date_to=${currentDate}`;
@@ -141,7 +141,6 @@ export const SalesByGames = () => {
         ) : (
           <Box
             sx={{
-              // height: 400,
               position: 'relative',
             }}
           >
@@ -150,7 +149,13 @@ export const SalesByGames = () => {
                 No data fetched!
               </Typography>
             ) : (
-              <Bar data={data} options={options} />
+              <Box
+                sx={{
+                  height: 400,
+                }}
+              >
+                <Bar data={data} options={options} />
+              </Box>
             )}
           </Box>
         )}

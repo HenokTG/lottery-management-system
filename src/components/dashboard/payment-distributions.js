@@ -39,7 +39,7 @@ export const OverviewPaymentDistributions = () => {
       const today = new Date();
       const backDate = new Date(today.setDate(today.getDate() - range));
 
-      const currentDate = today.toJSON().slice(0, 10);
+      const currentDate = new Date().toJSON().slice(0, 10);
       const initialDate = backDate.toJSON().slice(0, 10);
 
       const payDistribAPI = `payment-method/distribution?date_from=${initialDate}&date_to=${currentDate}`;
@@ -63,8 +63,14 @@ export const OverviewPaymentDistributions = () => {
     labels: payDistribData.title,
   };
 
+  const paymentsTotalValue = payDistribData.value.reduce((partialSum, a) => partialSum + a, 0);
+
   const payments = payDistribData.title.map((title, idx) => {
-    const payment = { title, value: payDistribData.value[idx], color: payDistribData.bgColorCode[idx] };
+    const payment = {
+      title,
+      value: ((payDistribData.value[idx] / paymentsTotalValue) * 100).toFixed(2),
+      color: payDistribData.bgColorCode[idx],
+    };
     return payment;
   });
 

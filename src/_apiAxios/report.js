@@ -31,15 +31,16 @@ export const revenuesFetch = (fetchAPI, setLoading, setRevenuesList, setPaginati
 
       const REVENUES =
         res.data.data !== undefined
-          ? res.data.data.map((revenue) => {
+          ? res.data.data.map((revenue, idx) => {
+              console.log(res.data.data);
               const newRevenue = {
-                id: revenue.id,
+                id: `${revenue.operator.name} ${revenue.operator.game} - ${idx}`,
                 operatorName: revenue.operator.name,
                 comName: revenue.operator.company_name,
-                gameName: revenue.operator.game,
-                licenceCatagory: revenue.operator.game,
-                sells: revenue.operator.total_sales,
-                tax: revenue.operator.total_tax,
+                gameName: revenue.game.name,
+                licenceCatagory: revenue.game.license.name,
+                sells: revenue.total_sale.toFixed(2),
+                tax: revenue.total_tax.toFixed(2),
               };
 
               return newRevenue;
@@ -63,6 +64,8 @@ export const offlineBettingsFetch = (fetchAPI, setLoading, setBettingTransaction
         setPaginationProps(res.data.pagination === undefined ? null : res.data.pagination);
       }
 
+      console.log(res.data.data);
+
       const BETTINGTRANSACTIONS =
         res.data.data !== undefined
           ? res.data.data.map((bettingTnx) => {
@@ -70,15 +73,15 @@ export const offlineBettingsFetch = (fetchAPI, setLoading, setBettingTransaction
                 id: bettingTnx.id,
                 playerID: `${bettingTnx.operator_reference_number}: ${bettingTnx.branch_id}`,
                 gameName: bettingTnx.game.name,
-                licenceCatagory: bettingTnx.game.license.name,
+                licenceCatagory: bettingTnx.game.license,
                 operatorName: bettingTnx.operator.name,
                 transactionID: bettingTnx.reference_number,
-                paymentMethod: bettingTnx.payment_method,
+                paymentMethod: bettingTnx.payment_method.name,
                 currency: bettingTnx.currency.code,
                 amount: bettingTnx.stake,
                 status: bettingTnx.status,
                 winAmount: bettingTnx.estimated_payout,
-                refundAmount: '$ -',
+                refundAmount: '',
                 createdAt: new Date(bettingTnx.bet_timestamp),
               };
 
@@ -103,6 +106,8 @@ export const onlineBettingsFetch = (fetchAPI, setLoading, setBettingTransactions
         setPaginationProps(res.data.pagination === undefined ? null : res.data.pagination);
       }
 
+      console.log(res);
+
       const BETTINGTRANSACTIONS =
         res.data.data !== undefined
           ? res.data.data.map((bettingTnx) => {
@@ -110,15 +115,15 @@ export const onlineBettingsFetch = (fetchAPI, setLoading, setBettingTransactions
                 id: bettingTnx.id,
                 playerID: `${bettingTnx.operator_reference_number}: ${bettingTnx.player_id}`,
                 gameName: bettingTnx.game.name,
-                licenceCatagory: bettingTnx.game.license.name,
+                licenceCatagory: bettingTnx.game.license,
                 operatorName: bettingTnx.operator.name,
                 transactionID: bettingTnx.reference_number,
-                paymentMethod: bettingTnx.payment_method,
+                paymentMethod: bettingTnx.payment_method.name,
                 currency: bettingTnx.currency.code,
                 amount: bettingTnx.stake,
                 status: bettingTnx.status,
                 winAmount: bettingTnx.estimated_payout,
-                refundAmount: '$ -',
+                refundAmount: '',
                 createdAt: new Date(bettingTnx.bet_timestamp),
               };
 
@@ -143,18 +148,24 @@ export const winningTicketsFetch = (fetchAPI, setLoading, setWinningTicketsList,
         setPaginationProps(res.data.pagination === undefined ? null : res.data.pagination);
       }
 
+      console.log(res.data.data);
+
       const WINNINGTICKETLIST =
         res.data.data !== undefined
           ? res.data.data.map((winTcKt) => {
               const newWinTckt = {
-                id: uuid(),
-                operatorName: winTcKt.operator,
-                gameName: faker.helpers.arrayElement(['Scratch']),
-                ticketRef: faker.random.alpha({ count: 15, casing: 'upper' }),
-                amount: faker.finance.amount(5000, 60000, 2, '$ ', true),
-                paymentType: faker.helpers.arrayElement(['Bank', 'Wallet', 'Cash']),
-                winAmount: faker.finance.amount(18000, 130000, 2, '$ ', true),
-                createdAt: faker.date.betweens('2020-01-01T00:00:00.000Z', '2030-01-01T00:00:00.000Z', 1)[0],
+                id: winTcKt.id,
+                playerId: winTcKt.player_id ? winTcKt.player_id : winTcKt.branch_id,
+                ticketRef: winTcKt.ticket_id,
+                operatorName: winTcKt.operator && winTcKt.operator.name,
+                gameName: winTcKt.game && winTcKt.game.name,
+                paymentMethod: winTcKt.payment_method && winTcKt.payment_method.name,
+                currency: winTcKt.currency && winTcKt.currency.code,
+                ticketType: winTcKt.ticket_type,
+                tnxStatus: winTcKt.transaction_status,
+                betAmount: winTcKt.amount,
+                winAmount: winTcKt.estimated_payout,
+                createdAt: new Date(winTcKt.created_at),
               };
 
               return newWinTckt;
@@ -177,6 +188,8 @@ export const operatorsWalletFetch = (fetchAPI, setLoading, setOperatorsWalletLis
       if (typeof setPaginationProps === 'function') {
         setPaginationProps(res.data.pagination === undefined ? null : res.data.pagination);
       }
+
+      console.log(res.data);
 
       const OPERATORSWALLET =
         res.data.data !== undefined

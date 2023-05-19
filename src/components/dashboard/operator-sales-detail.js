@@ -67,7 +67,7 @@ export const OperatorSalesDetail = () => {
       const today = new Date();
       const backDate = new Date(today.setDate(today.getDate() - range));
 
-      const currentDate = today.toJSON().slice(0, 10);
+      const currentDate = new Date().toJSON().slice(0, 10);
       const initialDate = backDate.toJSON().slice(0, 10);
 
       const topOperatorsAPI = `operator/performing-operators?date_from=${initialDate}&date_to=${currentDate}`;
@@ -87,7 +87,7 @@ export const OperatorSalesDetail = () => {
             <CircularProgress />
           </Box>
         ) : (
-          <TableContainer component={Paper}>
+          <TableContainer component={Paper} sx={{ height: 385}}>
             <Table size="small">
               <TableHead>
                 <TableRow>

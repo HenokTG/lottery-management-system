@@ -8,13 +8,15 @@ export const appConfigFetch = (fetchAPI, setLoading, setAppConfigList, setPagina
         setPaginationProps(res.data.pagination === undefined ? null : res.data.pagination);
       }
 
+      console.log(res.data.data);
+
       const APPCONFIGS =
         res.data.data !== undefined
           ? res.data.data.map((appConfig) => {
               const newConfig = {
                 id: appConfig.id,
-                key: appConfig.operator,
-                value: appConfig.company,
+                key: appConfig.operator.name,
+                value: appConfig.operator.company_name,
                 description: appConfig.online,
               };
 
@@ -99,17 +101,19 @@ export const operatorAppsFetch = (fetchAPI, setLoading, setOperatorAppsList, set
     });
 };
 
-export const operatorAppUpdateFetch = (fetchAPI, setGame) => {
+export const operatorAppUpdateFetch = (fetchAPI, setOperaroApp, setLoading) => {
   axiosInstance
     .get(fetchAPI)
-    .then((res) =>
-      setGame({
+    .then((res) => {
+      setOperaroApp({
         appName: res.data.name ? res.data.name : '',
         operatorName: res.data.operator ? res.data.operator.id : '',
-      })
-    )
+      });
+      setLoading(false);
+    })
     .catch((error) => {
       console.log(error);
+      setLoading(false);
     });
 };
 
@@ -147,17 +151,19 @@ export const currencyFetch = (fetchAPI, setLoading, setCurrencyList, setPaginati
     });
 };
 
-export const currencyUpdateFetch = (fetchAPI, setGame) => {
+export const currencyUpdateFetch = (fetchAPI, setCurrency, setLoading) => {
   axiosInstance
     .get(fetchAPI)
-    .then((res) =>
-      setGame({
+    .then((res) => {
+      setCurrency({
         currencyName: res.data.name ? res.data.name : '',
         currencyCode: res.data.code ? res.data.code : '',
-      })
-    )
+      });
+      setLoading(false);
+    })
     .catch((error) => {
       console.log(error);
+      setLoading(false);
     });
 };
 
@@ -194,17 +200,20 @@ export const countryFetch = (fetchAPI, setLoading, setCountryList, setPagination
       setCountryList([]);
     });
 };
-export const countryUpdateFetch = (fetchAPI, setGame) => {
+export const countryUpdateFetch = (fetchAPI, setCountry, setLoading) => {
   axiosInstance
     .get(fetchAPI)
-    .then((res) =>
-      setGame({
+    .then((res) => {
+      setCountry({
         countryName: res.data.name ? res.data.name : '',
         countryCode: res.data.code ? res.data.code : '',
-      })
-    )
+      });
+
+      setLoading(false);
+    })
     .catch((error) => {
       console.log(error);
+      setLoading(false);
     });
 };
 
@@ -243,18 +252,20 @@ export const regionsFetch = (fetchAPI, setLoading, setRegionsList, setPagination
     });
 };
 
-export const regionUpdateFetch = (fetchAPI, setRegion) => {
+export const regionUpdateFetch = (fetchAPI, setRegion, setLoading) => {
   axiosInstance
     .get(fetchAPI)
-    .then((res) =>
+    .then((res) => {
       setRegion({
         regionName: res.data.name ? res.data.name : '',
         regionCode: res.data.code ? res.data.code : '',
         countryName: res.data.country ? res.data.country.id : '',
-      })
-    )
+      });
+      setLoading(false);
+    })
     .catch((error) => {
       console.log(error);
+      setLoading(false);
     });
 };
 
@@ -294,18 +305,20 @@ export const taxRulesFetch = (fetchAPI, setLoading, setTaxRulesList, setPaginati
     });
 };
 
-export const taxRuleUpdateFetch = (fetchAPI, setTaxRule) => {
+export const taxRuleUpdateFetch = (fetchAPI, setTaxRule, setLoading) => {
   axiosInstance
     .get(fetchAPI)
-    .then((res) =>
+    .then((res) => {
       setTaxRule({
         taxName: res.data.name ? res.data.name : '',
         taxType: res.data.tax_type ? res.data.tax_type : '',
         taxValue: res.data.tax_value ? res.data.tax_value : '',
         countryName: res.data.country ? res.data.country.id : '',
-      })
-    )
+      });
+      setLoading(false);
+    })
     .catch((error) => {
       console.log(error);
+      setLoading(false);
     });
 };

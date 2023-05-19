@@ -30,6 +30,8 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import { styled } from '@mui/material/styles';
 
+// components
+import { AntSwitch } from '../auxilary/ant-switch';
 // modules
 import { axiosInstance } from '../../utils/axios';
 import { getInitials } from '../../utils/get-initials';
@@ -80,6 +82,7 @@ export const OperatorListResults = ({ setModalKey }) => {
 
   const [searchQuery, setSearchQuery] = useState('');
 
+  const [checkedId, setCheckedId] = useState('');
   const [deletedID, setDeletedID] = useState('');
 
   useEffect(
@@ -107,6 +110,10 @@ export const OperatorListResults = ({ setModalKey }) => {
     const fetchAPI = `operator?page=${page + 1}&per_page=${limit}&search_by=${searchKey}&search_term=${searchValue}`;
 
     operatorsFetch(fetchAPI, setLoading, setOperatorsList, setPaginationProps);
+  };
+
+  const handleChecked = (id) => {
+    setCheckedId(id);
   };
 
   const handelDeleteOperator = (id) => {
@@ -214,7 +221,15 @@ export const OperatorListResults = ({ setModalKey }) => {
                           <TableCell sx={{ fontSize: 12 }} align="center">
                             {operator.noGameCatagory}
                           </TableCell>
-                          <TableCell sx={{ fontSize: 12 }}>{operator.status}</TableCell>
+                          <TableCell sx={{ fontSize: 12 }}>
+                            {/* <AntSwitch
+                              checked={"isChecked"}
+                              onChange={handleChecked}
+                              inputProps={{ 'aria-label': 'check status' }}
+                              sx={{ mx: 1 }}
+                            /> */}
+                            {operator.status}
+                          </TableCell>
                           <TableCell sx={{ fontSize: 12 }}>{operator.createdBy}</TableCell>
                           <TableCell sx={{ fontSize: 12 }}>{format(operator.createdAt, 'MMM dd, yyyy')}</TableCell>
                           <TableCell align="center">

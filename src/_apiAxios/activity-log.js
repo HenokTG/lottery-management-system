@@ -8,34 +8,34 @@ export const activityLogFetch = (fetchAPI, setLoading, setActivityList, setPagin
         setPaginationProps(res.data.pagination === undefined ? null : res.data.pagination);
       }
 
+      console.log(res.data.data);
+
       const ACTIVITYLOGS =
         res.data.data !== undefined
-          ? res.data.data.map((activity) => {
+          ? res.data.data.map((activity, idx) => {
               let ACTIVITY = { id: null };
-              if (activity.description !== '/api/v1/activity-log') {
-                ACTIVITY = {
-                  id: activity.id,
-                  module: 'NO MODULE!',
-                  get type() {
-                    let action = '';
-                    if (activity.action === 'C') {
-                      action = 'Create';
-                    } else if (activity.action === 'R') {
-                      action = 'Read';
-                    } else if (activity.action === 'U') {
-                      action = 'Update';
-                    } else {
-                      action = 'Delete';
-                    }
+              ACTIVITY = {
+                id: `${activity.id} - ${activity.description}- ${idx}`,
+                module: activity.mobule,
+                get type() {
+                  let action = '';
+                  if (activity.action === 'C') {
+                    action = 'Create';
+                  } else if (activity.action === 'R') {
+                    action = 'Read';
+                  } else if (activity.action === 'U') {
+                    action = 'Update';
+                  } else {
+                    action = 'Delete';
+                  }
 
-                    return action;
-                  },
-                  description: activity.description,
-                  createdBy: activity.user && `${activity.user.first_name} ${activity.user.last_name}`,
-                  role: activity.user && activity.user.role,
-                  createdAt: new Date(activity.created_at),
-                };
-              }
+                  return action;
+                },
+                description: activity.description,
+                createdBy: activity.user && `${activity.user.first_name} ${activity.user.last_name}`,
+                role: activity.user && activity.user.role,
+                createdAt: new Date(activity.created_at),
+              };
 
               return ACTIVITY;
             })

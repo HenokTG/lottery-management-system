@@ -30,17 +30,19 @@ export const fetchRoleIDs = (fetchAPI, setRoleIDs) => {
     .then((res) => {
       let RoleIDs = [];
 
+      
       if (res.data.data && res.data.data.length !== 0) {
         RoleIDs = res.data.data.map((role) => {
           const newRoleID = {
             id: role.id,
             name: role.name,
           };
-
+          
           return newRoleID;
         });
       }
-
+      
+      console.log(RoleIDs);
       setRoleIDs(RoleIDs);
     })
     .catch((error) => {

@@ -75,7 +75,7 @@ export const AppConfigResults = () => {
         navigate(`/login?redirectTo=${prevLocation.pathname}`);
       }
 
-      const fetchAPI = `transaction/bonus?page=${page + 1}&per_page=${limit}`;
+      const fetchAPI = `app-config?page=${page + 1}&per_page=${limit}`;
 
       appConfigFetch(fetchAPI, setLoading, setAppConfigList, setPaginationProps);
     },

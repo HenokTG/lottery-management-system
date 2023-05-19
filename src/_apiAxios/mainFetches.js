@@ -45,10 +45,10 @@ export const operatorsFetch = (fetchAPI, setLoading, setOperatorsList, setPagina
     });
 };
 
-export const operatorUpdateFetch = (fetchAPI, setOperator) => {
+export const operatorUpdateFetch = (fetchAPI, setOperator, setLoading) => {
   axiosInstance
     .get(fetchAPI)
-    .then((res) =>
+    .then((res) => {
       setOperator({
         email: res.data.contact_persons.length !== 0 ? res.data.contact_persons[0].email : '',
         photo: res.data.contact_persons.length !== 0 ? res.data.contact_persons[0].photo_url : '',
@@ -61,10 +61,12 @@ export const operatorUpdateFetch = (fetchAPI, setOperator) => {
         address: res.data.address ? res.data.address : '',
         country: res.data.country ? res.data.country.id : '',
         region: res.data.state ? res.data.state.id : '',
-      })
-    )
+      });
+      setLoading(false);
+    })
     .catch((error) => {
       console.log(error);
+      setLoading(false);
     });
 };
 
@@ -102,17 +104,19 @@ export const fetchLicenceCatagories = (fetchAPI, setLoading, setLicenceCatagoryL
     });
 };
 
-export const licenceCatagoryUpdateFetch = (fetchAPI, setLicenceCatagory) => {
+export const licenceCatagoryUpdateFetch = (fetchAPI, setLicenceCatagory, setLoading) => {
   axiosInstance
     .get(fetchAPI)
-    .then((res) =>
+    .then((res) => {
       setLicenceCatagory({
         licenceCatagory: res.data.name ? res.data.name : '',
         description: res.data.description ? res.data.description : '',
-      })
-    )
+      });
+      setLoading(false);
+    })
     .catch((error) => {
       console.log(error);
+      setLoading(false);
     });
 };
 
@@ -153,19 +157,21 @@ export const fetchGames = (fetchAPI, setLoading, setGamesList, setPaginationProp
     });
 };
 
-export const gameUpdateFetch = (fetchAPI, setGame) => {
+export const gameUpdateFetch = (fetchAPI, setGame, setLoading) => {
   axiosInstance
     .get(fetchAPI)
-    .then((res) =>
+    .then((res) => {
       setGame({
         gameName: res.data.name ? res.data.name : '',
         gameCode: res.data.code ? res.data.code : '',
         gameIconURL: res.data.photo_url ? res.data.photo_url : '',
         licenceCatagory: res.data.license ? res.data.license.id : '',
         description: res.data.description ? res.data.description : '',
-      })
-    )
+      });
+      setLoading(false);
+    })
     .catch((error) => {
       console.log(error);
+      setLoading(false);
     });
 };
