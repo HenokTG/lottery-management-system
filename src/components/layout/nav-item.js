@@ -12,26 +12,26 @@ import Iconify from '../auxilary/Iconify';
 // Styles
 const ListItemStyle = {
   borderRadius: 1,
-  color: 'neutral.300',
+  color: 'neutral.900',
   justifyContent: 'flex-start',
   textAlign: 'left',
   pl: 3,
   textTransform: 'none',
   width: '100%',
   '& .MuiButton-startIcon': {
-    color: 'neutral.400',
+    color: 'neutral.900',
   },
   '&:hover': {
-    backgroundColor: 'rgba(255,255,255, 0.08)',
+    backgroundColor: 'rgba(255,255,255, 0.38)',
   },
 };
 
 const ActiveListItemStyle = {
-  backgroundColor: 'rgba(255,255,255, 0.08)',
-  color: 'secondary.main',
+  backgroundColor: 'rgba(255,255,255, 0.58)',
+  color: 'info.dark',
   fontWeight: 'fontWeightBold',
   '& .MuiButton-startIcon': {
-    color: 'secondary.main',
+    color: 'info.main',
   },
 };
 

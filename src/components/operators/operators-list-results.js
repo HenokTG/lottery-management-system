@@ -170,7 +170,7 @@ export const OperatorListResults = ({ setModalKey }) => {
                 <CircularProgress />
               </Box>
             ) : (
-              <Box sx={{ minWidth: 1050 }}>
+              <Box>
                 <Grid container direction="row" justifyContent="space-between" alignItems="center" sx={{ padding: 2 }}>
                   <Grid item md={downloading ? 8.5 : 9}>
                     <Box sx={{ maxWidth: 400 }}>
@@ -213,7 +213,7 @@ export const OperatorListResults = ({ setModalKey }) => {
                     </Button>
                   </Grid>
                 </Grid>
-                <Card sx={{ mx: 2 }}>
+                <Card sx={{ mx: 2, overflowX: 'auto' }}>
                   <Table size="small">
                     <TableHead sx={{ py: 2 }}>
                       <TableRow>
@@ -224,7 +224,7 @@ export const OperatorListResults = ({ setModalKey }) => {
                         <StyledTableCell>Phone Number</StyledTableCell>
                         <StyledTableCell>Website</StyledTableCell>
                         <StyledTableCell>Location</StyledTableCell>
-                        {/* <StyledTableCell>No. of Game Catagories</StyledTableCell> */}
+                        <StyledTableCell>Assigned Games</StyledTableCell>
                         <StyledTableCell align="center">Status</StyledTableCell>
                         <StyledTableCell>Created By</StyledTableCell>
                         <StyledTableCell>Created ON</StyledTableCell>
@@ -234,6 +234,7 @@ export const OperatorListResults = ({ setModalKey }) => {
                     <TableBody>
                       {operatorsList.map((operator) => (
                         <StyledTableRow hover key={operator.id}>
+                          {console.log(operator.assignedGames)}
                           <TableCell>
                             <Box
                               sx={{
@@ -255,9 +256,17 @@ export const OperatorListResults = ({ setModalKey }) => {
                           <TableCell sx={{ fontSize: 12 }}>{operator.phone}</TableCell>
                           <TableCell sx={{ fontSize: 12 }}>{operator.website}</TableCell>
                           <TableCell sx={{ fontSize: 12 }}>{operator.address}</TableCell>
-                          {/* <TableCell sx={{ fontSize: 12 }} align="center">
-                            {operator.noGameCatagory}
-                          </TableCell> */}
+                          <TableCell sx={{ fontSize: 12 }} align="center">
+                            {operator.assignedGames.map((operatorGame) => (
+                              <>
+                                <Typography key={`${operatorGame.id}-${operator.id}`} variant="caption">
+                                  {operatorGame.gameName}
+                                </Typography>
+                                {','}
+                                <br />
+                              </>
+                            ))}
+                          </TableCell>
                           <TableCell align="center">
                             <Typography
                               variant="caption"
@@ -313,7 +322,7 @@ export const OperatorListResults = ({ setModalKey }) => {
                     {isDataNotFound && (
                       <TableBody>
                         <TableRow>
-                          <TableCell align="center" colSpan={11} sx={{ py: 3 }}>
+                          <TableCell align="center" colSpan={12} sx={{ py: 3 }}>
                             <Box>
                               <Typography gutterBottom align="center" variant="subtitle1" color="error.main">
                                 No data fetched!

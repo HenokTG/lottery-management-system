@@ -17,13 +17,13 @@ export const operatorsFetch = (fetchAPI, setLoading, setOperatorsList, setPagina
           ? res.data.data.map((operator) => {
               const newOperator = {
                 id: operator.id,
-                address: `${operator.address}, ${operator.state.name}, ${operator.country.name}`,
+                address: `${operator.address}, ${operator.state?.name}, ${operator.country?.name}`,
                 createdBy: `${operator.created_by.first_name} ${operator.created_by.last_name}`,
                 createdAt: new Date(operator.created_at),
                 name: operator.name,
                 comName: operator.company_name,
                 website: operator.website,
-                avatarUrl: operator.contact_person ? operator.contact_person.photo_url : randomAvator,
+                avatarUrl: operator.logo ? operator.logo : randomAvator,
                 contactName: operator.contact_person
                   ? `${operator.contact_person.first_name} ${operator.contact_person.last_name}`
                   : '',
@@ -31,7 +31,14 @@ export const operatorsFetch = (fetchAPI, setLoading, setOperatorsList, setPagina
                 phone: operator.contact_person ? operator.contact_person.phone : '',
                 status: operator.is_active ? 'Active' : 'Inactive',
                 statusBool: operator.is_active,
-                noGameCatagory: operator.games,
+                assignedGames:
+                  operator.operator_games.length !== 0
+                    ? operator.operator_games.map((game) => {
+                        const operatorGame = { id: game.game.id, gameName: game.game.name };
+
+                        return operatorGame;
+                      })
+                    : [],
               };
 
               return newOperator;

@@ -96,6 +96,7 @@ export const OnlineBettingResults = () => {
       if (loggedIn === false) {
         navigate(`/login?redirectTo=${prevLocation.pathname}`);
       }
+      setLoading(true);
 
       onlineBettingsFetch(fetchAPI, setLoading, setBettingTransactionsList, setPaginationProps);
 
@@ -251,7 +252,7 @@ export const OnlineBettingResults = () => {
             <CircularProgress />
           </Box>
         ) : (
-          <Box sx={{ minWidth: 1050 }}>
+          <Box>
             <Grid container direction="row" justifyContent="space-between" alignItems="center" sx={{ padding: 2 }}>
               <Grid item md={8}>
                 <Box sx={{ maxWidth: 400 }}>
@@ -291,7 +292,7 @@ export const OnlineBettingResults = () => {
               </Grid>
             </Grid>
 
-            <Card sx={{ mx: 2 }}>
+            <Card sx={{ mx: 2, overflowX: 'auto' }}>
               <Table size="small">
                 <TableHead sx={{ py: 2 }}>
                   <TableRow>
@@ -305,8 +306,8 @@ export const OnlineBettingResults = () => {
                     <StyledTableCell align="center">Transaction Amount</StyledTableCell>
                     <StyledTableCell align="center">Transaction Status</StyledTableCell>
                     <StyledTableCell align="center">Winning Amount</StyledTableCell>
-                    {/* <StyledTableCell align="center">Refund Amount</StyledTableCell> */}
-                    {/* <StyledTableCell align="center">Date & Time</StyledTableCell> */}
+                    <StyledTableCell align="center">Refund Amount</StyledTableCell>
+                    <StyledTableCell align="center">Date & Time</StyledTableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -314,7 +315,7 @@ export const OnlineBettingResults = () => {
                     <StyledTableRow hover key={bettingTransaction.id}>
                       <TableCell>{bettingTransaction.playerID}</TableCell>
                       <TableCell>{bettingTransaction.gameName}</TableCell>
-                      <TableCell>{bettingTransaction.licenceCatagory}</TableCell>
+                      <TableCell align="center">{bettingTransaction.licenceCatagory}</TableCell>
                       <TableCell>{bettingTransaction.operatorName}</TableCell>
                       <TableCell>{bettingTransaction.transactionID}</TableCell>
                       <TableCell>{bettingTransaction.paymentMethod}</TableCell>
@@ -326,12 +327,12 @@ export const OnlineBettingResults = () => {
                       <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
                         {bettingTransaction.winAmount}
                       </TableCell>
-                      {/* <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
+                      <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
                         {bettingTransaction.refundAmount}
                       </TableCell>
                       <TableCell align="right">
                         {format(bettingTransaction.createdAt, 'yyyy-MM-dd HH:MM:SS z')}
-                      </TableCell> */}
+                      </TableCell>
                     </StyledTableRow>
                   ))}
                 </TableBody>

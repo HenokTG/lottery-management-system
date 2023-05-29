@@ -119,7 +119,8 @@ export const UserListResults = ({ setModalKey }) => {
       .get(`user/export`)
       .then(() => {
         setDownloading(false);
-        navigate('/app/downloads');      })
+        navigate('/app/downloads');
+      })
       .catch((error) => {
         console.log(error);
       });
@@ -165,9 +166,9 @@ export const UserListResults = ({ setModalKey }) => {
                 <CircularProgress />
               </Box>
             ) : (
-              <Box sx={{ minWidth: 1050 }}>
+              <Box>
                 <Grid container direction="row" justifyContent="space-between" alignItems="center" sx={{ padding: 2 }}>
-                  <Grid item md={downloading ? 8.8 :8}>
+                  <Grid item md={downloading ? 8.8 : 8}>
                     <Box sx={{ maxWidth: 400 }}>
                       <TextField
                         fullWidth
@@ -208,7 +209,7 @@ export const UserListResults = ({ setModalKey }) => {
                     </Button>
                   </Grid>
                 </Grid>
-                <Card sx={{ mx: 2 }}>
+                <Card sx={{ mx: 2, overflowX: 'auto' }}>
                   <Table size="small">
                     <TableHead sx={{ py: 2 }}>
                       <TableRow>

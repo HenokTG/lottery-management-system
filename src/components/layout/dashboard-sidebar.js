@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { useEffect } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 // @mui
-import { Box, Divider, Drawer, Typography, useMediaQuery } from '@mui/material';
+import { Box, Avatar, Divider, Drawer, Typography, useMediaQuery } from '@mui/material';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import ExtensionIcon from '@mui/icons-material/Extension';
 
@@ -14,7 +14,7 @@ import { Users as UsersIcon } from '../../icons/users';
 import { Report } from '../../icons/report';
 import { ActivityLog as Log } from '../../icons/activity-log';
 import { Cog as CogIcon } from '../../icons/cog';
-import { Logo } from '../auxilary/logo';
+// import { Logo } from '../auxilary/logo';
 import { Download } from '../../icons/download';
 
 // components
@@ -186,21 +186,22 @@ export const DashboardSidebar = (props) => {
         }}
       >
         <div>
-          <Box sx={{ p: 3 }}>
+          <Box sx={{ p: 3, backgroundColor: 'neutral.300' }}>
             <RouterLink to="/app/dashboard">
-              <Logo
+              <Avatar alt="Converx Technology" src="/static/convex.png" variant="rounded" sx={{ width: 200 }} />
+              {/* <Logo
                 sx={{
                   height: 42,
                   width: 42,
                 }}
-              />
+              /> */}
             </RouterLink>
           </Box>
           <Box sx={{ px: 2 }}>
             <Box
               sx={{
                 alignItems: 'center',
-                backgroundColor: 'rgba(255, 255, 255, 0.04)',
+                backgroundColor: 'rgba(255, 255, 255, 0.14)',
                 cursor: 'pointer',
                 display: 'flex',
                 justifyContent: 'space-between',
@@ -210,20 +211,13 @@ export const DashboardSidebar = (props) => {
               }}
             >
               <div>
-                <Typography color="inherit" variant="subtitle1">
+                <Typography sx={{ color: 'primary.main' }} variant="subtitle1">
                   John Doe
                 </Typography>
-                <Typography color="neutral.400" variant="body2">
+                <Typography sx={{ color: 'primary.main' }} variant="caption">
                   Your tier : Admin
                 </Typography>
               </div>
-              {/* <SelectorIcon
-                sx={{
-                  color: 'neutral.500',
-                  width: 14,
-                  height: 14,
-                }}
-              /> */}
             </Box>
           </Box>
         </div>
@@ -249,7 +243,7 @@ export const DashboardSidebar = (props) => {
         open
         PaperProps={{
           sx: {
-            backgroundColor: 'neutral.900',
+            backgroundColor: 'neutral.300',
             color: '#FFFFFF',
             width: 280,
           },
@@ -268,7 +262,7 @@ export const DashboardSidebar = (props) => {
       open={open}
       PaperProps={{
         sx: {
-          backgroundColor: 'neutral.900',
+          backgroundColor: 'neutral.300',
           color: '#FFFFFF',
           width: 280,
         },

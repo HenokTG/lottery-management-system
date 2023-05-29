@@ -8,7 +8,6 @@ import PerfectScrollbar from 'react-perfect-scrollbar';
 // @mui
 import {
   Box,
-  Button,
   Card,
   Grid,
   TextField,
@@ -29,11 +28,9 @@ import { styled } from '@mui/material/styles';
 // context and modules
 import { useGlobalContext } from '../context';
 import { activityLogFetch } from '../_apiAxios/activity-log';
-import { axiosInstance } from '../utils/axios';
 
 // icons
 import { Search as SearchIcon } from '../icons/search';
-import { Download as DownloadIcon } from '../icons/download';
 
 // custom styles
 
@@ -111,19 +108,6 @@ export const ActivityLogResults = () => {
     activityLogFetch(fetchAPI, setLoading, setActivityList, setPaginationProps);
   };
 
-  const exportAction = () => {
-    console.log('Exporting...');
-
-    axiosInstance
-      .get(`activity-log/export`)
-      .then(() => {
-        console.log('Exported.');
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
-
   const isDataNotFound = activityList.length === 0;
 
   return (
@@ -134,7 +118,7 @@ export const ActivityLogResults = () => {
             <CircularProgress />
           </Box>
         ) : (
-          <Box sx={{ minWidth: 1050 }}>
+          <Box>
             <Grid container direction="row" justifyContent="space-between" alignItems="center" sx={{ padding: 2 }}>
               <Grid item md={10}>
                 <Box sx={{ maxWidth: 400 }}>
@@ -156,18 +140,8 @@ export const ActivityLogResults = () => {
                   />
                 </Box>
               </Grid>
-              {/* <Grid item md={1.5}>
-                <Button
-                  color="info"
-                  variant="outlined"
-                  startIcon={<DownloadIcon fontSize="small" />}
-                  onClick={exportAction}
-                >
-                  Export
-                </Button>
-              </Grid> */}
             </Grid>
-            <Card sx={{ mx: 2 }}>
+            <Card sx={{ mx: 2, overflowX: 'auto' }}>
               <Table size="small">
                 <TableHead sx={{ py: 2 }}>
                   <TableRow>

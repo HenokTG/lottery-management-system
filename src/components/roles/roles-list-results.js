@@ -167,7 +167,7 @@ export const RoleListResults = ({ setModalKey }) => {
                 <CircularProgress />
               </Box>
             ) : (
-              <Box sx={{ minWidth: 1050 }}>
+              <Box>
                 <Grid container direction="row" justifyContent="space-between" alignItems="center" sx={{ padding: 2 }}>
                   <Grid item md={downloading ? 8.8 : 8}>
                     <Box sx={{ maxWidth: 400 }}>
@@ -211,7 +211,7 @@ export const RoleListResults = ({ setModalKey }) => {
                   </Grid>
                 </Grid>
 
-                <Card sx={{ mx: 2 }}>
+                <Card sx={{ mx: 2, overflowX: 'auto' }}>
                   <Table size="small">
                     <TableHead sx={{ py: 2 }}>
                       <TableRow>

@@ -22,7 +22,6 @@ import {
   TextField,
   Typography,
   MenuItem,
-  OutlinedInput,
   Chip,
 } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
@@ -106,6 +105,8 @@ const CreateOperator = ({ setModalKey }) => {
     const {
       target: { value },
     } = event;
+
+    console.log('Game_list', value);
     setAssignedGameList(
       // On autofill we get a stringified value.
       typeof value === 'string' ? value.split(',') : value
@@ -125,20 +126,20 @@ const CreateOperator = ({ setModalKey }) => {
     enableReinitialize: true,
     validationSchema: Yup.object({
       email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
-      firstName: Yup.string(),
-      lastName: Yup.string(),
-      phoneNumber: Yup.number(),
-      operatorName: Yup.string(),
-      companyName: Yup.string(),
-      website: Yup.string(),
+      firstName: Yup.string().max(255).required('First name is required'),
+      lastName: Yup.string().max(255).required('Last name is required'),
+      phoneNumber: Yup.number().required('Phone number is required'),
+      operatorName: Yup.string().max(255).required('Operator name is required'),
+      companyName: Yup.string().max(255).required('Company name is required'),
+      website: Yup.string().max(255).required('Website is required'),
       about: Yup.string(),
-      address: Yup.string(),
-      country: Yup.string(),
-      region: Yup.string(),
+      address: Yup.string().max(255).required('Address is required'),
+      country: Yup.string().max(255).required('Select country'),
+      region: Yup.string().max(255).required('Select region'),
     }),
     onSubmit: (values, helpers) => {
       const postData = {
-        // assigned_game: assignedGameList,
+        operator_games: assignedGameList.map((game) => game.id),
         name: values.operatorName,
         company_name: values.companyName,
         website: values.website,
@@ -154,6 +155,8 @@ const CreateOperator = ({ setModalKey }) => {
           phone: values.phoneNumber,
         },
       };
+
+      console.log(postData.assigned_games);
 
       if (id === undefined) {
         postData.is_active = true;
@@ -325,7 +328,6 @@ const CreateOperator = ({ setModalKey }) => {
                         helperText={formik.touched.assignedGame && formik.errors.assignedGame}
                         label="Assign Game"
                         name="assignedGame"
-                        value={assignedGameList}
                         onBlur={formik.handleBlur}
                         type="text"
                         color="success"
@@ -335,11 +337,10 @@ const CreateOperator = ({ setModalKey }) => {
                           multiple: true,
                           value: assignedGameList,
                           onChange: handleMultiSelect,
-                          input: <OutlinedInput id="select-multiple-chip" label="Chip" />,
                           renderValue: (selected) => (
                             <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
                               {selected.map((value) => (
-                                <Chip key={value} label={value} />
+                                <Chip key={value.id} label={value.name} />
                               ))}
                             </Box>
                           ),
@@ -347,7 +348,7 @@ const CreateOperator = ({ setModalKey }) => {
                         }}
                       >
                         {gameIDs.map((game) => (
-                          <MenuItem key={`${game.id}-${game.name}`} value={game.id}>
+                          <MenuItem key={`${game.id}-${game.name}`} value={game}>
                             {game.name}
                           </MenuItem>
                         ))}

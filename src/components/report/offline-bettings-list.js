@@ -97,6 +97,8 @@ export const OfflineBettingResults = () => {
         navigate(`/login?redirectTo=${prevLocation.pathname}`);
       }
 
+      setLoading(true);
+
       offlineBettingsFetch(fetchAPI, setLoading, setBettingTransactionsList, setPaginationProps);
 
       const operatorIDsFetchAPI = `operator?page=${1}&per_page=${50}`;
@@ -245,7 +247,7 @@ export const OfflineBettingResults = () => {
             <CircularProgress />
           </Box>
         ) : (
-          <Box sx={{ minWidth: 1050 }}>
+          <Box>
             <Grid container direction="row" justifyContent="space-between" alignItems="center" sx={{ padding: 2 }}>
               <Grid item md={8}>
                 <Box sx={{ maxWidth: 400 }}>
@@ -285,7 +287,7 @@ export const OfflineBettingResults = () => {
               </Grid>
             </Grid>
 
-            <Card sx={{ mx: 2 }}>
+            <Card sx={{ mx: 2, overflowX: 'auto' }}>
               <Table size="small">
                 <TableHead sx={{ py: 2 }}>
                   <TableRow>
@@ -299,8 +301,8 @@ export const OfflineBettingResults = () => {
                     <StyledTableCell align="center">Transaction Amount</StyledTableCell>
                     <StyledTableCell align="center">Transaction Status</StyledTableCell>
                     <StyledTableCell align="center">Bet Amount</StyledTableCell>
-                    {/* <StyledTableCell align="center">Refund Amount</StyledTableCell>
-                    <StyledTableCell align="center">Date & Time</StyledTableCell> */}
+                    <StyledTableCell align="center">Refund Amount</StyledTableCell>
+                    <StyledTableCell align="center">Date & Time</StyledTableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -320,12 +322,12 @@ export const OfflineBettingResults = () => {
                       <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
                         {bettingTransaction.winAmount}
                       </TableCell>
-                      {/* <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
+                      <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
                         {bettingTransaction.refundAmount}
                       </TableCell>
                       <TableCell align="right">
                         {format(bettingTransaction.createdAt, 'yyyy-MM-dd HH:MM:SS z')}
-                      </TableCell> */}
+                      </TableCell>
                     </StyledTableRow>
                   ))}
                 </TableBody>
