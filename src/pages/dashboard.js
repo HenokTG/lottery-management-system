@@ -35,7 +35,7 @@ const DashboardApp = () => {
   const [operatorIDs, setOperatorIDs] = useState([{ id: -1, operatorName: 'No operator to assign' }]);
   const [operatorId, setOperatorId] = useState('');
 
-  const [range, setRange] = useState(7);
+  const [range, setRange] = useState(30);
   const [loading, setLoading] = useState(true);
 
   const [summaryData, setSummaryData] = useState({
@@ -51,6 +51,8 @@ const DashboardApp = () => {
       if (loggedIn === false) {
         navigate(`/login?redirectTo=${prevLocation.pathname}`);
       }
+
+      setLoading(true);
 
       const operatorFetchAPI = `operator?page=${1}&per_page=${25}`;
 

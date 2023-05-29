@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 import PerfectScrollbar from 'react-perfect-scrollbar';
-
 // @mui
 import {
   Box,
@@ -28,15 +27,11 @@ import { styled } from '@mui/material/styles';
 
 // context and modules
 import { useGlobalContext } from '../context';
-import { activityLogFetch } from '../_apiAxios/activity-log';
-import { axiosInstance } from '../utils/axios';
-
+import { fetchDownloadList } from '../_apiAxios/mainFetches';
 // icons
 import { Search as SearchIcon } from '../icons/search';
 import { Download as DownloadIcon } from '../icons/download';
-
 // custom styles
-
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: theme.palette.info.main,
@@ -59,8 +54,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 }));
 
 // ---------------------------------------------------------------------------------
-
-export const ActivityLogResults = () => {
+export const DownloadList = () => {
   const { loggedIn } = useGlobalContext();
 
   const prevLocation = useLocation();
@@ -70,7 +64,7 @@ export const ActivityLogResults = () => {
 
   const [limit, setLimit] = useState(25);
   const [page, setPage] = useState(0);
-  const [activityList, setActivityList] = useState([]);
+  const [downloadList, setDownloadList] = useState([]);
   const [paginationProps, setPaginationProps] = useState(null);
 
   const countAll = paginationProps !== null ? paginationProps.per_page * paginationProps.total_pages : -1;
@@ -83,9 +77,9 @@ export const ActivityLogResults = () => {
         navigate(`/login?redirectTo=${prevLocation.pathname}`);
       }
 
-      const fetchAPI = `activity-log?page=${page + 1}&per_page=${limit}`;
+      const fetchAPI = `download?page=${page + 1}&per_page=${limit}`;
 
-      activityLogFetch(fetchAPI, setLoading, setActivityList, setPaginationProps);
+      fetchDownloadList(fetchAPI, setLoading, setDownloadList, setPaginationProps);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [limit, page]
@@ -102,29 +96,14 @@ export const ActivityLogResults = () => {
   const searchAction = (e) => {
     setSearchQuery(e.target.value);
 
-    const searchKey = 'description';
+    const searchKey = 'name';
     const searchValue = e.target.value;
-    const fetchAPI = `activity-log?page=${
-      page + 1
-    }&per_page=${limit}&search_by=${searchKey}&search_term=${searchValue}`;
+    const fetchAPI = `download?page=${page + 1}&per_page=${limit}&search_by=${searchKey}&search_term=${searchValue}`;
 
-    activityLogFetch(fetchAPI, setLoading, setActivityList, setPaginationProps);
+    fetchDownloadList(fetchAPI, setLoading, setDownloadList, setPaginationProps);
   };
 
-  const exportAction = () => {
-    console.log('Exporting...');
-
-    axiosInstance
-      .get(`activity-log/export`)
-      .then(() => {
-        console.log('Exported.');
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
-
-  const isDataNotFound = activityList.length === 0;
+  const isDataNotFound = downloadList.length === 0;
 
   return (
     <Card>
@@ -149,7 +128,7 @@ export const ActivityLogResults = () => {
                         </InputAdornment>
                       ),
                     }}
-                    placeholder="Search app setting"
+                    placeholder="Search download list"
                     variant="outlined"
                     color="success"
                     onChange={searchAction}
@@ -157,12 +136,7 @@ export const ActivityLogResults = () => {
                 </Box>
               </Grid>
               {/* <Grid item md={1.5}>
-                <Button
-                  color="info"
-                  variant="outlined"
-                  startIcon={<DownloadIcon fontSize="small" />}
-                  onClick={exportAction}
-                >
+                <Button color="info" variant="outlined" startIcon={<DownloadIcon fontSize="small" />}>
                   Export
                 </Button>
               </Grid> */}
@@ -171,30 +145,34 @@ export const ActivityLogResults = () => {
               <Table size="small">
                 <TableHead sx={{ py: 2 }}>
                   <TableRow>
-                    <StyledTableCell>Module</StyledTableCell>
-                    <StyledTableCell>Activity Type</StyledTableCell>
-                    <StyledTableCell>Description</StyledTableCell>
-                    <StyledTableCell> User Name</StyledTableCell>
-                    <StyledTableCell>User Role</StyledTableCell>
-                    <StyledTableCell>Created On</StyledTableCell>
+                    <StyledTableCell>Download Name</StyledTableCell>
+                    <StyledTableCell>Download Query</StyledTableCell>
+                    <StyledTableCell>System Module</StyledTableCell>
+                    <StyledTableCell>Status</StyledTableCell>
+                    <StyledTableCell align="center">Download Link</StyledTableCell>
+                    <StyledTableCell>Created By</StyledTableCell>
+                    <StyledTableCell>Created At</StyledTableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {activityList.map((activity) => (
-                    <StyledTableRow hover key={activity.id}>
-                      <TableCell>{activity.module}</TableCell>
-                      <TableCell>{activity.type}</TableCell>
-                      <TableCell>{activity.description}</TableCell>
-                      <TableCell>{activity.createdBy}</TableCell>
-                      <TableCell>{activity.role}</TableCell>
-                      <TableCell>{format(activity.createdAt, 'MMM dd, yyyy')}</TableCell>
+                  {downloadList.map((download) => (
+                    <StyledTableRow hover key={download.id}>
+                      <TableCell>{download.name}</TableCell>
+                      <TableCell>{download.query}</TableCell>
+                      <TableCell>{download.module}</TableCell>
+                      <TableCell>{download.status}</TableCell>
+                      <TableCell>
+                        <a href={download.downloadURL}>Download if completed.</a>
+                      </TableCell>
+                      <TableCell>{download.createdBy}</TableCell>
+                      <TableCell>{format(download.createdAt, 'MMM dd, yyyy hh:mm:ss z')}</TableCell>
                     </StyledTableRow>
                   ))}
                 </TableBody>
                 {isDataNotFound && (
                   <TableBody>
                     <TableRow>
-                      <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
+                      <TableCell align="center" colSpan={7} sx={{ py: 3 }}>
                         <Box>
                           <Typography gutterBottom align="center" variant="subtitle1" color="error.main">
                             No data fetched!

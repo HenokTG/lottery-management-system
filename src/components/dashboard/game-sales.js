@@ -31,12 +31,13 @@ import { fetchSalesByGamesCatagory } from '../../_apiAxios/dashboard-summary';
 export const SalesByGames = () => {
   const theme = useTheme();
 
-  const [range, setRange] = useState(7);
+  const [range, setRange] = useState(30);
   const [loading, setLoading] = useState(true);
   const [gameSalesData, setGameSalesData] = useState({ title: [], value: [] });
 
   useEffect(
     () => {
+      setLoading(true);
       const today = new Date();
       const backDate = new Date(today.setDate(today.getDate() - range));
 

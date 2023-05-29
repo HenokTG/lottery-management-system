@@ -30,12 +30,14 @@ import { fetchOverviewPaymentDistributions } from '../../_apiAxios/dashboard-sum
 export const OverviewPaymentDistributions = () => {
   const theme = useTheme();
 
-  const [range, setRange] = useState(7);
+  const [range, setRange] = useState(30);
   const [loading, setLoading] = useState(true);
   const [payDistribData, setPayDistribData] = useState({ title: [], value: [], bgColorCode: [] });
 
   useEffect(
     () => {
+      setLoading(true);
+
       const today = new Date();
       const backDate = new Date(today.setDate(today.getDate() - range));
 

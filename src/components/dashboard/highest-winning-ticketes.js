@@ -58,12 +58,14 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 // ---------------------------------------------------------------------------------------------------
 
 export const HighestWinningTicketes = () => {
-  const [range, setRange] = useState(7);
+  const [range, setRange] = useState(30);
   const [loading, setLoading] = useState(true);
   const [topWinsData, setTopWinsData] = useState([]);
 
   useEffect(
     () => {
+      setLoading(true);
+
       const today = new Date();
       const backDate = new Date(today.setDate(today.getDate() - range));
 

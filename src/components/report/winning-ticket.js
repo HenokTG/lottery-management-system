@@ -33,6 +33,7 @@ import { useGlobalContext } from '../../context';
 import { winningTicketsFetch } from '../../_apiAxios/report';
 import { fetchOperatorIDs } from '../../_apiAxios/modelCreateFetches';
 import { bettingTypeIDs, fetchCurrencyIDs, fetchPaymentMethodIDs } from '../../_apiAxios/fetchFilterIDs';
+import { axiosInstance } from '../../utils/axios';
 
 // icons
 import { Search as SearchIcon } from '../../icons/search';
@@ -125,6 +126,19 @@ export const WinTicketResults = () => {
     }&per_page=${limit}&search_by=${searchKey}&search_term=${searchValue}`;
 
     winningTicketsFetch(fetchAPI, setLoading, setWinningTicketsList, setPaginationProps);
+  };
+
+  const exportAction = () => {
+    console.log('Exporting...');
+
+    axiosInstance
+      .get(`transaction/ticket/export`)
+      .then(() => {
+        console.log('Exported.');
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   const isDataNotFound = winningTicketsList.length === 0;
@@ -236,7 +250,12 @@ export const WinTicketResults = () => {
                 </Box>
               </Grid>
               <Grid item md={2.4} sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Button color="info" variant="outlined" startIcon={<DownloadIcon fontSize="small" />}>
+                <Button
+                  color="info"
+                  variant="outlined"
+                  startIcon={<DownloadIcon fontSize="small" />}
+                  onClick={exportAction}
+                >
                   Export
                 </Button>
                 <AnnualReportFilter
@@ -287,7 +306,7 @@ export const WinTicketResults = () => {
                 {isDataNotFound && (
                   <TableBody>
                     <TableRow>
-                      <TableCell align="center" colSpan={8} sx={{ py: 3 }}>
+                      <TableCell align="center" colSpan={11} sx={{ py: 3 }}>
                         <Box>
                           <Typography gutterBottom align="center" variant="subtitle1" color="error.main">
                             No data fetched!

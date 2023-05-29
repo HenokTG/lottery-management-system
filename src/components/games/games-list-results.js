@@ -26,6 +26,9 @@ import {
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
 
+// components
+import { AntSwitch } from '../auxilary/ant-switch';
+
 // modules
 import { axiosInstance } from '../../utils/axios';
 import { fetchGames } from '../../_apiAxios/mainFetches';
@@ -42,6 +45,7 @@ export const GameListResults = ({ setModalKey }) => {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
+  const [downloading, setDownloading] = useState(false);
 
   const [page, setPage] = useState(1);
   const [gamesList, setGamesList] = useState([]);
@@ -51,16 +55,19 @@ export const GameListResults = ({ setModalKey }) => {
 
   const [searchQuery, setSearchQuery] = useState('');
 
+  const [checkedId, setCheckedId] = useState('');
   const [deletedID, setDeletedID] = useState(null);
 
   useEffect(
     () => {
+      setLoading(true);
+
       const fetchAPI = `game?page=${page}&per_page=${9}`;
 
       fetchGames(fetchAPI, setLoading, setGamesList, setPaginationProps);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [page, deletedID]
+    [page, deletedID, checkedId]
   );
 
   const handlePageChange = (event, newPage) => {
@@ -74,6 +81,30 @@ export const GameListResults = ({ setModalKey }) => {
     const fetchAPI = `game?page=${page}&per_page=${9}&search_by=${searchKey}&search_term=${searchValue}`;
 
     fetchGames(fetchAPI, setLoading, setGamesList, setPaginationProps);
+  };
+
+  const exportAction = () => {
+    setDownloading(true);
+
+    axiosInstance
+      .get(`game/export`)
+      .then(() => {
+        setDownloading(false);
+        navigate('/app/downloads');
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const changeActivation = (id, boolVal) => {
+    const statusChangeAPI = boolVal ? `game/${id}/disable` : `game/${id}/enable`;
+    axiosInstance
+      .get(statusChangeAPI)
+      .then(setCheckedId(`${id}-${boolVal}`))
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   const handelDeleteGame = (id) => {
@@ -102,7 +133,7 @@ export const GameListResults = ({ setModalKey }) => {
         <PerfectScrollbar sx={{ minWidth: 1050 }}>
           <Card>
             <Grid container direction="row" justifyContent="space-between" alignItems="center" sx={{ padding: 2 }}>
-              <Grid item md={8}>
+              <Grid item md={downloading ? 8.5 : 8}>
                 <Box sx={{ maxWidth: 400 }}>
                   <TextField
                     fullWidth
@@ -122,9 +153,20 @@ export const GameListResults = ({ setModalKey }) => {
                   />
                 </Box>
               </Grid>
-              <Grid item md={2.75} sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Button color="info" variant="outlined" startIcon={<DownloadIcon fontSize="small" />}>
-                  Export
+              <Grid item md={downloading ? 3.5 : 2.75} sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                <Button
+                  color="info"
+                  variant="outlined"
+                  startIcon={
+                    downloading ? (
+                      <CircularProgress color="info" size="1rem" sx={{ p: 0, m: 0, mr: 1 }} />
+                    ) : (
+                      <DownloadIcon fontSize="small" />
+                    )
+                  }
+                  onClick={exportAction}
+                >
+                  {downloading ? 'Downloading' : 'Export'}
                 </Button>
 
                 <Button color="info" variant="contained" onClick={() => setModalKey(true)} startIcon={<AddIcon />}>
@@ -143,7 +185,7 @@ export const GameListResults = ({ setModalKey }) => {
                 {gamesList.map((game) => (
                   <Grid item xs={12} md={6} lg={4} key={game.id}>
                     <Card>
-                      <CardContent>
+                      <CardContent sx={{ p: 2 }}>
                         <Box
                           sx={{
                             display: 'flex',
@@ -169,7 +211,13 @@ export const GameListResults = ({ setModalKey }) => {
                           >
                             {game.gameName}
                           </Typography>
-                          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <Box sx={{ display: 'flex', justifyContent: 'space-evenly', alignItems: 'center' }}>
+                            <AntSwitch
+                              checked={game.statusBool}
+                              onChange={() => changeActivation(game.id, game.statusBool)}
+                              inputProps={{ 'aria-label': 'check status' }}
+                              sx={{ mx: 1 }}
+                            />
                             <Edit
                               onClick={() => navigate(`/app/games/update/${game.id}`, { replace: true })}
                               sx={{
@@ -208,7 +256,7 @@ export const GameListResults = ({ setModalKey }) => {
                             display: 'flex',
                             justifyContent: 'space-between',
                             alignItems: 'center',
-                            mt: 2,
+                            mt: 1,
                           }}
                         >
                           <Typography>Sales Total</Typography>

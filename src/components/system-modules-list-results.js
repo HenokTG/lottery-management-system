@@ -1,6 +1,8 @@
 import { format } from 'date-fns';
 
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+
 import PerfectScrollbar from 'react-perfect-scrollbar';
 
 // @mui
@@ -27,6 +29,7 @@ import { styled } from '@mui/material/styles';
 
 // modules
 import { systemModulesFetch } from '../_apiAxios/app-config';
+import { axiosInstance } from '../utils/axios';
 
 // icons
 import { Search as SearchIcon } from '../icons/search';
@@ -58,7 +61,10 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 // ---------------------------------------------------------------------------------------------------------
 
 export const SystemModulesList = () => {
+  const navigate = useNavigate();
+
   const [loading, setLoading] = useState(true);
+  const [downloading, setDownloading] = useState(false);
 
   const [limit, setLimit] = useState(25);
   const [page, setPage] = useState(0);
@@ -96,6 +102,19 @@ export const SystemModulesList = () => {
     systemModulesFetch(fetchAPI, setLoading, setSystemModulesList, setPaginationProps);
   };
 
+  const exportAction = () => {
+    setDownloading(true);
+    axiosInstance
+      .get(`module/export`)
+      .then(() => {
+        setDownloading(false);
+        navigate('/app/downloads');
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   const isDataNotFound = systemModulesList.length === 0;
 
   return (
@@ -119,7 +138,7 @@ export const SystemModulesList = () => {
             ) : (
               <Box sx={{ minWidth: 1050 }}>
                 <Grid container direction="row" justifyContent="space-between" alignItems="center" sx={{ padding: 2 }}>
-                  <Grid item md={10}>
+                  <Grid item md={downloading ? 9.5 : 10}>
                     <Box sx={{ maxWidth: 400 }}>
                       <TextField
                         fullWidth
@@ -139,9 +158,20 @@ export const SystemModulesList = () => {
                       />
                     </Box>
                   </Grid>
-                  <Grid item md={1.5}>
-                    <Button color="info" variant="outlined" startIcon={<DownloadIcon fontSize="small" />}>
-                      Export
+                  <Grid item md={downloading ? 2 : 1.5}>
+                    <Button
+                      color="info"
+                      variant="outlined"
+                      startIcon={
+                        downloading ? (
+                          <CircularProgress color="info" size="1rem" sx={{ p: 0, m: 0, mr: 1 }} />
+                        ) : (
+                          <DownloadIcon fontSize="small" />
+                        )
+                      }
+                      onClick={exportAction}
+                    >
+                      {downloading ? 'Downloading' : 'Export'}
                     </Button>
                   </Grid>
                 </Grid>
@@ -157,17 +187,24 @@ export const SystemModulesList = () => {
                     </TableHead>
                     <TableBody>
                       {systemModulesList.map((sysModules) => (
-                        <StyledTableRow
-                          hover
-                          key={sysModules.id}
-                          sx={{
-                            backgroundColor: sysModules.status === 'Active' ? '#43C6B748' : '#DA686848',
-                          }}
-                        >
+                        <StyledTableRow hover key={sysModules.id}>
                           <TableCell>{sysModules.name}</TableCell>
                           <TableCell>{sysModules.description}</TableCell>
-
-                          <TableCell>{sysModules.status}</TableCell>
+                          <TableCell>
+                            <Typography
+                              variant="caption"
+                              sx={{
+                                px: 3,
+                                pb: 0.7,
+                                pt: 0.5,
+                                borderRadius: 1,
+                                color: 'white',
+                                bgcolor: sysModules.status === 'Active' ? 'success.main' : 'error.main',
+                              }}
+                            >
+                              {sysModules.status}
+                            </Typography>
+                          </TableCell>
                           <TableCell>{format(sysModules.createdAt, 'MMM dd, yyyy')}</TableCell>
                         </StyledTableRow>
                       ))}

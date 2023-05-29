@@ -6,6 +6,7 @@ export { default as DashboardApp } from './dashboard';
 export { default as Operators } from './operators';
 export { default as LicenceCatagory } from './licence-catagories';
 export { default as Games } from './games';
+export { default as DownloadManager } from './download-manager';
 export { default as ActivityLogs } from './activity-logs';
 
 export { default as Page404 } from './Page404';

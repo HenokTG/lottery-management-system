@@ -29,6 +29,9 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import { styled } from '@mui/material/styles';
 
+// components
+import { AntSwitch } from '../auxilary/ant-switch';
+
 // context and modules
 import { axiosInstance } from '../../utils/axios';
 import { fetchRoles } from '../../_apiAxios/management';
@@ -68,6 +71,7 @@ export const RoleListResults = ({ setModalKey }) => {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
+  const [downloading, setDownloading] = useState(false);
 
   const [limit, setLimit] = useState(25);
   const [page, setPage] = useState(0);
@@ -78,16 +82,18 @@ export const RoleListResults = ({ setModalKey }) => {
 
   const [searchQuery, setSearchQuery] = useState('');
 
+  const [checkedId, setCheckedId] = useState('');
   const [deletedID, setDeletedID] = useState('');
 
   useEffect(
     () => {
+      setLoading(true);
       const fetchAPI = `role?page=${page + 1}&per_page=${limit}`;
 
       fetchRoles(fetchAPI, setLoading, setRolesList, setPaginationProps);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [limit, page, deletedID]
+    [limit, page, deletedID, checkedId]
   );
 
   const handleLimitChange = (event) => {
@@ -105,6 +111,30 @@ export const RoleListResults = ({ setModalKey }) => {
     const fetchAPI = `role?page=${page + 1}&per_page=${limit}&search_by=${searchKey}&search_term=${searchValue}`;
 
     fetchRoles(fetchAPI, setLoading, setRolesList, setPaginationProps);
+  };
+
+  const exportAction = () => {
+    setDownloading(true);
+
+    axiosInstance
+      .get(`role/export`)
+      .then(() => {
+        setDownloading(false);
+        navigate('/app/downloads');
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const changeActivation = (id, boolVal) => {
+    const statusChangeAPI = boolVal ? `role/${id}/disable` : `role/${id}/enable`;
+    axiosInstance
+      .get(statusChangeAPI)
+      .then(setCheckedId(`${id}-${boolVal}`))
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   const handelDeleteRole = (id) => {
@@ -139,7 +169,7 @@ export const RoleListResults = ({ setModalKey }) => {
             ) : (
               <Box sx={{ minWidth: 1050 }}>
                 <Grid container direction="row" justifyContent="space-between" alignItems="center" sx={{ padding: 2 }}>
-                  <Grid item md={8}>
+                  <Grid item md={downloading ? 8.8 : 8}>
                     <Box sx={{ maxWidth: 400 }}>
                       <TextField
                         fullWidth
@@ -159,9 +189,20 @@ export const RoleListResults = ({ setModalKey }) => {
                       />
                     </Box>
                   </Grid>
-                  <Grid item md={2.65} sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Button color="info" variant="outlined" startIcon={<DownloadIcon fontSize="small" />}>
-                      Export
+                  <Grid item md={downloading ? 3.2 : 2.65} sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Button
+                      color="info"
+                      variant="outlined"
+                      startIcon={
+                        downloading ? (
+                          <CircularProgress color="info" size="1rem" sx={{ p: 0, m: 0, mr: 1 }} />
+                        ) : (
+                          <DownloadIcon fontSize="small" />
+                        )
+                      }
+                      onClick={exportAction}
+                    >
+                      {downloading ? 'Downloading' : 'Export'}
                     </Button>
 
                     <Button color="info" variant="contained" onClick={() => setModalKey(true)} startIcon={<AddIcon />}>
@@ -178,7 +219,7 @@ export const RoleListResults = ({ setModalKey }) => {
                         <StyledTableCell>Role Description</StyledTableCell>
                         <StyledTableCell>Permission</StyledTableCell>
                         <StyledTableCell>No. of Users</StyledTableCell>
-                        <StyledTableCell>Status</StyledTableCell>
+                        <StyledTableCell align="center">Status</StyledTableCell>
                         <StyledTableCell>Created By</StyledTableCell>
                         <StyledTableCell>Created ON</StyledTableCell>
                         <StyledTableCell>Updated ON</StyledTableCell>
@@ -192,12 +233,31 @@ export const RoleListResults = ({ setModalKey }) => {
                           <TableCell>{role.description}</TableCell>
                           <TableCell>{role.permission}</TableCell>
                           <TableCell align="center">{role.noUsers}</TableCell>
-                          <TableCell>{role.status}</TableCell>
+                          <TableCell align="center">
+                            <Typography
+                              variant="caption"
+                              sx={{
+                                p: 1,
+                                pt: 0.75,
+                                borderRadius: 1,
+                                color: 'white',
+                                bgcolor: role.statusBool ? 'success.main' : 'error.main',
+                              }}
+                            >
+                              {role.status}
+                            </Typography>
+                          </TableCell>
                           <TableCell>{role.createdBy}</TableCell>
                           <TableCell sx={{ fontSize: 12 }}>{format(role.createdAt, 'MMM dd, yyyy')}</TableCell>
                           <TableCell sx={{ fontSize: 12 }}>{format(role.updatedAt, 'MMM dd, yyyy')}</TableCell>
-                          <TableCell align="center">
-                            <Box sx={{ display: 'flex', justifyContent: 'space-evenly' }}>
+                          <TableCell align="left" sx={{ p: 0 }}>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-evenly', alignItems: 'center' }}>
+                              <AntSwitch
+                                checked={role.statusBool}
+                                onChange={() => changeActivation(role.id, role.statusBool)}
+                                inputProps={{ 'aria-label': 'check status' }}
+                                sx={{ mx: 1 }}
+                              />
                               <Edit
                                 onClick={() =>
                                   navigate(`/app/management/role-management/update/${role.id}`, {

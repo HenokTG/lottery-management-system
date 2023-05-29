@@ -16,6 +16,7 @@ export const fetchPaymentMethods = (fetchAPI, setLoading, setPaymentMethodList, 
                 method: payMethod.name,
                 description: payMethod.description,
                 status: payMethod.is_active ? 'APPROVED' : 'NOT APPROVED',
+                statusBool: payMethod.is_active,
                 createdBy: `${payMethod.created_by.first_name} ${payMethod.created_by.last_name}`,
                 createdAt: new Date(payMethod.created_at),
               };
@@ -61,9 +62,9 @@ export const paymentDistributionsFetch = (fetchAPI, setLoading, setPaymentDistri
 
       const PAYMENTDISTRIBUTIONS =
         res.data.data !== undefined
-          ? res.data.data.map((payDist) => {
+          ? res.data.data.map((payDist, idx) => {
               const newPayDistrb = {
-                id: payDist.id,
+                id: `${idx}-${payDist.id}`,
                 operatorName: payDist.operator ? payDist.operator.name : '',
                 comName: payDist.operator ? payDist.operator.company_name : '',
                 payMethod: payDist.payment_method ? payDist.payment_method.name : '',

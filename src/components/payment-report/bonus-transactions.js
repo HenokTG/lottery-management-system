@@ -32,7 +32,7 @@ import { useGlobalContext } from '../../context';
 import { bonusTransactionsFetch } from '../../_apiAxios/payment-report';
 import { fetchOperatorIDs } from '../../_apiAxios/modelCreateFetches';
 import { boolianIDs } from '../../_apiAxios/fetchFilterIDs';
-
+import { axiosInstance } from '../../utils/axios';
 // icons
 import { Search as SearchIcon } from '../../icons/search';
 import { Download as DownloadIcon } from '../../icons/download';
@@ -119,7 +119,18 @@ export const BonusTransactionsResults = () => {
 
     bonusTransactionsFetch(fetchAPI, setLoading, setBonusTransactionsList, setPaginationProps);
   };
+  const exportAction = () => {
+    console.log('Exporting...');
 
+    axiosInstance
+      .get(`transaction/bonus/export`)
+      .then(() => {
+        console.log('Exported.');
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
   const isDataNotFound = bonusTransactionsList.length === 0;
 
   // For Filter component
@@ -198,7 +209,12 @@ export const BonusTransactionsResults = () => {
                 </Box>
               </Grid>
               <Grid item md={2.4} sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Button color="info" variant="outlined" startIcon={<DownloadIcon fontSize="small" />}>
+                <Button
+                  color="info"
+                  variant="outlined"
+                  startIcon={<DownloadIcon fontSize="small" />}
+                  onClick={exportAction}
+                >
                   Export
                 </Button>
                 <AnnualReportFilter

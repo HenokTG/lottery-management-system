@@ -15,6 +15,7 @@ import { Report } from '../../icons/report';
 import { ActivityLog as Log } from '../../icons/activity-log';
 import { Cog as CogIcon } from '../../icons/cog';
 import { Logo } from '../auxilary/logo';
+import { Download } from '../../icons/download';
 
 // components
 import { NavItem } from './nav-item';
@@ -39,6 +40,11 @@ const items = [
     href: '/app/games',
     icon: <ExtensionIcon fontSize="small" />,
     title: 'Games',
+  },
+  {
+    href: '/app/downloads',
+    icon: <Download fontSize="small" />,
+    title: 'Download Manager',
   },
 
   {

@@ -37,6 +37,7 @@ import { Download as DownloadIcon } from '../../icons/download';
 import { useGlobalContext } from '../../context';
 import { revenuesFetch, revenueSummary } from '../../_apiAxios/report';
 import { fetchOperatorIDs } from '../../_apiAxios/modelCreateFetches';
+import { axiosInstance } from '../../utils/axios';
 
 // custom style
 
@@ -127,6 +128,19 @@ export const RevenueReportResults = () => {
     revenuesFetch(fetchAPI, setLoading, setRevenuesList, setPaginationProps);
   };
 
+  const exportAction = () => {
+    console.log('Exporting...');
+
+    axiosInstance
+      .get(`transaction/revenue/export`)
+      .then(() => {
+        console.log('Exported.');
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   const isDataNotFound = revenuesList.length === 0;
 
   // For Filter component
@@ -208,7 +222,12 @@ export const RevenueReportResults = () => {
                   </Box>
                 </Grid>
                 <Grid item md={2.4} sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <Button color="info" variant="outlined" startIcon={<DownloadIcon fontSize="small" />}>
+                  <Button
+                    color="info"
+                    variant="outlined"
+                    startIcon={<DownloadIcon fontSize="small" />}
+                    onClick={exportAction}
+                  >
                     Export
                   </Button>
                   <AnnualReportFilter

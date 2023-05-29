@@ -72,6 +72,7 @@ const CreateOperator = ({ setModalKey }) => {
     phoneNumber: '',
     operatorName: '',
     companyName: '',
+    website: '',
     about: '',
     address: '',
     country: '',
@@ -129,6 +130,7 @@ const CreateOperator = ({ setModalKey }) => {
       phoneNumber: Yup.number(),
       operatorName: Yup.string(),
       companyName: Yup.string(),
+      website: Yup.string(),
       about: Yup.string(),
       address: Yup.string(),
       country: Yup.string(),
@@ -139,18 +141,18 @@ const CreateOperator = ({ setModalKey }) => {
         // assigned_game: assignedGameList,
         name: values.operatorName,
         company_name: values.companyName,
+        website: values.website,
         description: values.about,
         address: values.address,
+        logo: 'https://cdn-icons-png.flaticon.com/512/3143/3143160.png',
         country: values.country,
         state: values.region,
-        // contact_persons: [
-        //   {
-        //     email: values.email,
-        //     first_name: values.firstName,
-        //     last_name: values.lastName,
-        //     phone: values.phoneNumber,
-        //   },
-        // ],
+        contact_person: {
+          email: values.email,
+          first_name: values.firstName,
+          last_name: values.lastName,
+          phone: values.phoneNumber,
+        },
       };
 
       if (id === undefined) {
@@ -242,7 +244,22 @@ const CreateOperator = ({ setModalKey }) => {
                         size="small"
                       />
                     </Grid>
-                    <Grid item md={12}>
+                    <Grid item md={6}>
+                      <TextField
+                        error={Boolean(formik.touched.website && formik.errors.website)}
+                        fullWidth
+                        helperText={formik.touched.website && formik.errors.website}
+                        label="Website"
+                        name="website"
+                        onBlur={formik.handleBlur}
+                        onChange={formik.handleChange}
+                        type="text"
+                        color="success"
+                        value={formik.values.website}
+                        size="small"
+                      />
+                    </Grid>
+                    <Grid item md={6}>
                       <TextField
                         error={Boolean(formik.touched.address && formik.errors.address)}
                         fullWidth

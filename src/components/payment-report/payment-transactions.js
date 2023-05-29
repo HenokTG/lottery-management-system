@@ -33,6 +33,8 @@ import { useGlobalContext } from '../../context';
 import { paymentTransactionsFetch } from '../../_apiAxios/payment-report';
 import { fetchOperatorIDs } from '../../_apiAxios/modelCreateFetches';
 import { bettingTypeIDs, tnxTypeIDs, fetchCurrencyIDs, fetchPaymentMethodIDs } from '../../_apiAxios/fetchFilterIDs';
+import { axiosInstance } from '../../utils/axios';
+
 // icons
 import { Search as SearchIcon } from '../../icons/search';
 import { Download as DownloadIcon } from '../../icons/download';
@@ -125,7 +127,18 @@ export const PaymentTransactionsResults = () => {
 
     paymentTransactionsFetch(fetchAPI, setLoading, setPaymentTransactionsList, setPaginationProps);
   };
+  const exportAction = () => {
+    console.log('Exporting...');
 
+    axiosInstance
+      .get(`transaction/payment/export`)
+      .then(() => {
+        console.log('Exported.');
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
   const isDataNotFound = paymentTransactionsList.length === 0;
 
   // For Filter component
@@ -243,7 +256,12 @@ export const PaymentTransactionsResults = () => {
                 </Box>
               </Grid>
               <Grid item md={2.4} sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Button color="info" variant="outlined" startIcon={<DownloadIcon fontSize="small" />}>
+                <Button
+                  color="info"
+                  variant="outlined"
+                  startIcon={<DownloadIcon fontSize="small" />}
+                  onClick={exportAction}
+                >
                   Export
                 </Button>
                 <AnnualReportFilter

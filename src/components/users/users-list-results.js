@@ -29,6 +29,9 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import { styled } from '@mui/material/styles';
 
+// components
+import { AntSwitch } from '../auxilary/ant-switch';
+
 // context and modules
 import { axiosInstance } from '../../utils/axios';
 import { fetchUsers } from '../../_apiAxios/management';
@@ -68,6 +71,7 @@ export const UserListResults = ({ setModalKey }) => {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
+  const [downloading, setDownloading] = useState(false);
 
   const [limit, setLimit] = useState(25);
   const [page, setPage] = useState(0);
@@ -78,16 +82,18 @@ export const UserListResults = ({ setModalKey }) => {
 
   const [searchQuery, setSearchQuery] = useState('');
 
+  const [checkedId, setCheckedId] = useState('');
   const [deletedID, setDeletedID] = useState('');
 
   useEffect(
     () => {
+      setLoading(true);
       const fetchAPI = `user?page=${page + 1}&per_page=${limit}`;
 
       fetchUsers(fetchAPI, setLoading, setUsersList, setPaginationProps);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [limit, page, deletedID]
+    [limit, page, deletedID, checkedId]
   );
 
   const handleLimitChange = (event) => {
@@ -107,6 +113,28 @@ export const UserListResults = ({ setModalKey }) => {
     fetchUsers(fetchAPI, setLoading, setUsersList, setPaginationProps);
   };
 
+  const exportAction = () => {
+    setDownloading(true);
+    axiosInstance
+      .get(`user/export`)
+      .then(() => {
+        setDownloading(false);
+        navigate('/app/downloads');      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const changeActivation = (id, boolVal) => {
+    const statusChangeAPI = boolVal ? `user/${id}/disable` : `user/${id}/enable`;
+    axiosInstance
+      .get(statusChangeAPI)
+      .then(setCheckedId(`${id}-${boolVal}`))
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   const handelDeleteUser = (id) => {
     axiosInstance
       .delete(`user/${id}`)
@@ -115,7 +143,7 @@ export const UserListResults = ({ setModalKey }) => {
         console.log(error);
       });
   };
-  
+
   const isDataNotFound = usersList.length === 0;
 
   return (
@@ -139,7 +167,7 @@ export const UserListResults = ({ setModalKey }) => {
             ) : (
               <Box sx={{ minWidth: 1050 }}>
                 <Grid container direction="row" justifyContent="space-between" alignItems="center" sx={{ padding: 2 }}>
-                  <Grid item md={8}>
+                  <Grid item md={downloading ? 8.8 :8}>
                     <Box sx={{ maxWidth: 400 }}>
                       <TextField
                         fullWidth
@@ -159,9 +187,20 @@ export const UserListResults = ({ setModalKey }) => {
                       />
                     </Box>
                   </Grid>
-                  <Grid item md={2.65} sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Button color="info" variant="outlined" startIcon={<DownloadIcon fontSize="small" />}>
-                      Export
+                  <Grid item md={downloading ? 3.2 : 2.65} sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Button
+                      color="info"
+                      variant="outlined"
+                      startIcon={
+                        downloading ? (
+                          <CircularProgress color="info" size="1rem" sx={{ p: 0, m: 0, mr: 1 }} />
+                        ) : (
+                          <DownloadIcon fontSize="small" />
+                        )
+                      }
+                      onClick={exportAction}
+                    >
+                      {downloading ? 'Downloading' : 'Export'}
                     </Button>
 
                     <Button color="info" variant="contained" onClick={() => setModalKey(true)} startIcon={<AddIcon />}>
@@ -178,7 +217,7 @@ export const UserListResults = ({ setModalKey }) => {
                         <StyledTableCell>Linked Operator</StyledTableCell>
                         <StyledTableCell>Email ID</StyledTableCell>
                         <StyledTableCell>Phone Number</StyledTableCell>
-                        <StyledTableCell>Status</StyledTableCell>
+                        <StyledTableCell align="center">Status</StyledTableCell>
                         <StyledTableCell>Created On</StyledTableCell>
                         <StyledTableCell align="center">Actions</StyledTableCell>
                       </TableRow>
@@ -202,10 +241,29 @@ export const UserListResults = ({ setModalKey }) => {
                           <TableCell>{user.operator}</TableCell>
                           <TableCell>{user.email}</TableCell>
                           <TableCell>{user.phoneNumber}</TableCell>
-                          <TableCell>{user.status}</TableCell>
-                          <TableCell>{format(user.createdAt, 'MMM dd, yyyy')}</TableCell>
                           <TableCell align="center">
-                            <Box sx={{ display: 'flex', justifyContent: 'space-evenly' }}>
+                            <Typography
+                              variant="caption"
+                              sx={{
+                                p: 1,
+                                pt: 0.75,
+                                borderRadius: 1,
+                                color: 'white',
+                                bgcolor: user.statusBool ? 'success.main' : 'error.main',
+                              }}
+                            >
+                              {user.status}
+                            </Typography>
+                          </TableCell>
+                          <TableCell>{format(user.createdAt, 'MMM dd, yyyy')}</TableCell>
+                          <TableCell align="left" sx={{ p: 0 }}>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-evenly', alignItems: 'center' }}>
+                              <AntSwitch
+                                checked={user.statusBool}
+                                onChange={() => changeActivation(user.id, user.statusBool)}
+                                inputProps={{ 'aria-label': 'check status' }}
+                                sx={{ mx: 1 }}
+                              />
                               <Edit
                                 onClick={() =>
                                   navigate(`/app/management/user-management/update/${user.id}`, { replace: true })

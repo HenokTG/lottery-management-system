@@ -20,6 +20,7 @@ export const fetchUsers = (fetchAPI, setLoading, setUsersList, setPaginationProp
                 phoneNumber: user.phone,
                 role: user.role ? user.role.name : 'no role assigned',
                 status: user.is_active ? 'Active' : 'Inactive',
+                statusBool: user.is_active,
                 operator: user.operator ? user.operator.name : 'not linked',
                 createdAt: new Date(user.created_at),
               };
@@ -75,6 +76,7 @@ export const fetchRoles = (fetchAPI, setLoading, setRolesList, setPaginationProp
                 role: role.name,
                 description: role.description,
                 status: role.is_active ? 'Active' : 'Inactive',
+                statusBool: role.is_active,
                 noUsers: role.users_count,
                 createdBy: `${role.created_by.first_name} ${role.created_by.last_name}`,
                 createdAt: new Date(role.created_at),

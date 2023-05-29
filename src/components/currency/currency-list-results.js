@@ -29,6 +29,9 @@ import {
 import AddIcon from '@mui/icons-material/Add';
 import { styled } from '@mui/material/styles';
 
+// components
+import { AntSwitch } from '../auxilary/ant-switch';
+
 // modules
 import { axiosInstance } from '../../utils/axios';
 import { currencyFetch } from '../../_apiAxios/app-config';
@@ -68,6 +71,7 @@ export const CurrencyList = ({ setModalKey }) => {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
+  const [downloading, setDownloading] = useState(false);
 
   const [limit, setLimit] = useState(25);
   const [page, setPage] = useState(0);
@@ -78,16 +82,19 @@ export const CurrencyList = ({ setModalKey }) => {
 
   const [searchQuery, setSearchQuery] = useState('');
 
+  const [checkedId, setCheckedId] = useState('');
   const [deletedID, setDeletedID] = useState('');
 
   useEffect(
     () => {
+      setLoading(true);
+
       const fetchAPI = `currency?page=${page + 1}&per_page=${limit}`;
 
       currencyFetch(fetchAPI, setLoading, setCurrencyList, setPaginationProps);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [limit, page, deletedID]
+    [limit, page, deletedID, checkedId]
   );
 
   const handleLimitChange = (event) => {
@@ -105,6 +112,30 @@ export const CurrencyList = ({ setModalKey }) => {
     const fetchAPI = `currency?page=${page + 1}&per_page=${limit}&search_by=${searchKey}&search_term=${searchValue}`;
 
     currencyFetch(fetchAPI, setLoading, setCurrencyList, setPaginationProps);
+  };
+
+  const exportAction = () => {
+    setDownloading(true);
+
+    axiosInstance
+      .get(`currency/export`)
+      .then(() => {
+        setDownloading(false);
+        navigate('/app/downloads');
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const changeActivation = (id, boolVal) => {
+    const statusChangeAPI = boolVal ? `currency/${id}/disable` : `currency/${id}/enable`;
+    axiosInstance
+      .get(statusChangeAPI)
+      .then(setCheckedId(`${id}-${boolVal}`))
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   const handelDeleteCurrency = (id) => {
@@ -139,7 +170,7 @@ export const CurrencyList = ({ setModalKey }) => {
             ) : (
               <Box sx={{ minWidth: 1050 }}>
                 <Grid container direction="row" justifyContent="space-between" alignItems="center" sx={{ padding: 2 }}>
-                  <Grid item md={8}>
+                  <Grid item md={downloading ? 8.5 : 9}>
                     <Box sx={{ maxWidth: 400 }}>
                       <TextField
                         fullWidth
@@ -159,9 +190,20 @@ export const CurrencyList = ({ setModalKey }) => {
                       />
                     </Box>
                   </Grid>
-                  <Grid item md={3} sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Button color="info" variant="outlined" startIcon={<DownloadIcon fontSize="small" />}>
-                      Export
+                  <Grid item md={downloading ? 3.5 : 3} sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Button
+                      color="info"
+                      variant="outlined"
+                      startIcon={
+                        downloading ? (
+                          <CircularProgress color="info" size="1rem" sx={{ p: 0, m: 0, mr: 1 }} />
+                        ) : (
+                          <DownloadIcon fontSize="small" />
+                        )
+                      }
+                      onClick={exportAction}
+                    >
+                      {downloading ? 'Downloading' : 'Export'}
                     </Button>
 
                     <Button color="info" variant="contained" onClick={() => setModalKey(true)} startIcon={<AddIcon />}>
@@ -175,7 +217,7 @@ export const CurrencyList = ({ setModalKey }) => {
                       <TableRow>
                         <StyledTableCell>Currency Name</StyledTableCell>
                         <StyledTableCell>Currency Code</StyledTableCell>
-                        <StyledTableCell>Status</StyledTableCell>
+                        <StyledTableCell align="center">Status</StyledTableCell>
                         <StyledTableCell>Created By</StyledTableCell>
                         <StyledTableCell>Created On</StyledTableCell>
                         <StyledTableCell align="center">Actions</StyledTableCell>
@@ -183,21 +225,33 @@ export const CurrencyList = ({ setModalKey }) => {
                     </TableHead>
                     <TableBody>
                       {currencyList.map((currency) => (
-                        <StyledTableRow
-                          hover
-                          key={currency.id}
-                          sx={{
-                            backgroundColor: currency.status === 'Active' ? '#43C6B748' : '#DA686848',
-                          }}
-                        >
+                        <StyledTableRow hover key={currency.id}>
                           <TableCell>{currency.name}</TableCell>
                           <TableCell>{currency.code}</TableCell>
-
-                          <TableCell>{currency.status}</TableCell>
+                          <TableCell align="center">
+                            <Typography
+                              variant="caption"
+                              sx={{
+                                p: 1,
+                                pt: 0.75,
+                                borderRadius: 1,
+                                color: 'white',
+                                bgcolor: currency.statusBool ? 'success.main' : 'error.main',
+                              }}
+                            >
+                              {currency.status}
+                            </Typography>
+                          </TableCell>
                           <TableCell>{currency.createdBy}</TableCell>
                           <TableCell>{format(currency.createdAt, 'MMM dd, yyyy')}</TableCell>
-                          <TableCell align="center">
-                            <Box>
+                          <TableCell align="left" sx={{ p: 0 }}>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-evenly', alignItems: 'center' }}>
+                              <AntSwitch
+                                checked={currency.statusBool}
+                                onChange={() => changeActivation(currency.id, currency.statusBool)}
+                                inputProps={{ 'aria-label': 'check status' }}
+                                sx={{ mx: 1 }}
+                              />
                               <Edit
                                 onClick={() =>
                                   navigate(`/app/app-settings/currency/update/${currency.id}`, {

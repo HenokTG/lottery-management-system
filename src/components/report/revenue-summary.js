@@ -1,5 +1,9 @@
 import { Typography, Grid, Card } from '@mui/material';
 
+// utility
+import { fCurrency } from '../../utils/formatNumber';
+
+// icons
 import { Sales } from '../../icons/sales';
 import { Tax } from '../../icons/tax';
 
@@ -31,7 +35,7 @@ const RevenueSummary = (props) => (
             {props.title}
           </Typography>
           <Typography color="goldenrod" variant="h5">
-            {props.amount}
+            {fCurrency(props.amount)}
           </Typography>
         </Grid>
       </Grid>

@@ -50,6 +50,7 @@ export const systemModulesFetch = (fetchAPI, setLoading, setSystemModulesList, s
                 name: sysModules.name,
                 description: sysModules.online,
                 status: sysModules.is_active ? 'Active' : 'Inactive',
+                statusBool: sysModules.is_active,
                 createdAt: new Date(sysModules.created_at),
               };
 
@@ -83,6 +84,7 @@ export const operatorAppsFetch = (fetchAPI, setLoading, setOperatorAppsList, set
                 name: opertorApp.name,
                 operatorName: opertorApp.operator.name,
                 status: opertorApp.is_active ? 'Active' : 'Inactive',
+                statusBool: opertorApp.is_active,
                 createdBy: `${opertorApp.created_by.first_name} ${opertorApp.created_by.last_name}`,
                 createdAt: new Date(opertorApp.created_at),
               };
@@ -133,6 +135,7 @@ export const currencyFetch = (fetchAPI, setLoading, setCurrencyList, setPaginati
                 name: currency.name,
                 code: currency.code,
                 status: currency.is_active ? 'Active' : 'Inactive',
+                statusBool: currency.is_active,
                 createdBy: `${currency.created_by.first_name} ${currency.created_by.last_name}`,
                 createdAt: new Date(currency.created_at),
               };
@@ -183,6 +186,7 @@ export const countryFetch = (fetchAPI, setLoading, setCountryList, setPagination
                 name: country.name,
                 code: country.code,
                 status: country.is_active ? 'Active' : 'Inactive',
+                statusBool: country.is_active,
                 createdBy: `${country.created_by.first_name} ${country.created_by.last_name}`,
                 createdAt: new Date(country.created_at),
               };
@@ -234,6 +238,7 @@ export const regionsFetch = (fetchAPI, setLoading, setRegionsList, setPagination
                 code: region.code,
                 countryName: region.country.name,
                 status: region.is_active ? 'Active' : 'Inactive',
+                statusBool: region.is_active,
                 createdBy: `${region.created_by.first_name} ${region.created_by.last_name}`,
                 createdAt: new Date(region.created_at),
               };
@@ -287,6 +292,7 @@ export const taxRulesFetch = (fetchAPI, setLoading, setTaxRulesList, setPaginati
                 type: taxRule.tax_type,
                 value: taxRule.tax_value,
                 status: taxRule.is_active ? 'Active' : 'Inactive',
+                statusBool: taxRule.is_active,
                 createdBy: `${taxRule.created_by.first_name} ${taxRule.created_by.last_name}`,
                 createdAt: new Date(taxRule.created_at),
               };

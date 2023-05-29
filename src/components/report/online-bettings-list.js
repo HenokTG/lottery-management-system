@@ -34,6 +34,7 @@ import { onlineBettingsFetch } from '../../_apiAxios/report';
 import { fetchOperatorIDs } from '../../_apiAxios/modelCreateFetches';
 import { fetchGameIDs } from '../../_apiAxios/mainCreateFetches';
 import { statusIDs, fetchCurrencyIDs, fetchPaymentMethodIDs } from '../../_apiAxios/fetchFilterIDs';
+import { axiosInstance } from '../../utils/axios';
 
 // icons
 import { Search as SearchIcon } from '../../icons/search';
@@ -133,6 +134,19 @@ export const OnlineBettingResults = () => {
     const operatorFetchAPI = `operator?page=${1}&per_page=${25}`;
 
     fetchOperatorIDs(operatorFetchAPI, setOperatorIDs);
+  };
+
+  const exportAction = () => {
+    console.log('Exporting...');
+
+    axiosInstance
+      .get(`ticket/online-ticket/export`)
+      .then(() => {
+        console.log('Exported.');
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   const isDataNotFound = bettingTransactionsList.length === 0;
@@ -260,7 +274,12 @@ export const OnlineBettingResults = () => {
                 </Box>
               </Grid>
               <Grid item md={2.4} sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Button color="info" variant="outlined" startIcon={<DownloadIcon fontSize="small" />}>
+                <Button
+                  color="info"
+                  variant="outlined"
+                  startIcon={<DownloadIcon fontSize="small" />}
+                  onClick={exportAction}
+                >
                   Export
                 </Button>
                 <AnnualReportFilter

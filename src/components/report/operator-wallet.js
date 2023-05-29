@@ -32,6 +32,7 @@ import { useGlobalContext } from '../../context';
 import { operatorsWalletFetch } from '../../_apiAxios/report';
 import { fetchOperatorIDs } from '../../_apiAxios/modelCreateFetches';
 import { fetchCurrencyIDs } from '../../_apiAxios/fetchFilterIDs';
+import { axiosInstance } from '../../utils/axios';
 
 // icons
 import { Search as SearchIcon } from '../../icons/search';
@@ -121,6 +122,19 @@ export const OperatorWalletResults = () => {
     }&per_page=${limit}&search_by=${searchKey}&search_term=${searchValue}`;
 
     operatorsWalletFetch(fetchAPI, setLoading, setOperatorsWalletList, setPaginationProps);
+  };
+
+  const exportAction = () => {
+    console.log('Exporting...');
+
+    axiosInstance
+      .get(`operator-wallet/export`)
+      .then(() => {
+        console.log('Exported.');
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   const isDataNotFound = operatorsWalletList.length === 0;
@@ -216,7 +230,12 @@ export const OperatorWalletResults = () => {
                 </Box>
               </Grid>
               <Grid item md={2.4} sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                <Button color="info" variant="outlined" startIcon={<DownloadIcon fontSize="small" />}>
+                <Button
+                  color="info"
+                  variant="outlined"
+                  startIcon={<DownloadIcon fontSize="small" />}
+                  onClick={exportAction}
+                >
                   Export
                 </Button>
                 <AnnualReportFilter

@@ -32,6 +32,7 @@ import { styled } from '@mui/material/styles';
 
 // components
 import { AntSwitch } from '../auxilary/ant-switch';
+
 // modules
 import { axiosInstance } from '../../utils/axios';
 import { getInitials } from '../../utils/get-initials';
@@ -72,6 +73,7 @@ export const OperatorListResults = ({ setModalKey }) => {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
+  const [downloading, setDownloading] = useState(false);
 
   const [limit, setLimit] = useState(25);
   const [page, setPage] = useState(0);
@@ -87,12 +89,14 @@ export const OperatorListResults = ({ setModalKey }) => {
 
   useEffect(
     () => {
+      setLoading(true);
+
       const fetchAPI = `operator?page=${page + 1}&per_page=${limit}`;
 
       operatorsFetch(fetchAPI, setLoading, setOperatorsList, setPaginationProps);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [limit, page, deletedID]
+    [limit, page, deletedID, checkedId]
   );
 
   const handleLimitChange = (event) => {
@@ -112,8 +116,28 @@ export const OperatorListResults = ({ setModalKey }) => {
     operatorsFetch(fetchAPI, setLoading, setOperatorsList, setPaginationProps);
   };
 
-  const handleChecked = (id) => {
-    setCheckedId(id);
+  const exportAction = () => {
+    setDownloading(true);
+
+    axiosInstance
+      .get(`operator/export`)
+      .then(() => {
+        setDownloading(false);
+        navigate('/app/downloads');
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const changeActivation = (id, boolVal) => {
+    const statusChangeAPI = boolVal ? `operator/${id}/disable` : `operator/${id}/enable`;
+    axiosInstance
+      .get(statusChangeAPI)
+      .then(setCheckedId(`${id}-${boolVal}`))
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   const handelDeleteOperator = (id) => {
@@ -148,7 +172,7 @@ export const OperatorListResults = ({ setModalKey }) => {
             ) : (
               <Box sx={{ minWidth: 1050 }}>
                 <Grid container direction="row" justifyContent="space-between" alignItems="center" sx={{ padding: 2 }}>
-                  <Grid item md={9}>
+                  <Grid item md={downloading ? 8.5 : 9}>
                     <Box sx={{ maxWidth: 400 }}>
                       <TextField
                         fullWidth
@@ -168,9 +192,20 @@ export const OperatorListResults = ({ setModalKey }) => {
                       />
                     </Box>
                   </Grid>
-                  <Grid item md={3} sx={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Button color="info" variant="outlined" startIcon={<DownloadIcon fontSize="small" />}>
-                      Export
+                  <Grid item md={downloading ? 3.5 : 3} sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Button
+                      color="info"
+                      variant="outlined"
+                      startIcon={
+                        downloading ? (
+                          <CircularProgress color="info" size="1rem" sx={{ p: 0, m: 0, mr: 1 }} />
+                        ) : (
+                          <DownloadIcon fontSize="small" />
+                        )
+                      }
+                      onClick={exportAction}
+                    >
+                      {downloading ? 'Downloading' : 'Export'}
                     </Button>
 
                     <Button color="info" variant="contained" onClick={() => setModalKey(true)} startIcon={<AddIcon />}>
@@ -187,9 +222,10 @@ export const OperatorListResults = ({ setModalKey }) => {
                         <StyledTableCell>Contact Person</StyledTableCell>
                         <StyledTableCell>Email</StyledTableCell>
                         <StyledTableCell>Phone Number</StyledTableCell>
+                        <StyledTableCell>Website</StyledTableCell>
                         <StyledTableCell>Location</StyledTableCell>
-                        <StyledTableCell>No. of Game Catagories</StyledTableCell>
-                        <StyledTableCell>Status</StyledTableCell>
+                        {/* <StyledTableCell>No. of Game Catagories</StyledTableCell> */}
+                        <StyledTableCell align="center">Status</StyledTableCell>
                         <StyledTableCell>Created By</StyledTableCell>
                         <StyledTableCell>Created ON</StyledTableCell>
                         <StyledTableCell align="center">Actions</StyledTableCell>
@@ -217,23 +253,35 @@ export const OperatorListResults = ({ setModalKey }) => {
                           <TableCell sx={{ fontSize: 12 }}>{operator.contactName}</TableCell>
                           <TableCell sx={{ fontSize: 12 }}>{operator.email}</TableCell>
                           <TableCell sx={{ fontSize: 12 }}>{operator.phone}</TableCell>
+                          <TableCell sx={{ fontSize: 12 }}>{operator.website}</TableCell>
                           <TableCell sx={{ fontSize: 12 }}>{operator.address}</TableCell>
-                          <TableCell sx={{ fontSize: 12 }} align="center">
+                          {/* <TableCell sx={{ fontSize: 12 }} align="center">
                             {operator.noGameCatagory}
-                          </TableCell>
-                          <TableCell sx={{ fontSize: 12 }}>
-                            {/* <AntSwitch
-                              checked={"isChecked"}
-                              onChange={handleChecked}
-                              inputProps={{ 'aria-label': 'check status' }}
-                              sx={{ mx: 1 }}
-                            /> */}
-                            {operator.status}
+                          </TableCell> */}
+                          <TableCell align="center">
+                            <Typography
+                              variant="caption"
+                              sx={{
+                                p: 1,
+                                pt: 0.75,
+                                borderRadius: 1,
+                                color: 'white',
+                                bgcolor: operator.statusBool ? 'success.main' : 'error.main',
+                              }}
+                            >
+                              {operator.status}
+                            </Typography>
                           </TableCell>
                           <TableCell sx={{ fontSize: 12 }}>{operator.createdBy}</TableCell>
                           <TableCell sx={{ fontSize: 12 }}>{format(operator.createdAt, 'MMM dd, yyyy')}</TableCell>
-                          <TableCell align="center">
-                            <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <TableCell align="left" sx={{ p: 0 }}>
+                            <Box sx={{ display: 'flex', justifyContent: 'space-evenly', alignItems: 'center' }}>
+                              <AntSwitch
+                                checked={operator.statusBool}
+                                onChange={() => changeActivation(operator.id, operator.statusBool)}
+                                inputProps={{ 'aria-label': 'check status' }}
+                                sx={{ mx: 1 }}
+                              />
                               <Edit
                                 onClick={() => navigate(`/app/operators/update/${operator.id}`, { replace: true })}
                                 sx={{
@@ -265,7 +313,7 @@ export const OperatorListResults = ({ setModalKey }) => {
                     {isDataNotFound && (
                       <TableBody>
                         <TableRow>
-                          <TableCell align="center" colSpan={10} sx={{ py: 3 }}>
+                          <TableCell align="center" colSpan={11} sx={{ py: 3 }}>
                             <Box>
                               <Typography gutterBottom align="center" variant="subtitle1" color="error.main">
                                 No data fetched!

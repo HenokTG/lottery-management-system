@@ -12,6 +12,7 @@ import {
   Operators,
   LicenceCatagory,
   Games,
+  DownloadManager,
   ActivityLogs,
   Page404,
 } from './pages';
@@ -81,6 +82,10 @@ export default function Router() {
             { path: '', element: <Games /> },
             { path: 'update/:id', element: <UpdateGame /> },
           ],
+        },
+        {
+          path: 'downloads',
+          element: <DownloadManager />,
         },
         {
           path: 'report/',
