@@ -108,7 +108,7 @@ export const SystemModulesList = () => {
       .get(`module/export`)
       .then(() => {
         setDownloading(false);
-        navigate('/app/downloads');
+        navigate('/downloads');
       })
       .catch((error) => {
         console.log(error);

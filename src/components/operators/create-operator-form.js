@@ -109,7 +109,7 @@ const CreateOperator = ({ setModalKey }) => {
     if (id === undefined) {
       setModalKey(false);
     } else {
-      navigate('/app/operators', { replace: true });
+      navigate('/operators', { replace: true });
     }
   };
 
@@ -168,7 +168,7 @@ const CreateOperator = ({ setModalKey }) => {
         axiosInstance
           .patch(`operator/${id}`, postData)
           .then(() => {
-            navigate('/app/operators', { replace: true });
+            navigate('/operators', { replace: true });
           })
           .catch((error) => {
             console.log(error);

@@ -129,7 +129,7 @@ export const RevenueReportResults = () => {
       .get(`transaction/revenue/export`)
       .then(() => {
         setDownloading(false);
-        navigate('/app/downloads');
+        navigate('/downloads');
       })
       .catch((error) => {
         console.log(error);

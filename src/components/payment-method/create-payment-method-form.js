@@ -47,7 +47,7 @@ const CreatePaymentMethod = ({ setModalKey }) => {
     if (id === undefined) {
       setModalKey(false);
     } else {
-      navigate('/app/app-settings/payment-method', { replace: true });
+      navigate('/app-settings/payment-method', { replace: true });
     }
   };
 
@@ -85,7 +85,7 @@ const CreatePaymentMethod = ({ setModalKey }) => {
         axiosInstance
           .patch(`payment-method/${id}`, postData)
           .then(() => {
-            navigate('/app/app-settings/payment-method', { replace: true });
+            navigate('/app-settings/payment-method', { replace: true });
           })
           .catch((error) => {
             console.log(error);

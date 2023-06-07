@@ -120,7 +120,7 @@ export const TaxRulesList = ({ setModalKey }) => {
       .get(`tax-rule/export`)
       .then(() => {
         setDownloading(false);
-        navigate('/app/downloads');
+        navigate('/downloads');
       })
       .catch((error) => {
         console.log(error);
@@ -261,7 +261,7 @@ export const TaxRulesList = ({ setModalKey }) => {
                               />
                               <Edit
                                 onClick={() =>
-                                  navigate(`/app/app-settings/tax-rules/update/${taxRule.id}`, {
+                                  navigate(`/app-settings/tax-rules/update/${taxRule.id}`, {
                                     replace: true,
                                   })
                                 }

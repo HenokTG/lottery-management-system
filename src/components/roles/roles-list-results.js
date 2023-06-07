@@ -120,7 +120,7 @@ export const RoleListResults = ({ setModalKey }) => {
       .get(`role/export`)
       .then(() => {
         setDownloading(false);
-        navigate('/app/downloads');
+        navigate('/downloads');
       })
       .catch((error) => {
         console.log(error);
@@ -260,7 +260,7 @@ export const RoleListResults = ({ setModalKey }) => {
                               />
                               <Edit
                                 onClick={() =>
-                                  navigate(`/app/management/role-management/update/${role.id}`, {
+                                  navigate(`/management/role-management/update/${role.id}`, {
                                     replace: true,
                                   })
                                 }

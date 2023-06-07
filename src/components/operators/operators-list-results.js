@@ -123,7 +123,7 @@ export const OperatorListResults = ({ setModalKey }) => {
       .get(`operator/export`)
       .then(() => {
         setDownloading(false);
-        navigate('/app/downloads');
+        navigate('/downloads');
       })
       .catch((error) => {
         console.log(error);
@@ -287,7 +287,7 @@ export const OperatorListResults = ({ setModalKey }) => {
                                 sx={{ mx: 1 }}
                               />
                               <Edit
-                                onClick={() => navigate(`/app/operators/update/${operator.id}`, { replace: true })}
+                                onClick={() => navigate(`/operators/update/${operator.id}`, { replace: true })}
                                 sx={{
                                   p: 0,
                                   m: 1,

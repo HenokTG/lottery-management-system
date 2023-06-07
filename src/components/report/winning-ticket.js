@@ -130,7 +130,7 @@ export const WinTicketResults = () => {
       .get(`transaction/ticket/export`)
       .then(() => {
         setDownloading(false);
-        navigate('/app/downloads');
+        navigate('/downloads');
       })
       .catch((error) => {
         console.log(error);

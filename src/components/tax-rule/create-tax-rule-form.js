@@ -55,7 +55,7 @@ const CreateTaxRule = ({ setModalKey }) => {
     if (id === undefined) {
       setModalKey(false);
     } else {
-      navigate('/app/app-settings/tax-rules', { replace: true });
+      navigate('/app-settings/tax-rules', { replace: true });
     }
   };
 
@@ -94,7 +94,7 @@ const CreateTaxRule = ({ setModalKey }) => {
         axiosInstance
           .patch(`tax-rule/${id}`, postData)
           .then(() => {
-            navigate('/app/app-settings/tax-rules', { replace: true });
+            navigate('/app-settings/tax-rules', { replace: true });
           })
           .catch((error) => {
             console.log(error);

@@ -121,7 +121,7 @@ export const LicenceCatagoryList = ({ setModalKey }) => {
       .get(`license/export`)
       .then(() => {
         setDownloading(false);
-        navigate('/app/downloads');
+        navigate('/downloads');
       })
       .catch((error) => {
         console.log(error);
@@ -254,7 +254,7 @@ export const LicenceCatagoryList = ({ setModalKey }) => {
                               />
                               <Edit
                                 onClick={() =>
-                                  navigate(`/app/licence-catagories/update/${licenceCatagory.id}`, { replace: true })
+                                  navigate(`/licence-catagories/update/${licenceCatagory.id}`, { replace: true })
                                 }
                                 sx={{
                                   p: 0,

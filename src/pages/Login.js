@@ -18,7 +18,7 @@ const Login = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const redirectTo = location.state?.redirectTo?.pathname || '/app/dashboard';
+  const redirectTo = location.state?.redirectTo?.pathname || '/dashboard';
 
   const { setAuth } = useAuth();
 
@@ -48,8 +48,6 @@ const Login = () => {
           axiosInstance.defaults.headers.Authorization = `Bearer ${localStorage.getItem('access_token')}`;
 
           const role = [res?.data?.role];
-          const accessToken = res?.data?.access_token;
-          const refreshToken = res?.data?.refresh_token;
 
           setAuth({ userEmail: postData.email, role });
 

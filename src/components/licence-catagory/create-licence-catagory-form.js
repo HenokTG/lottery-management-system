@@ -46,7 +46,7 @@ const CreateLicenceCatagory = ({ setModalKey }) => {
     if (id === undefined) {
       setModalKey(false);
     } else {
-      navigate('/app/licence-catagories', { replace: true });
+      navigate('/licence-catagories', { replace: true });
     }
   };
 
@@ -81,7 +81,7 @@ const CreateLicenceCatagory = ({ setModalKey }) => {
         axiosInstance
           .patch(`license/${id}`, postData)
           .then(() => {
-            navigate('/app/licence-catagories', { replace: true });
+            navigate('/licence-catagories', { replace: true });
           })
           .catch((error) => {
             console.log(error);

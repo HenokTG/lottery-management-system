@@ -121,7 +121,7 @@ export const RegionList = ({ setModalKey }) => {
       .get(`state/export`)
       .then(() => {
         setDownloading(false);
-        navigate('/app/downloads');
+        navigate('/downloads');
       })
       .catch((error) => {
         console.log(error);
@@ -257,7 +257,7 @@ export const RegionList = ({ setModalKey }) => {
                               />
                               <Edit
                                 onClick={() =>
-                                  navigate(`/app/app-settings/regional-locations/update/${region.id}`, {
+                                  navigate(`/app-settings/regional-locations/update/${region.id}`, {
                                     replace: true,
                                   })
                                 }

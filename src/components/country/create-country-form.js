@@ -46,7 +46,7 @@ const CreateCountry = ({ setModalKey }) => {
     if (id === undefined) {
       setModalKey(false);
     } else {
-      navigate('/app/app-settings/country-locations', { replace: true });
+      navigate('/app-settings/country-locations', { replace: true });
     }
   };
 
@@ -81,7 +81,7 @@ const CreateCountry = ({ setModalKey }) => {
         axiosInstance
           .patch(`country/${id}`, postData)
           .then(() => {
-            navigate('/app/app-settings/country-locations', { replace: true });
+            navigate('/app-settings/country-locations', { replace: true });
           })
           .catch((error) => {
             console.log(error);

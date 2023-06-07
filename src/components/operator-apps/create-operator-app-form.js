@@ -53,7 +53,7 @@ const CreateOperatorApp = ({ setModalKey }) => {
     if (id === undefined) {
       setModalKey(false);
     } else {
-      navigate('/app/app-settings/operator-apps', { replace: true });
+      navigate('/app-settings/operator-apps', { replace: true });
     }
   };
 
@@ -88,7 +88,7 @@ const CreateOperatorApp = ({ setModalKey }) => {
         axiosInstance
           .patch(`app/${id}`, postData)
           .then(() => {
-            navigate('/app/app-settings/operator-apps', { replace: true });
+            navigate('/app-settings/operator-apps', { replace: true });
           })
           .catch((error) => {
             console.log(error);

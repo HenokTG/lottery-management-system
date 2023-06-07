@@ -25,7 +25,6 @@ const CreateUser = ({ setModalKey }) => {
 
   const { id } = useParams();
 
-
   const [loading, setLoading] = useState(true);
 
   const [roleIDs, setRoleIDs] = useState([{ id: -1, name: 'No role to assign' }]);
@@ -58,7 +57,7 @@ const CreateUser = ({ setModalKey }) => {
     if (id === undefined) {
       setModalKey(false);
     } else {
-      navigate('/app/management/user-management', { replace: true });
+      navigate('/management/user-management', { replace: true });
     }
   };
 
@@ -102,7 +101,7 @@ const CreateUser = ({ setModalKey }) => {
         axiosInstance
           .patch(`user/${id}`, postData)
           .then(() => {
-            navigate('/app/management/user-management', { replace: true });
+            navigate('/management/user-management', { replace: true });
           })
           .catch((error) => {
             console.log(error);

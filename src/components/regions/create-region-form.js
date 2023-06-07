@@ -54,7 +54,7 @@ const CreateRegion = ({ setModalKey }) => {
     if (id === undefined) {
       setModalKey(false);
     } else {
-      navigate('/app/app-settings/regional-locations', { replace: true });
+      navigate('/app-settings/regional-locations', { replace: true });
     }
   };
 
@@ -91,7 +91,7 @@ const CreateRegion = ({ setModalKey }) => {
         axiosInstance
           .patch(`state/${id}`, postData)
           .then(() => {
-            navigate('/app/app-settings/regional-locations', { replace: true });
+            navigate('/app-settings/regional-locations', { replace: true });
           })
           .catch((error) => {
             console.log(error);

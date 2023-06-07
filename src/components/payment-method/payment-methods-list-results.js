@@ -123,7 +123,7 @@ export const PaymentMethodList = ({ setModalKey }) => {
       .get(`payment-method/export`)
       .then(() => {
         setDownloading(false);
-        navigate('/app/downloads');
+        navigate('/downloads');
       })
       .catch((error) => {
         console.log(error);
@@ -256,7 +256,7 @@ export const PaymentMethodList = ({ setModalKey }) => {
                               />
                               <Edit
                                 onClick={() =>
-                                  navigate(`/app/app-settings/payment-method/update/${paymentMethods.id}`, {
+                                  navigate(`/app-settings/payment-method/update/${paymentMethods.id}`, {
                                     replace: true,
                                   })
                                 }

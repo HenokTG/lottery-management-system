@@ -132,7 +132,7 @@ export const OfflineBettingResults = () => {
       .get(`ticket/offline-ticket/export`)
       .then(() => {
         setDownloading(false);
-        navigate('/app/downloads');
+        navigate('/downloads');
       })
       .catch((error) => {
         console.log(error);

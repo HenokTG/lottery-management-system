@@ -137,7 +137,7 @@ export const OnlineBettingResults = () => {
       .get(`ticket/online-ticket/export`)
       .then(() => {
         setDownloading(false);
-        navigate('/app/downloads');
+        navigate('/downloads');
       })
       .catch((error) => {
         console.log(error);

@@ -22,119 +22,119 @@ import { NavItem } from './nav-item';
 
 const items = [
   {
-    href: '/app/dashboard',
+    href: '/dashboard',
     icon: <ChartBarIcon fontSize="small" />,
     title: 'Dashboard',
   },
   {
-    href: '/app/operators',
+    href: '/operators',
     icon: <UsersIcon fontSize="small" />,
     title: 'Operators',
   },
   {
-    href: '/app/licence-catagories',
+    href: '/licence-catagories',
     icon: <EmojiEventsIcon fontSize="small" />,
     title: 'Licence Catagories',
   },
   {
-    href: '/app/games',
+    href: '/games',
     icon: <ExtensionIcon fontSize="small" />,
     title: 'Games',
   },
   {
-    href: '/app/downloads',
+    href: '/downloads',
     icon: <Download fontSize="small" />,
     title: 'Download Manager',
   },
 
   {
-    href: '/app/report',
+    href: '/report',
     icon: <Report fontSize="small" />,
     title: 'Report',
     children: [
-      { href: '/app/report/revenue', title: 'Revenue' },
-      { href: '/app/report/online-betting-transactions', title: 'Online Betting' },
-      { href: '/app/report/offline-betting-transactions', title: 'Offline Betting' },
+      { href: '/report/revenue', title: 'Revenue' },
+      { href: '/report/online-betting-transactions', title: 'Online Betting' },
+      { href: '/report/offline-betting-transactions', title: 'Offline Betting' },
       {
-        href: '/app/report/winning-ticket',
+        href: '/report/winning-ticket',
         title: 'Winning Ticket',
       },
       {
-        href: '/app/report/operator-wallet',
+        href: '/report/operator-wallet',
         title: 'Operator Wallet',
       },
     ],
   },
   {
-    href: '/app/payment-report',
+    href: '/payment-report',
     icon: <Report fontSize="small" />,
     title: 'Payment Report',
     children: [
       {
-        href: '/app/payment-report/payment-distribution',
+        href: '/payment-report/payment-distribution',
         title: 'Payment Distribution',
       },
-      { href: '/app/payment-report/payment-transactions', title: 'Payment Transactions' },
-      { href: '/app/payment-report/bonus-transactions', title: 'Bonus Transactions' },
+      { href: '/payment-report/payment-transactions', title: 'Payment Transactions' },
+      { href: '/payment-report/bonus-transactions', title: 'Bonus Transactions' },
     ],
   },
   {
-    href: '/app/management',
+    href: '/management',
     icon: <UserIcon fontSize="small" />,
     title: 'Management',
     children: [
       {
-        href: '/app/management/role-management',
+        href: '/management/role-management',
         title: 'Role Management',
       },
       {
-        href: '/app/management/user-management',
+        href: '/management/user-management',
         title: 'User Management',
       },
     ],
   },
   {
-    href: '/app/app-settings',
+    href: '/app-settings',
     icon: <CogIcon fontSize="small" />,
     title: 'App Settings',
     children: [
       {
-        href: '/app/app-settings/general',
+        href: '/app-settings/general',
         title: 'General',
       },
       {
-        href: '/app/app-settings/system-modules',
+        href: '/app-settings/system-modules',
         title: 'System Modules',
       },
       {
-        href: '/app/app-settings/operator-apps',
+        href: '/app-settings/operator-apps',
         title: 'Operator Apps',
       },
       {
-        href: '/app/app-settings/payment-method',
+        href: '/app-settings/payment-method',
         title: 'Payment Methods',
       },
       {
-        href: '/app/app-settings/currency',
+        href: '/app-settings/currency',
         title: 'Currency Settings',
       },
       {
-        href: '/app/app-settings/country-locations',
+        href: '/app-settings/country-locations',
         title: 'Locations: Country',
       },
       {
-        href: '/app/app-settings/regional-locations',
+        href: '/app-settings/regional-locations',
         title: 'Locations: Regions',
       },
       {
-        href: '/app/app-settings/tax-rules',
+        href: '/app-settings/tax-rules',
         title: 'Tax Rules',
       },
     ],
   },
 
   {
-    href: '/app/activity-logs',
+    href: '/activity-logs',
     icon: <Log fontSize="small" />,
     title: 'Activity Logs',
   },
@@ -175,13 +175,13 @@ export const DashboardSidebar = (props) => {
           overflow: 'auto',
           scrollbarWidth: 'thin',
           '&::-webkit-scrollbar': {
-            width: '0.2em',
+            width: '0.15em',
           },
           '&::-webkit-scrollbar-track': {
             background: '#f1f1f1',
           },
           '&::-webkit-scrollbar-thumb': {
-            backgroundColor: '#888',
+            backgroundColor: '#bbbbbb',
           },
           '&::-webkit-scrollbar-thumb:hover': {
             background: '#555',
@@ -190,7 +190,7 @@ export const DashboardSidebar = (props) => {
       >
         <div>
           <Box sx={{ p: 3, backgroundColor: 'neutral.300' }}>
-            <RouterLink to="/app/dashboard">
+            <RouterLink to="/dashboard">
               <Avatar alt="Converx Technology" src="/static/convex.png" variant="rounded" sx={{ width: 200 }} />
             </RouterLink>
           </Box>

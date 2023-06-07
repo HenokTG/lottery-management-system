@@ -35,17 +35,25 @@ const ActiveListItemStyle = {
   },
 };
 
+const ActiveChildStyle = {
+  color: 'success.main',
+  fontWeight: 'fontWeightBold',
+};
+
 export const NavItem = (props) => {
   const { pathname } = useLocation();
 
+  const groupPath = pathname.split('/').slice(0, 2).join('/');
+
   const activeRoute = (path) => (path ? !!matchPath({ path, end: true }, pathname) : false);
+  const groupRoute = (path) => (path ? !!matchPath({ path, end: true }, groupPath) : false);
 
   const { href, icon, title, subgroup, ...others } = props;
   const active = activeRoute(href);
+  const isActiveGroup = groupRoute(href);
 
-  const [open, setOpen] = useState(active);
-
-  let subGroupOpen = false;
+  console.log(groupPath, href, isActiveGroup);
+  const [open, setOpen] = useState(isActiveGroup);
 
   const handleOpen = () => {
     setOpen((prev) => !prev);
@@ -75,7 +83,7 @@ export const NavItem = (props) => {
             disableRipple
             sx={{
               ...ListItemStyle,
-              ...(subGroupOpen && ActiveListItemStyle),
+              ...(isActiveGroup && ActiveListItemStyle),
             }}
           >
             <Box sx={{ flexGrow: 1 }}>{title}</Box>
@@ -88,10 +96,6 @@ export const NavItem = (props) => {
               const { title, href, icon } = item;
 
               const childActive = activeRoute(href);
-
-              if (childActive) {
-                subGroupOpen = true;
-              }
 
               return (
                 <ListItem
@@ -111,7 +115,7 @@ export const NavItem = (props) => {
                     disableRipple
                     sx={{
                       ...ListItemStyle,
-                      ...(childActive && ActiveListItemStyle),
+                      ...(childActive && ActiveChildStyle),
                     }}
                   >
                     <Box>{title}</Box>

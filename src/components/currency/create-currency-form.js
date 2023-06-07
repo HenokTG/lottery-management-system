@@ -46,7 +46,7 @@ const CreateCurrency = ({ setModalKey }) => {
     if (id === undefined) {
       setModalKey(false);
     } else {
-      navigate('/app/app-settings/currency', { replace: true });
+      navigate('/app-settings/currency', { replace: true });
     }
   };
 
@@ -81,7 +81,7 @@ const CreateCurrency = ({ setModalKey }) => {
         axiosInstance
           .patch(`currency/${id}`, postData)
           .then(() => {
-            navigate('/app/app-settings/currency', { replace: true });
+            navigate('/app-settings/currency', { replace: true });
           })
           .catch((error) => {
             console.log(error);

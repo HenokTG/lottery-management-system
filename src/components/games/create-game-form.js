@@ -56,7 +56,7 @@ const CreateGame = ({ setModalKey }) => {
     if (id === undefined) {
       setModalKey(false);
     } else {
-      navigate('/app/games', { replace: true });
+      navigate('/games', { replace: true });
     }
   };
 
@@ -97,7 +97,7 @@ const CreateGame = ({ setModalKey }) => {
         axiosInstance
           .patch(`game/${id}`, postData)
           .then(() => {
-            navigate('/app/games', { replace: true });
+            navigate('/games', { replace: true });
           })
           .catch((error) => {
             console.log(error);

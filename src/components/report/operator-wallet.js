@@ -126,7 +126,7 @@ export const OperatorWalletResults = () => {
       .get(`operator-wallet/export`)
       .then(() => {
         setDownloading(false);
-        navigate('/app/downloads');
+        navigate('/downloads');
       })
       .catch((error) => {
         console.log(error);

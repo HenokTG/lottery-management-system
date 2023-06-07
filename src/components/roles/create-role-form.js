@@ -51,7 +51,7 @@ const CreateRole = ({ setModalKey }) => {
     if (id === undefined) {
       setModalKey(false);
     } else {
-      navigate('/app/management/role-management', { replace: true });
+      navigate('/management/role-management', { replace: true });
     }
   };
 
@@ -87,7 +87,7 @@ const CreateRole = ({ setModalKey }) => {
         axiosInstance
           .patch(`role/${id}`, postData)
           .then(() => {
-            navigate('/app/management/role-management', { replace: true });
+            navigate('/management/role-management', { replace: true });
           })
           .catch((error) => {
             console.log(error);

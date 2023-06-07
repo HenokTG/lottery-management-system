@@ -119,7 +119,7 @@ export const UserListResults = ({ setModalKey }) => {
       .get(`user/export`)
       .then(() => {
         setDownloading(false);
-        navigate('/app/downloads');
+        navigate('/downloads');
       })
       .catch((error) => {
         console.log(error);
@@ -267,7 +267,7 @@ export const UserListResults = ({ setModalKey }) => {
                               />
                               <Edit
                                 onClick={() =>
-                                  navigate(`/app/management/user-management/update/${user.id}`, { replace: true })
+                                  navigate(`/management/user-management/update/${user.id}`, { replace: true })
                                 }
                                 sx={{
                                   p: 0,

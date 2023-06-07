@@ -121,7 +121,7 @@ export const CurrencyList = ({ setModalKey }) => {
       .get(`currency/export`)
       .then(() => {
         setDownloading(false);
-        navigate('/app/downloads');
+        navigate('/downloads');
       })
       .catch((error) => {
         console.log(error);
@@ -254,7 +254,7 @@ export const CurrencyList = ({ setModalKey }) => {
                               />
                               <Edit
                                 onClick={() =>
-                                  navigate(`/app/app-settings/currency/update/${currency.id}`, {
+                                  navigate(`/app-settings/currency/update/${currency.id}`, {
                                     replace: true,
                                   })
                                 }

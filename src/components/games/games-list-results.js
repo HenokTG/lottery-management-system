@@ -90,7 +90,7 @@ export const GameListResults = ({ setModalKey }) => {
       .get(`game/export`)
       .then(() => {
         setDownloading(false);
-        navigate('/app/downloads');
+        navigate('/downloads');
       })
       .catch((error) => {
         console.log(error);
@@ -219,7 +219,7 @@ export const GameListResults = ({ setModalKey }) => {
                               sx={{ mx: 1 }}
                             />
                             <Edit
-                              onClick={() => navigate(`/app/games/update/${game.id}`, { replace: true })}
+                              onClick={() => navigate(`/games/update/${game.id}`, { replace: true })}
                               sx={{
                                 p: 0,
                                 m: 1,

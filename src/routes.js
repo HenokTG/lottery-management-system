@@ -71,7 +71,7 @@ const ROLE = {
 export default function Router() {
   return useRoutes([
     {
-      path: '/app',
+      path: '/',
       element: <DashboardLayout />,
       children: [
         {
@@ -229,7 +229,7 @@ export default function Router() {
       path: '/',
       element: <LogoOnlyLayout />,
       children: [
-        { path: '/', element: <Navigate to="/login" /> },
+        { index: true, element: <Navigate to="/login" /> },
         { path: '404', element: <Page404 /> },
         { path: '*', element: <Navigate to="/404" /> },
       ],

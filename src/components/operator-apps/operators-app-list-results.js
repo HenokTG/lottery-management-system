@@ -120,7 +120,7 @@ export const OperatorsAppList = ({ setModalKey }) => {
       .get(`app/export`)
       .then(() => {
         setDownloading(false);
-        navigate('/app/downloads');
+        navigate('/downloads');
       })
       .catch((error) => {
         console.log(error);
@@ -254,7 +254,7 @@ export const OperatorsAppList = ({ setModalKey }) => {
                               />
                               <Edit
                                 onClick={() =>
-                                  navigate(`/app/app-settings/operator-apps/update/${operatorApp.id}`, {
+                                  navigate(`/app-settings/operator-apps/update/${operatorApp.id}`, {
                                     replace: true,
                                   })
                                 }

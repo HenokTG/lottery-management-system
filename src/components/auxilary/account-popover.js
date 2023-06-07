@@ -66,7 +66,7 @@ export const AccountPopover = (props) => {
               fullWidth
               color="info"
               component={RouterLink}
-              to="/app/user-profile"
+              to="/user-profile"
             >
               User profile
             </Button>
@@ -77,7 +77,7 @@ export const AccountPopover = (props) => {
               fullWidth
               color="info"
               component={RouterLink}
-              to="/app/account-settings"
+              to="/account-settings"
             >
               Account settings
             </Button>
