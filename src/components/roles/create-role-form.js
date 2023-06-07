@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 
 import { useState, useEffect } from 'react';
-import { useNavigate, useLocation, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 // forms validate
 import { useFormik } from 'formik';
@@ -16,7 +16,6 @@ import PermissionsForm from './permissions_form';
 
 // context and modules
 import { axiosInstance } from '../../utils/axios';
-import { useGlobalContext } from '../../context';
 import { roleUpdateFetch } from '../../_apiAxios/management';
 
 // -----------------------------------------------------------------------------------------------------------------------
@@ -24,11 +23,8 @@ import { roleUpdateFetch } from '../../_apiAxios/management';
 const CreateRole = ({ setModalKey }) => {
   const theme = useTheme();
   const navigate = useNavigate();
-  const prevLocation = useLocation();
 
   const { id } = useParams();
-
-  const { loggedIn } = useGlobalContext();
 
   const [loading, setLoading] = useState(true);
 
@@ -43,10 +39,6 @@ const CreateRole = ({ setModalKey }) => {
   useEffect(
     () => {
       if (id !== undefined) {
-        if (loggedIn === false) {
-          navigate(`/login?redirectTo=${prevLocation.pathname}`);
-        }
-
         const updateLicenceAPI = `role/${id}`;
         roleUpdateFetch(updateLicenceAPI, setIntialRoleData, setLoading);
       }

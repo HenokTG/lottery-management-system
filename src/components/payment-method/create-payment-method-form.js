@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 
 import { useState, useEffect } from 'react';
-import { useNavigate, useLocation, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 // forms validate
 import { useFormik } from 'formik';
@@ -13,7 +13,6 @@ import { useTheme } from '@mui/material/styles';
 
 // context and modules
 import { axiosInstance } from '../../utils/axios';
-import { useGlobalContext } from '../../context';
 import { paymentMethodUpdateFetch } from '../../_apiAxios/payment-report';
 
 // -----------------------------------------------------------------------------------------------------------------------
@@ -22,11 +21,8 @@ const CreatePaymentMethod = ({ setModalKey }) => {
   const theme = useTheme();
 
   const navigate = useNavigate();
-  const prevLocation = useLocation();
 
   const { id } = useParams();
-
-  const { loggedIn } = useGlobalContext();
 
   const [loading, setLoading] = useState(true);
 
@@ -39,12 +35,8 @@ const CreatePaymentMethod = ({ setModalKey }) => {
   useEffect(
     () => {
       if (id !== undefined) {
-        if (loggedIn === false) {
-          navigate(`/login?redirectTo=${prevLocation.pathname}`);
-        }
-
         const updatePaymentMethodAPI = `payment-method/${id}`;
-        paymentMethodUpdateFetch(updatePaymentMethodAPI, setIntialPaymentMethodData, setLoading );
+        paymentMethodUpdateFetch(updatePaymentMethodAPI, setIntialPaymentMethodData, setLoading);
       }
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps

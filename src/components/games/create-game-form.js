@@ -13,7 +13,6 @@ import { useTheme } from '@mui/material/styles';
 
 // context and modules
 import { axiosInstance } from '../../utils/axios';
-import { useGlobalContext } from '../../context';
 import { fetchLicenceCatIDs } from '../../_apiAxios/mainCreateFetches';
 import { gameUpdateFetch } from '../../_apiAxios/mainFetches';
 
@@ -23,11 +22,8 @@ const CreateGame = ({ setModalKey }) => {
   const theme = useTheme();
 
   const navigate = useNavigate();
-  const prevLocation = useLocation();
 
   const { id } = useParams();
-
-  const { loggedIn } = useGlobalContext();
 
   const [loading, setLoading] = useState(true);
 
@@ -48,10 +44,6 @@ const CreateGame = ({ setModalKey }) => {
       fetchLicenceCatIDs(licenseCatFetchAPI, setlicenseCatIDs);
 
       if (id !== undefined) {
-        if (loggedIn === false) {
-          navigate(`/login?redirectTo=${prevLocation.pathname}`);
-        }
-
         const updateGameAPI = `game/${id}`;
         gameUpdateFetch(updateGameAPI, setIntialGameData, setLoading);
       }

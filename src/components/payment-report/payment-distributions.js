@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import PerfectScrollbar from 'react-perfect-scrollbar';
 
@@ -28,7 +28,6 @@ import { styled } from '@mui/material/styles';
 import AnnualReportFilter from '../auxilary/AnnualReportFilter';
 
 // context and modules
-import { useGlobalContext } from '../../context';
 import { paymentDistributionsFetch } from '../../_apiAxios/payment-report';
 import { fetchOperatorIDs } from '../../_apiAxios/modelCreateFetches';
 import { fetchPaymentMethodIDs } from '../../_apiAxios/fetchFilterIDs';
@@ -63,9 +62,6 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 // ---------------------------------------------------------------------------------
 
 export const PaymentDistributionResults = () => {
-  const { loggedIn } = useGlobalContext();
-
-  const prevLocation = useLocation();
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
@@ -89,9 +85,6 @@ export const PaymentDistributionResults = () => {
 
   useEffect(
     () => {
-      if (loggedIn === false) {
-        navigate(`/login?redirectTo=${prevLocation.pathname}`);
-      }
       setLoading(true);
 
       paymentDistributionsFetch(fetchAPI, setLoading, setPaymentDistributionsList, setPaginationProps);

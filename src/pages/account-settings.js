@@ -18,9 +18,9 @@ const AccountSettings = () => {
 
   useEffect(
     () => {
-      if (loggedIn === false) {
-        navigate(`/login?redirectTo=${prevLocation.pathname}`);
-      }
+      // if (loggedIn === false) {
+      //   navigate(`/login?redirectTo=${prevLocation.pathname}`);
+      // }
 
       // const summaryAPI = `/ecl-analysis/api/dashboard-summary/${bankName}/${profilePk}/${summaryMonth}`;
 

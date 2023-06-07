@@ -8,6 +8,7 @@ import { HelmetProvider } from 'react-helmet-async';
 //
 import App from './App';
 import AppProvider from './context';
+import { AuthProvider } from './hooks/useAuth';
 import * as serviceWorker from './serviceWorker';
 import reportWebVitals from './reportWebVitals';
 
@@ -19,7 +20,9 @@ root.render(
   <HelmetProvider>
     <BrowserRouter>
       <AppProvider>
-        <App />
+        <AuthProvider>
+          <App />
+        </AuthProvider>
       </AppProvider>
     </BrowserRouter>
   </HelmetProvider>

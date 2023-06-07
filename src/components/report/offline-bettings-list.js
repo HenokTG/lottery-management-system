@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import { format } from 'date-fns';
@@ -29,7 +29,6 @@ import { styled } from '@mui/material/styles';
 import AnnualReportFilter from '../auxilary/AnnualReportFilter';
 
 // context and modules
-import { useGlobalContext } from '../../context';
 import { offlineBettingsFetch } from '../../_apiAxios/report';
 import { fetchOperatorIDs } from '../../_apiAxios/modelCreateFetches';
 import { fetchGameIDs } from '../../_apiAxios/mainCreateFetches';
@@ -66,9 +65,6 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 // ---------------------------------------------------------------------
 
 export const OfflineBettingResults = () => {
-  const { loggedIn } = useGlobalContext();
-
-  const prevLocation = useLocation();
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
@@ -94,10 +90,6 @@ export const OfflineBettingResults = () => {
 
   useEffect(
     () => {
-      if (loggedIn === false) {
-        navigate(`/login?redirectTo=${prevLocation.pathname}`);
-      }
-
       setLoading(true);
 
       offlineBettingsFetch(fetchAPI, setLoading, setBettingTransactionsList, setPaginationProps);

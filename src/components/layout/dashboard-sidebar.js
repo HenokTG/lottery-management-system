@@ -141,8 +141,11 @@ const items = [
 ];
 
 export const DashboardSidebar = (props) => {
-  const { open, onClose } = props;
+  const { open, onClose, role, userProfile } = props;
   const router = { pathname: 'useRouter()' };
+
+  const renderedNavs = role === 'admin' ? items : [0, 3, 4, 5, 6].map((x) => items[x]);
+
   const lgUp = useMediaQuery((theme) => theme.breakpoints.up('lg'), {
     defaultMatches: true,
     noSsr: false,
@@ -189,12 +192,6 @@ export const DashboardSidebar = (props) => {
           <Box sx={{ p: 3, backgroundColor: 'neutral.300' }}>
             <RouterLink to="/app/dashboard">
               <Avatar alt="Converx Technology" src="/static/convex.png" variant="rounded" sx={{ width: 200 }} />
-              {/* <Logo
-                sx={{
-                  height: 42,
-                  width: 42,
-                }}
-              /> */}
             </RouterLink>
           </Box>
           <Box sx={{ px: 2 }}>
@@ -212,10 +209,10 @@ export const DashboardSidebar = (props) => {
             >
               <div>
                 <Typography sx={{ color: 'primary.main' }} variant="subtitle1">
-                  John Doe
+                  {`${userProfile.firstName} ${userProfile.lastName}`}
                 </Typography>
                 <Typography sx={{ color: 'primary.main' }} variant="caption">
-                  Your tier : Admin
+                  User privilege : {role === 'admin' ? 'Admin' : 'Operator'}
                 </Typography>
               </div>
             </Box>
@@ -228,7 +225,7 @@ export const DashboardSidebar = (props) => {
           }}
         />
         <Box sx={{ flexGrow: 1 }}>
-          {items.map((item) => (
+          {renderedNavs.map((item) => (
             <NavItem key={item.title} icon={item.icon} href={item.href} title={item.title} subgroup={item.children} />
           ))}
         </Box>
@@ -278,4 +275,6 @@ export const DashboardSidebar = (props) => {
 DashboardSidebar.propTypes = {
   onClose: PropTypes.func,
   open: PropTypes.bool,
+  role: PropTypes.string,
+  userProfile: PropTypes.object,
 };

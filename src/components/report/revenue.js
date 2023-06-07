@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import PerfectScrollbar from 'react-perfect-scrollbar';
 
@@ -34,7 +34,6 @@ import { Search as SearchIcon } from '../../icons/search';
 import { Download as DownloadIcon } from '../../icons/download';
 
 // context and modules
-import { useGlobalContext } from '../../context';
 import { revenuesFetch, revenueSummary } from '../../_apiAxios/report';
 import { fetchOperatorIDs } from '../../_apiAxios/modelCreateFetches';
 import { axiosInstance } from '../../utils/axios';
@@ -65,9 +64,6 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 // ------------------------------------------------------------------------------------------
 
 export const RevenueReportResults = () => {
-  const { loggedIn } = useGlobalContext();
-
-  const prevLocation = useLocation();
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
@@ -94,10 +90,6 @@ export const RevenueReportResults = () => {
 
   useEffect(
     () => {
-      if (loggedIn === false) {
-        navigate(`/login?redirectTo=${prevLocation.pathname}`);
-      }
-
       setLoading(true);
 
       revenueSummary('transaction/revenue-report', setSummaryData);

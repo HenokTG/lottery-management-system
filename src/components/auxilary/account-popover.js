@@ -97,11 +97,9 @@ export const AccountPopover = (props) => {
           },
         }}
       >
-        {/* <MenuItem> */}
         <Button fullWidth color="error" onClick={handleSignOut}>
           Sign out
         </Button>
-        {/* </MenuItem> */}
       </MenuList>
     </Popover>
   );

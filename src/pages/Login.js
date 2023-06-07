@@ -10,22 +10,22 @@ import { Box, Button, Container, TextField, Typography } from '@mui/material';
 import Page from '../components/layout/Page';
 // context and modules
 import { axiosInstance } from '../utils/axios';
-import { useGlobalContext } from '../context';
+import useAuth from '../hooks/useAuth';
 
-const queryString = require('query-string');
+// -----------------------------------------------------------------------------------------------
 
 const Login = () => {
   const navigate = useNavigate();
-  const nextLocation = useLocation();
+  const location = useLocation();
 
-  const { redirectTo } = queryString.parse(nextLocation.search);
+  const redirectTo = location.state?.redirectTo?.pathname || '/app/dashboard';
 
-  const { setLoggedIn, setProfilePk } = useGlobalContext();
+  const { setAuth } = useAuth();
 
   const formik = useFormik({
     initialValues: {
-      email: 'superadmin@hulusport.com',
-      password: 'ThisIsSuperAdmin',
+      email: '',
+      password: '',
     },
     validationSchema: Yup.object({
       email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
@@ -46,9 +46,14 @@ const Login = () => {
           localStorage.setItem('access_token', res.data.access_token);
           localStorage.setItem('refresh_token', res.data.refresh_token);
           axiosInstance.defaults.headers.Authorization = `Bearer ${localStorage.getItem('access_token')}`;
-          setLoggedIn(true);
-          setProfilePk(postData.email);
-          navigate(!redirectTo ? '/app/dashboard' : redirectTo, { replace: true });
+
+          const role = [res?.data?.role];
+          const accessToken = res?.data?.access_token;
+          const refreshToken = res?.data?.refresh_token;
+
+          setAuth({ userEmail: postData.email, role });
+
+          navigate(redirectTo, { replace: true });
         })
         .catch((error) => {
           helpers.setStatus({ success: false });

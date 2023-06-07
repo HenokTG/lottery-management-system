@@ -1,7 +1,6 @@
 import { format } from 'date-fns';
 
 import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
 
 import PerfectScrollbar from 'react-perfect-scrollbar';
 
@@ -26,7 +25,6 @@ import {
 import { styled } from '@mui/material/styles';
 
 // context and modules
-import { useGlobalContext } from '../context';
 import { activityLogFetch } from '../_apiAxios/activity-log';
 
 // icons
@@ -58,11 +56,6 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 // ---------------------------------------------------------------------------------
 
 export const ActivityLogResults = () => {
-  const { loggedIn } = useGlobalContext();
-
-  const prevLocation = useLocation();
-  const navigate = useNavigate();
-
   const [loading, setLoading] = useState(true);
 
   const [limit, setLimit] = useState(25);
@@ -76,10 +69,7 @@ export const ActivityLogResults = () => {
 
   useEffect(
     () => {
-      if (loggedIn === false) {
-        navigate(`/login?redirectTo=${prevLocation.pathname}`);
-      }
-
+      setLoading(true);
       const fetchAPI = `activity-log?page=${page + 1}&per_page=${limit}`;
 
       activityLogFetch(fetchAPI, setLoading, setActivityList, setPaginationProps);

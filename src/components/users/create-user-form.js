@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 
 import { useState, useEffect } from 'react';
-import { useNavigate, useLocation, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 // forms validate
 import { useFormik } from 'formik';
@@ -12,7 +12,6 @@ import { Box, Button, Card, Divider, Grid, TextField, Typography, MenuItem, Circ
 import { useTheme } from '@mui/material/styles';
 
 // context and modules
-import { useGlobalContext } from '../../context';
 import { axiosInstance } from '../../utils/axios';
 import { fetchRoleIDs } from '../../_apiAxios/modelCreateFetches';
 import { userUpdateFetch } from '../../_apiAxios/management';
@@ -23,11 +22,9 @@ const CreateUser = ({ setModalKey }) => {
   const theme = useTheme();
 
   const navigate = useNavigate();
-  const prevLocation = useLocation();
 
   const { id } = useParams();
 
-  const { loggedIn } = useGlobalContext();
 
   const [loading, setLoading] = useState(true);
 
@@ -49,10 +46,6 @@ const CreateUser = ({ setModalKey }) => {
       fetchRoleIDs(roleFetchAPI, setRoleIDs);
 
       if (id !== undefined) {
-        if (loggedIn === false) {
-          navigate(`/login?redirectTo=${prevLocation.pathname}`);
-        }
-
         const updateOperatorAPI = `user/${id}`;
         userUpdateFetch(updateOperatorAPI, setIntialUserData, setLoading);
       }

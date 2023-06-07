@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
 
 import PerfectScrollbar from 'react-perfect-scrollbar';
+
 // @mui
 import {
   Box,
@@ -27,10 +27,12 @@ import { styled } from '@mui/material/styles';
 import { Search as SearchIcon } from '../icons/search';
 import { Download as DownloadIcon } from '../icons/download';
 import { Edit } from '../icons/edit';
+
 // context and modules
-import { useGlobalContext } from '../context';
 import { appConfigFetch } from '../_apiAxios/app-config';
+
 // custom styles
+
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: theme.palette.info.main,
@@ -52,12 +54,9 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   },
 }));
 
+// ---------------------------------------------------------------------------
+
 export const AppConfigResults = () => {
-  const { loggedIn } = useGlobalContext();
-
-  const prevLocation = useLocation();
-  const navigate = useNavigate();
-
   const [loading, setLoading] = useState(true);
 
   const [limit, setLimit] = useState(25);
@@ -71,10 +70,6 @@ export const AppConfigResults = () => {
 
   useEffect(
     () => {
-      if (loggedIn === false) {
-        navigate(`/login?redirectTo=${prevLocation.pathname}`);
-      }
-
       const fetchAPI = `app-config?page=${page + 1}&per_page=${limit}`;
 
       appConfigFetch(fetchAPI, setLoading, setAppConfigList, setPaginationProps);

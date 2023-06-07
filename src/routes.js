@@ -1,8 +1,14 @@
+import { lazy } from 'react';
 import { Navigate, useRoutes } from 'react-router-dom';
 // layouts
 import { DashboardLayout } from './components/layout/dashboard-layout';
 import LogoOnlyLayout from './components/layout/LogoOnlyLayout';
 //
+import RequireAuth from './components/auxilary/RequireAuth';
+
+// import Loadable from './components/auxilary/Loadable';
+// import AuthGuard from 'utils/route-guard/AuthGuard';
+// const DashboardDefault = Loadable(lazy(() => import('pages/dashboard/default')));
 
 import {
   Login,
@@ -55,15 +61,27 @@ import {
 } from './pages/index-update-forms';
 // ----------------------------------------------------------------------
 
+const ROLE = {
+  operator: 'operator',
+  Admin: 'admin',
+};
+
+// ------------------------------------------------------------------------
+
 export default function Router() {
   return useRoutes([
     {
       path: '/app',
       element: <DashboardLayout />,
       children: [
-        { path: 'dashboard', element: <DashboardApp /> },
+        {
+          path: 'dashboard',
+          element: <RequireAuth userRole={[ROLE.Admin, ROLE.operator]} />,
+          children: [{ path: '', element: <DashboardApp /> }],
+        },
         {
           path: 'operators',
+          element: <RequireAuth userRole={[ROLE.Admin]} />,
           children: [
             { path: '', element: <Operators /> },
             { path: 'update/:id', element: <UpdateOperator /> },
@@ -71,6 +89,7 @@ export default function Router() {
         },
         {
           path: 'licence-catagories',
+          element: <RequireAuth userRole={[ROLE.Admin]} />,
           children: [
             { path: '', element: <LicenceCatagory /> },
             { path: 'update/:id', element: <UpdateLicenceCatagory /> },
@@ -78,6 +97,7 @@ export default function Router() {
         },
         {
           path: 'games',
+          element: <RequireAuth userRole={[ROLE.Admin, ROLE.operator]} />,
           children: [
             { path: '', element: <Games /> },
             { path: 'update/:id', element: <UpdateGame /> },
@@ -85,10 +105,12 @@ export default function Router() {
         },
         {
           path: 'downloads',
-          element: <DownloadManager />,
+          element: <RequireAuth userRole={[ROLE.Admin, ROLE.operator]} />,
+          children: [{ path: '', element: <DownloadManager /> }],
         },
         {
           path: 'report/',
+          element: <RequireAuth userRole={[ROLE.Admin, ROLE.operator]} />,
           children: [
             { path: 'revenue', element: <RevenueReport /> },
             { path: 'online-betting-transactions', element: <OnlineBettingTransactionsReport /> },
@@ -99,6 +121,7 @@ export default function Router() {
         },
         {
           path: 'payment-report/',
+          element: <RequireAuth userRole={[ROLE.Admin, ROLE.operator]} />,
           children: [
             { path: 'payment-distribution', element: <PaymentDistributionReport /> },
             { path: 'payment-transactions', element: <PaymentTransactionsReport /> },
@@ -107,6 +130,7 @@ export default function Router() {
         },
         {
           path: 'management/',
+          element: <RequireAuth userRole={[ROLE.Admin]} />,
           children: [
             {
               path: 'role-management',
@@ -126,6 +150,7 @@ export default function Router() {
         },
         {
           path: 'app-settings/',
+          element: <RequireAuth userRole={[ROLE.Admin]} />,
           children: [
             {
               path: 'general',
@@ -179,13 +204,25 @@ export default function Router() {
             },
           ],
         },
-        { path: 'activity-logs/', element: <ActivityLogs /> },
-        { path: 'user-profile', element: <UserProfile /> },
-        { path: 'account-settings', element: <AccountSettings /> },
+        {
+          path: 'activity-logs/',
+          element: <RequireAuth userRole={[ROLE.Admin]} />,
+          children: [{ path: '', element: <ActivityLogs /> }],
+        },
+        {
+          path: 'user-profile',
+          element: <RequireAuth userRole={[ROLE.Admin, ROLE.operator]} />,
+          children: [{ path: '', element: <UserProfile /> }],
+        },
+        {
+          path: 'account-settings',
+          element: <RequireAuth userRole={[ROLE.Admin, ROLE.operator]} />,
+          children: [{ path: '', element: <AccountSettings /> }],
+        },
       ],
     },
     {
-      path: 'login',
+      path: '/login',
       element: <Login />,
     },
     {

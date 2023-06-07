@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 
 import { useState, useEffect } from 'react';
-import { useNavigate, useLocation, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 // forms validate
 import { useFormik } from 'formik';
@@ -13,7 +13,6 @@ import { useTheme } from '@mui/material/styles';
 
 // context and modules
 import { axiosInstance } from '../../utils/axios';
-import { useGlobalContext } from '../../context';
 import { fetchCountryIDs } from '../../_apiAxios/modelCreateFetches';
 import { taxRuleUpdateFetch } from '../../_apiAxios/app-config';
 
@@ -23,11 +22,8 @@ const CreateTaxRule = ({ setModalKey }) => {
   const theme = useTheme();
 
   const navigate = useNavigate();
-  const prevLocation = useLocation();
 
   const { id } = useParams();
-
-  const { loggedIn } = useGlobalContext();
 
   const [loading, setLoading] = useState(true);
 
@@ -47,10 +43,6 @@ const CreateTaxRule = ({ setModalKey }) => {
       fetchCountryIDs(countryFetchAPI, setCountryIDs);
 
       if (id !== undefined) {
-        if (loggedIn === false) {
-          navigate(`/login?redirectTo=${prevLocation.pathname}`);
-        }
-
         const updateTaxRuleAPI = `tax-rule/${id}`;
         taxRuleUpdateFetch(updateTaxRuleAPI, setIntialTaxRuleData, setLoading);
       }

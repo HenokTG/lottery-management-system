@@ -134,7 +134,7 @@ export const OperatorListResults = ({ setModalKey }) => {
     const statusChangeAPI = boolVal ? `operator/${id}/disable` : `operator/${id}/enable`;
     axiosInstance
       .get(statusChangeAPI)
-      .then(setCheckedId(`${id}-${boolVal}`))
+      .then(setCheckedId(`${id}-${boolVal}-${new Date()}`))
       .catch((error) => {
         console.log(error);
       });
@@ -146,7 +146,7 @@ export const OperatorListResults = ({ setModalKey }) => {
       .then(setDeletedID(id))
       .catch((error) => {
         console.log(error);
-      }); 
+      });
   };
 
   const isDataNotFound = operatorsList.length === 0;
@@ -234,7 +234,6 @@ export const OperatorListResults = ({ setModalKey }) => {
                     <TableBody>
                       {operatorsList.map((operator) => (
                         <StyledTableRow hover key={operator.id}>
-                          {console.log(operator.assignedGames)}
                           <TableCell>
                             <Box
                               sx={{
@@ -257,14 +256,10 @@ export const OperatorListResults = ({ setModalKey }) => {
                           <TableCell sx={{ fontSize: 12 }}>{operator.website}</TableCell>
                           <TableCell sx={{ fontSize: 12 }}>{operator.address}</TableCell>
                           <TableCell sx={{ fontSize: 12 }} align="center">
-                            {operator.assignedGames.map((operatorGame) => (
-                              <>
-                                <Typography key={`${operatorGame.id}-${operator.id}`} variant="caption">
-                                  {operatorGame.gameName}
-                                </Typography>
-                                {','}
-                                <br />
-                              </>
+                            {operator.assignedGames.map((operatorGame, idx) => (
+                              <Typography key={`${operatorGame.id}-${operator.id}-${idx}`} variant="caption">
+                                {operatorGame.gameName}
+                              </Typography>
                             ))}
                           </TableCell>
                           <TableCell align="center">

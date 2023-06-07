@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types';
 
 import { useState, useEffect } from 'react';
-import { useNavigate, useLocation, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 // forms validate
 import { useFormik } from 'formik';
@@ -27,7 +27,6 @@ import {
 import { useTheme } from '@mui/material/styles';
 
 // context and modules
-import { useGlobalContext } from '../../context';
 import { axiosInstance } from '../../utils/axios';
 import { fetchGameIDs, fetchCountryIDs, fetchStateIDs } from '../../_apiAxios/mainCreateFetches';
 import { operatorUpdateFetch } from '../../_apiAxios/mainFetches';
@@ -50,11 +49,8 @@ const CreateOperator = ({ setModalKey }) => {
   const theme = useTheme();
 
   const navigate = useNavigate();
-  const prevLocation = useLocation();
 
   const { id } = useParams();
-
-  const { loggedIn } = useGlobalContext();
 
   const [loading, setLoading] = useState(true);
 
@@ -89,10 +85,6 @@ const CreateOperator = ({ setModalKey }) => {
       fetchStateIDs(stateAPI, setStateIDs);
 
       if (id !== undefined) {
-        if (loggedIn === false) {
-          navigate(`/login?redirectTo=${prevLocation.pathname}`);
-        }
-
         const updateOperatorAPI = `operator/${id}`;
         operatorUpdateFetch(updateOperatorAPI, setIntialOperatorData, setLoading);
       }

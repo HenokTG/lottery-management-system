@@ -1,9 +1,9 @@
 import { format } from 'date-fns';
 
 import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
 
 import PerfectScrollbar from 'react-perfect-scrollbar';
+
 // @mui
 import {
   Box,
@@ -25,12 +25,13 @@ import {
 import { styled } from '@mui/material/styles';
 
 // context and modules
-import { useGlobalContext } from '../context';
 import { fetchDownloadList } from '../_apiAxios/mainFetches';
+
 // icons
 import { Search as SearchIcon } from '../icons/search';
- 
+
 // custom styles
+
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   [`&.${tableCellClasses.head}`]: {
     backgroundColor: theme.palette.info.main,
@@ -53,12 +54,8 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 }));
 
 // ---------------------------------------------------------------------------------
+
 export const DownloadList = () => {
-  const { loggedIn } = useGlobalContext();
-
-  const prevLocation = useLocation();
-  const navigate = useNavigate();
-
   const [loading, setLoading] = useState(true);
 
   const [limit, setLimit] = useState(25);
@@ -72,10 +69,6 @@ export const DownloadList = () => {
 
   useEffect(
     () => {
-      if (loggedIn === false) {
-        navigate(`/login?redirectTo=${prevLocation.pathname}`);
-      }
-
       const fetchAPI = `download?page=${page + 1}&per_page=${limit}`;
 
       fetchDownloadList(fetchAPI, setLoading, setDownloadList, setPaginationProps);

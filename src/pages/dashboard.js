@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+ 
 // @mui
 import { Typography, Box, Container, Grid, Card, TextField, MenuItem } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+
 // components
 import Page from '../components/layout/Page';
 import { OverviewTotals } from '../components/dashboard/overview-totals';
@@ -10,6 +11,7 @@ import { SalesByGames } from '../components/dashboard/game-sales';
 import { OverviewPaymentDistributions } from '../components/dashboard/payment-distributions';
 import { OperatorSalesDetail } from '../components/dashboard/operator-sales-detail';
 import { HighestWinningTicketes } from '../components/dashboard/highest-winning-ticketes';
+
 // icons
 import { Sales } from '../icons/sales';
 import { Tax } from '../icons/tax';
@@ -18,7 +20,6 @@ import { Deposit } from '../icons/deposit';
 import { Withdrawals } from '../icons/withdrawal';
 
 // context and modules
-import { useGlobalContext } from '../context';
 import { fetchOperatorIDs } from '../_apiAxios/modelCreateFetches';
 import { fetchDashboardOverview } from '../_apiAxios/dashboard-summary';
 
@@ -26,11 +27,6 @@ import { fetchDashboardOverview } from '../_apiAxios/dashboard-summary';
 
 const DashboardApp = () => {
   const theme = useTheme();
-
-  const { loggedIn } = useGlobalContext();
-
-  const navigate = useNavigate();
-  const prevLocation = useLocation();
 
   const [operatorIDs, setOperatorIDs] = useState([{ id: -1, operatorName: 'No operator to assign' }]);
   const [operatorId, setOperatorId] = useState('');
@@ -48,10 +44,6 @@ const DashboardApp = () => {
 
   useEffect(
     () => {
-      if (loggedIn === false) {
-        navigate(`/login?redirectTo=${prevLocation.pathname}`);
-      }
-
       setLoading(true);
 
       const operatorFetchAPI = `operator?page=${1}&per_page=${25}`;
@@ -61,14 +53,10 @@ const DashboardApp = () => {
       const today = new Date();
       const backDate = new Date(today.setDate(today.getDate() - range));
 
-      console.log(today, backDate);
-
       const currentDate = new Date().toJSON().slice(0, 10);
       const initialDate = backDate.toJSON().slice(0, 10);
 
       const summaryAPI = `transaction/statistics?date_from=${initialDate}&date_to=${currentDate}&operator=${operatorId}`;
-
-      console.log('summaryAPI', summaryAPI);
 
       fetchDashboardOverview(summaryAPI, setLoading, setSummaryData);
     },

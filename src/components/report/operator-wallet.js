@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import PerfectScrollbar from 'react-perfect-scrollbar';
 
@@ -28,7 +28,6 @@ import { styled } from '@mui/material/styles';
 import AnnualReportFilter from '../auxilary/AnnualReportFilter';
 
 // context and modules
-import { useGlobalContext } from '../../context';
 import { operatorsWalletFetch } from '../../_apiAxios/report';
 import { fetchOperatorIDs } from '../../_apiAxios/modelCreateFetches';
 import { fetchCurrencyIDs } from '../../_apiAxios/fetchFilterIDs';
@@ -64,9 +63,6 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 // -------------------------------------------------------------------------------
 
 export const OperatorWalletResults = () => {
-  const { loggedIn } = useGlobalContext();
-
-  const prevLocation = useLocation();
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
@@ -90,10 +86,6 @@ export const OperatorWalletResults = () => {
 
   useEffect(
     () => {
-      if (loggedIn === false) {
-        navigate(`/login?redirectTo=${prevLocation.pathname}`);
-      }
-
       setLoading(true);
 
       operatorsWalletFetch(fetchAPI, setLoading, setOperatorsWalletList, setPaginationProps);
