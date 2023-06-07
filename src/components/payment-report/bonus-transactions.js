@@ -69,6 +69,7 @@ export const BonusTransactionsResults = () => {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
+  const [downloading, setDownloading] = useState(false);
 
   const [limit, setLimit] = useState(25);
   const [page, setPage] = useState(0);
@@ -122,12 +123,13 @@ export const BonusTransactionsResults = () => {
     bonusTransactionsFetch(fetchAPI, setLoading, setBonusTransactionsList, setPaginationProps);
   };
   const exportAction = () => {
-    console.log('Exporting...');
+    setDownloading(true);
 
     axiosInstance
       .get(`transaction/bonus/export`)
       .then(() => {
-        console.log('Exported.');
+        setDownloading(false);
+        navigate('/app/downloads');
       })
       .catch((error) => {
         console.log(error);
@@ -190,7 +192,7 @@ export const BonusTransactionsResults = () => {
         ) : (
           <Box>
             <Grid container direction="row" justifyContent="space-between" alignItems="center" sx={{ padding: 2 }}>
-              <Grid item md={8}>
+              <Grid item md={downloading ? 9 : 9.5}>
                 <Box sx={{ maxWidth: 400 }}>
                   <TextField
                     fullWidth
@@ -210,14 +212,20 @@ export const BonusTransactionsResults = () => {
                   />
                 </Box>
               </Grid>
-              <Grid item md={2.4} sx={{ display: 'flex', justifyContent: 'space-between' }}>
+              <Grid item md={downloading ? 3 : 2.5} sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Button
                   color="info"
                   variant="outlined"
-                  startIcon={<DownloadIcon fontSize="small" />}
+                  startIcon={
+                    downloading ? (
+                      <CircularProgress color="info" size="1rem" sx={{ p: 0, m: 0, mr: 1 }} />
+                    ) : (
+                      <DownloadIcon fontSize="small" />
+                    )
+                  }
                   onClick={exportAction}
                 >
-                  Export
+                  {downloading ? 'Downloading' : 'Export'}
                 </Button>
                 <AnnualReportFilter
                   filterProps={filterProps}

@@ -146,7 +146,7 @@ export const OperatorListResults = ({ setModalKey }) => {
       .then(setDeletedID(id))
       .catch((error) => {
         console.log(error);
-      });
+      }); 
   };
 
   const isDataNotFound = operatorsList.length === 0;
